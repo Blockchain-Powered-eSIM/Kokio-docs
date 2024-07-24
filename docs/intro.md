@@ -5,3 +5,8 @@ sidebar_position: 1
 # What is Kokio?
 
 
+## How Kokio works?
+
+
+## Components
+
