@@ -4,10 +4,10 @@
 
 **NOTICE: Building a blockchain powered eSIM will require discussions followed by adjustments with carrier providers and device manufacturers.**
 
-- Resources and takeaways
+## Resources and takeaways
 
 
-  # -1. [Security Concerns In Telecom Industry](https://www.securityhq.com/blog/rising-security-concerns-in-the-telecom-industry/)
+### 1. [Security Concerns In Telecom Industry](https://www.securityhq.com/blog/rising-security-concerns-in-the-telecom-industry/)
 
   The Telecommunications Industry Must Adapt to Tackle a Diverse Set of Cyber Threats, Exploitation of Vulnerabilities, and Protect Critical Infrastructure.
 
@@ -27,7 +27,7 @@
   This article emphasizes the need for comprehensive and dynamic cybersecurity strategies in the telecom industry to protect against an evolving threat landscape. Through threat intelligence, employee training, and collaboration with security experts, telecom companies can safeguard their critical infrastructure.
 
 
-  # 0. [13 Questions about eSIM](https://www.idemia.com/insights/13-questions-about-esim)
+### 2. [13 Questions about eSIM](https://www.idemia.com/insights/13-questions-about-esim)
 
   - eSIM (embedded SIM) is a programmable SIM hardware embedded in a device during the manufacturing process.
   - eUICC (embedded Universal Integrated Circuit Cards) is the term used to describe the operating system (OS) and software which, when combined with the eSIM hardware, enable a device to be configured and managed via a remote connection.
@@ -41,7 +41,7 @@
   - eSIM management works differently for consumers and M2M solutions. For eSIM M2M solutions, the subscription is triggered automatically in the back-end system. For eSIM consumer solutions, the subscription is triggered and managed by the consumer.
 
 
-  # 1. [A guide to eSIM technology for consumer devices](https://valid.com/articles/blog-esim-how-it-works/)
+### 3. [A guide to eSIM technology for consumer devices](https://valid.com/articles/blog-esim-how-it-works/)
 
   eSIM (embedded SIM) technology has brought a lot of convenience to consumers’ daily lives and revolutionized the way Original Equipment Manufacturers (OEMs) develop their devices. Here are the key facts about eSIM:
 
@@ -55,7 +55,7 @@
   - You can activate your eSIM device through a physical or digital QR code provided by your mobile operator, via the mobile operator application, or through the GSMA Subscription Management Root-Discovery Service.
 
 
-  # 2. [Is Blockchain replacing the Sim Card](https://www.investopedia.com/tech/blockchain-replacing-sim-card/)
+### 4. [Is Blockchain replacing the Sim Card](https://www.investopedia.com/tech/blockchain-replacing-sim-card/)
 
   1. Rapid changes in the telecommunications industry due to merging of computing and communications.
   2. Debates surrounding privacy and data ownership in the industry.
@@ -140,7 +140,7 @@
   The telecommunications industry is undergoing rapid change as technology continues to advance. The evolution of the industry has led to debates about privacy and data ownership. The traditional SIM card is facing obsolescence with the advent of eSIM technology, which is being embraced by companies like Apple and Google. eSIMs offer consumers more flexibility and cost savings, but they also present a threat to service providers. Blockchain technology is being combined with eSIMs to offer greater security and transparency, and to create a decentralized network where users can choose their own providers. Verizon has acquired a blockchain patent for the creation of virtual SIM cards. While eSIMs are not yet the norm, they are the future of the telecommunications industry. The idea of a blockchain phone is also gaining popularity as a way to cut costs and improve security. The rollout of eSIMs is still in its early stages, but it is expected that they will eventually replace physical SIM cards.
 
 
-  # 3. [**What's Cooking Between eSIMs and Blockchain Technology**](https://insidetelecom.com/whats-cooking-between-esims-and-blockchain-technology/)
+### 5. [**What's Cooking Between eSIMs and Blockchain Technology**](https://insidetelecom.com/whats-cooking-between-esims-and-blockchain-technology/)
 
   eSIMs can be powered by blockchain technology, which can change the way mobile technology is used. It's possible to use an eSIM on a phone that doesn't support blockchain, but it might not have all the benefits of a blockchain-supported eSIM. Blockchain technology has the potential to revolutionize various industries, including payments, record-keeping, and ownership.
 
@@ -185,7 +185,7 @@
   The future of eSIMs is uncertain but it is expected to continue to grow with the support of blockchain technology. The focus on innovation in this industry holds a lot of potential for advancements in the future.
 
 
-  # 4. [Deloitte Blockchain TelCo](https://www2.deloitte.com/content/dam/Deloitte/de/Documents/technology-media-telecommunications/TMT_Blockchain_TelCo.pdf)
+### 6. [Deloitte Blockchain TelCo](https://www2.deloitte.com/content/dam/Deloitte/de/Documents/technology-media-telecommunications/TMT_Blockchain_TelCo.pdf)
 
   - Blockchain can enable more reliable, tamper-proof, and failure-resistant applications.
   - Communications service providers (CSPs) face competition from OTT players and decreasing revenues from voice.
@@ -194,7 +194,7 @@
   - Four potential use cases of blockchain for CSPs are: fraud management, identity-as-a-service and data management, 5G enablement, and secure IoT connectivity.
 
 
-  # 5. [**3 ways not to screw up an eSIM design**](https://www.electronicspecifier.com/industries/industrial/3-ways-not-to-screw-up-an-esim-design)
+### 7. [**3 ways not to screw up an eSIM design**](https://www.electronicspecifier.com/industries/industrial/3-ways-not-to-screw-up-an-esim-design)
 
   **After remaining essentially unchanged for more than 25 years, the Subscriber Identity Modules (SIMs) used to authenticate devices onto cellular networks are undergoing a dramatic transformation, moving from physical hardware to downloadable software – embodied by the concept of eSIMs. Cyril Caillaud, NXP Semiconductors, explains.**
 
@@ -240,12 +240,12 @@
   - Planning ahead and taking a holistic view of design and tests can help avoid incompatibility issues and other surprises in a fragmented cellular market.
 
 
-  ## 6. [Rise in eSIMs and iSIMs and their impact on IoT](https://www.qualcomm.com/news/onq/2019/11/rise-esims-and-isims-and-their-impact-iot)
+### 8. [Rise in eSIMs and iSIMs and their impact on IoT](https://www.qualcomm.com/news/onq/2019/11/rise-esims-and-isims-and-their-impact-iot)
 
-- Existing Products and takeaways
+## Existing Products and takeaways
 
 
-  # 1. [G+D](https://www.gi-de.com/en/)
+  ### 1. [G+D](https://www.gi-de.com/en/)
 
   ## [**eSIM and Blockchain from the very beginning: Making IoT more Independent**](https://www.avnet.com/wps/portal/silica/resources/article/esim-and-blockchain-from-the-very-beginning-making-iot-more-independent/)
 
@@ -259,7 +259,7 @@
   - The benefits of the solution include verification of IoT data and deployment of new data-driven business models, as well as protection against hacking attacks.
 
 
-  # 2. [Claytech](https://www.claytech.in/blockchain-and-esim): Blockchain and eSIM
+  ### 2. [Claytech](https://www.claytech.in/blockchain-and-esim): Blockchain and eSIM
 
   ### Overview:
 
@@ -334,290 +334,9 @@
      - This creates new revenue generation opportunities for telecoms operators.
 
 
-  # 3. [MOVENDA](https://www.movenda.com/en/sim-esim/mercurius/overview)
+  ### 3. [MOVENDA](https://www.movenda.com/en/sim-esim/mercurius/overview)
 
-  # 4. [DENT](https://drive.google.com/file/d/0B7XC9TPzyTmOd0pqQ3hRLUM0UzQ/view?resourcekey=0-kbEcLwIrJ2XTRNi4AKS4Zw)
-
-- **Work at EthIndia Fellowship 3.0**
-
-
-  # EthIndia Fellowship 3.0, Gwei Track
-
-  # _Blockchain Powered eSIM_
-
-  ### AIM:
-
-  Aiming to build a prototype in this fellowship
-
-  - Arpit Kumar
-  - Proof of fellowship [**SBT**](https://opensea.io/assets/matic/0xfe8321df99317c365797c4f95c2dbd9beec8c694/30)
-  - Timeline 02/23 - 03/23
-
-
-  ## Week 1
-
-  ***
-
-  **Progress Report:**
-
-  Week1 went well, accomplished my milestone of the first week.
-
-  - Worked on planning the project and identifying different personas.
-  - Created the flow according to different personas
-  - No challenges faced so far, but thinking about including account abstractions for users to making it simple for the structure in the backend.
-
-  **Next Steps:**
-
-  - Understanding account abstractions.
-  - implementing account abstractions so that one end is linked with pure cryptographic wallets.
-
-  **Questions & Feedback:**
-
-  received this tweet from [FrancescoRenziA](https://twitter.com/FrancescoRenziA)
-
-  - Definitely interesting to couple an eSim with a crypto wallet. But was surprised to see you weren't actually generating the wallet using the eSim's software. If that were possible it could be pretty interesting
-
-  Solution:
-
-  - Coupling an eSIM with a crypto wallet can provide a convenient and secure way to manage cryptocurrency holdings.
-  - An eSIM is a digital SIM card built into a device that can be programmed with multiple profiles from different mobile network operators.
-  - An eSIM can enable seamless and secure access to your cryptocurrency holdings, no matter where you are in the world.
-  - The combination of an eSIM and a crypto wallet can provide a convenient and secure way to manage your cryptocurrency holdings, especially for those who travel frequently or need to access their funds from different locations.
-  - It's technically possible to generate a cryptocurrency wallet using the software on an eSIM, but it's not a common practice at the moment.
-  - Cryptocurrency wallets are typically generated using dedicated software applications or web-based services and are stored on a device's internal storage or an external hardware device.
-  - Some companies are exploring the use of eSIMs for secure storage and management of private keys, which are a critical component of cryptocurrency wallets, but this is still an emerging technology.
-
-  **Published link:** <https://mirror.xyz/0xB563Fd34a62617509cBC06E5BBBE7045b38874E6/dj6jV8EFZRKWdeNr0vf7wJHn4Yd_g5ranL0mqDyGuWQ>
-
-  **Tweet link:** <https://twitter.com/ARPITKU80579385/status/1626070961102659584?s=20>
-
-
-  ## Week 2
-
-  ***
-
-  **Progress Report:**
-
-  Week2 went great, accomplished my milestone of the second week.
-
-  - Understood account abstraction as a concept.
-  - Explained how to use in this project.
-
-  **Challenges:**
-
-  - Should we implement account abstraction in the firmware of the eSIM, if yes
-
-    - should we build it ourselves
-    - should we reach out to protocols providing account abstractions SDKs
-
-  - Should we implement it as a module, if yes
-
-    - should we build it ourselves
-    - should we reach out to protocols providing account abstractions SDKs
-
-  **Next Steps:**
-
-  - Take action against the challenges
-
-    - Actions:
-
-      - implement account abstraction in the firmware
-      - as a core component
-
-  - Proceed to GSMA eSIM WhitePaper
-
-  **Questions & Feedback:**
-
-  By [Nabeel](https://twitter.com/NabeelK4122),
-
-  _**That's a great idea, just had a few things, I was trying to prove uniqueness of a device, to avoid malicious attacks, but got stuck with the reading of the hardware data, could you let me know how would the software wallets be able to read the hardware, eSIM ID,**_
-
-  Reply: _**So in the design of eSIM, i'm ensuring the uniqueness of a device by uploading the encrypted eSIM ID alongside with the primary wallet address(and a few other values) on the blockchain network while activation.**_ Storing the eSIM ID alongside the wallet addresses on the blockchain network during the activation of the eSIM could be a valid way to prove the uniqueness of a device. By linking the eSIM ID to the specific wallet addresses of the user, you can ensure that only the owner of the corresponding wallet can use the eSIM.
-
-  **Published link:** <https://mirror.xyz/0xB563Fd34a62617509cBC06E5BBBE7045b38874E6/8DrPEXoHIKt7XLd3EAI7cilgjTuxYTgXe1TyjO_nPio>
-
-  **Tweet link:** <https://twitter.com/ARPITKU80579385/status/1629270027919851520>
-
-
-  ## Week 3
-
-  ***
-
-  **Progress Report:**
-
-  Week3 went great and cleared lots of concepts(including small details about the structure of traditional eSIM).
-
-  - Content of eSIM whitepaper has been updated in the doc as a toggle.
-
-  **Next Steps:**
-
-  - Simplifying the existing structure to make it understandable to everyone.
-  - Proceed to ZKP.
-
-  **Questions & Feedback:**
-
-  From sir [Jaf](https://twitter.com/jafetsc):
-
-  - Plug-in your solution at the "Retrieve SIM from inventory" step.
-
-    - so you can serve as a "provider" for for any Telecom company to offer **Blockchain Powered eSIM** ?
-    - And of course the web3 portion will have everything else we discussed regarding delegation of wallets.
-
-  ![image.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/08017db5-5e5e-46ea-ab31-14bffcae0632/image.png)
-
-  - why an eSIM design or architecture paper? SIMs hold different types of data not only the IMEI.
-  - Are you eventually going for a modification to the eSIM - meaning adding 1 more field called wallet address (or similar)
-    - I eventually want to do a modification to the traditional eSIM. And build a firmware of this design to run it on a software(have to ask GSMA for this). The reason for creating an eSIM design or architecture paper is to provide a detailed overview of how the eSIM solution will work and how it will integrate with the user's crypto wallets. Outlining the technical specifications and design considerations for building the eSIM solution, including the use of blockchain and cryptographic identity services. And regarding the SIMs holding different types of data, that is correct. And here we are specifically focused on the eSIM's unique ID, mapped/coupled to the user's crypto wallets, enabling them to access applications and services using their fingerprints. This unique ID will be used as a means of authentication, providing a secure and decentralized solution that is resistant to data breaches and other security threats.
-
-  **Published link:** <https://mirror.xyz/0xB563Fd34a62617509cBC06E5BBBE7045b38874E6/VLX67CPoCP8MpsDDhWHqN0rAu1ZTv07hRFgvFzbfA_c>
-
-  **Tweet link:**
-
-  <https://twitter.com/ARPITKU80579385/status/1633779986086735878>
-
-
-  ## Week 4
-
-  ***
-
-  **Progress Report:**
-
-  - Have updated the doc with “How we can use ZKP is this project and in the telecom industry”
-  - Presented 4 week progress report at the session on 7th of march, attached the presentation below.
-
-  **Next Steps:**
-
-  - Designing the LPA
-  - Going through all the packages of open source eSIM development provided by Android.
-
-  **Questions & Feedback:**
-
-  - by sir Jaf, adding Ceramic DIDs into this mix? being cross-chain from the get-go is almost a mandatory thing now
-
-    - A DID is a unique identifier that is anchored on a blockchain, which allows individuals or entities to prove their identity without relying on a third-party authority or centralized service. Ceramic is a decentralized network that allows developers to build apps and services that rely on DIDs and verifiable credentials.
-    - By incorporating Ceramic DIDs into the blockchain-powered eSIM solution, the project could become cross-chain from the get-go, meaning that it could work on multiple blockchain networks. This could be beneficial for users who hold cryptocurrencies on different blockchains and want to seamlessly access them through the eSIM solution. Additionally, using Ceramic DIDs could improve the security and privacy of the solution by allowing users to have greater control over their digital identities and enabling the use of verifiable credentials.
-
-    **High-level architecture of the project:**
-
-    1. User Interface: The user interface will provide a simple and intuitive way for users to manage their eSIM solution. It will be responsible for creating and managing virtual accounts linked to the user's eSIM ID, allowing secure access to their crypto wallets.
-    2. eSIM Identity Management: The eSIM identity management component will be responsible for providing cryptographic identity services. It will use Ceramic DIDs to create and manage decentralized identities for users, ensuring privacy and security through zero-knowledge proofs.
-    3. Blockchain Storage: The blockchain storage component will be used to store and manage the eSIM data. The blockchain technology will provide a secure and decentralized solution that is resistant to data breaches and other security threats.
-    4. Cross-chain Communication: To enable seamless integration with the user's existing crypto wallets, the eSIM solution will need to support cross-chain communication. This will be achieved through the use of blockchain bridges, allowing users to access their crypto wallets on multiple chains.
-    5. Smart Contracts: Smart contracts will be used to facilitate the creation and management of virtual accounts, as well as to enforce the rules and logic of the eSIM solution. This will ensure that transactions are executed in a secure and transparent manner.
-
-    The high-level architecture of the blockchain-powered eSIM solution will consist of a user interface for managing virtual accounts, an eSIM identity management component using Ceramic DIDs, blockchain storage for eSIM data, cross-chain communication for integration with existing crypto wallets, and smart contracts to enforce the rules and logic of the system.
-
-  - Comment by [Arjun Sir](https://twitter.com/arjunbhuptani) in the De-Fi session, your solution proposal is quite interesting and has a lot of potential but it’ll be better if you ask the user what the features they want out of this project
-
-    - here are some suggestions that i think to enhance this project:
-
-      1. Consider user adoption: Although the blockchain-powered eSIM solution can solve the challenges faced by the traditional SIM and existing eSIMs, user adoption is crucial. Considering user needs and preferences while designing the solution to increase the likelihood of adoption.
-      2. Address regulatory concerns: The telecommunications industry is highly regulated, and there may be regulatory concerns with the integration of blockchain technology. Ensuring that this solution complies with all relevant regulations.
-      3. Provide a user-friendly interface: A user-friendly interface can help users to quickly and easily understand the features and benefits of the eSIM solution. Considering building an intuitive and easy-to-use interface to increase user adoption.
-      4. Provide multi-device support: Users may have multiple devices, and it can be inconvenient to have a separate eSIM for each device. Considering building a solution that provides support for multiple devices, making it more convenient for users to switch between devices.
-      5. Collaborate with telecom providers: Telecom providers have a wealth of experience and expertise in the industry. Collaborating with them can provide valuable insights and help in the adoption of the eSIM solution.
-      6. Develop a robust security framework: Security is crucial for any eSIM solution. Considering building a robust security framework that includes multi-factor authentication, encryption, and other security features to protect user data.
-      7. Address scalability: Blockchain technology can face scalability issues, and it's important to address this concern when developing the eSIM solution. Considering building a scalable architecture that can handle large numbers of users and devices.
-
-  **Published link:** <https://mirror.xyz/0xB563Fd34a62617509cBC06E5BBBE7045b38874E6/eiT2TfQU_yEaYF5LlupfmXIn3UbkvOAiTKtB03CRrSk>
-
-  **Tweet link:**
-
-  <https://twitter.com/ARPITKU80579385/status/1633782036019249152>
-
-  **4 Week Progress Report, Session Presentation:**
-
-  ***
-
-  [Blockchain Powered eSIM.pdf](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/f7bdcd1b-a38b-48b3-afdd-6e677d0b4910/Blockchain_Powered_eSIM.pdf)
-
-
-  ## Week 5
-
-  ***
-
-  **Progress Report:**
-
-  - Noted services to deliver and to whom
-
-    - Carrier App to Mobile Network Operators
-    - A local Profile Assistant app
-    - Activating eSIM Profile through carrier app
-
-  **Next Steps:**
-
-  - Understand the Android eSIM API and user authentication method
-
-    1. EID Retrieval: Retrieve the EID of the eSIM that will be used for the crypto wallet.
-    2. User Authentication: Authenticate the user before proceeding with the coupling process.
-
-  - Develop the carrier app
-    - The carrier app shouldn’t have any blockchain component, still double check eUICC manager.
-
-  - Develop the LPA APK
-
-    1. Wallet Creation: Create a crypto wallet within the LPA.
-    2. Key Management: Generate a private key and a corresponding public key for the crypto wallet.
-    3. Key Storage: Store the private key securely in the LPA.
-    4. EID and Key Association: Associate the EID of the eSIM with the private key of the crypto wallet in the LPA.
-    5. Blockchain Network Selection: Associate this wallet with a blockchain network and allow management of multiple network within the LPA.
-
-  - Work on the smart contract for the automation and eSIM activation management.
-    - Wallet Activation: Activate the crypto wallet within the LPA.
-
-  - Integrate the LPA and the carrier app
-    - Testing and Verification: Test and verify the coupling of the EID with the crypto wallet to ensure that it works as intended.
-
-  **Questions & Feedback: How wallet and keys are managed?**
-
-  **Published link:** <https://mirror.xyz/0xB563Fd34a62617509cBC06E5BBBE7045b38874E6/RokEo47Wbn6fVjKVfAvjUno8cwGFKhV03c1Jqp3mdCk>
-
-  **Tweet link:** <https://twitter.com/ARPITKU80579385/status/1637627347586121737>
-
-
-  ## Week 6
-
-  ***
-
-  **Progress Report:**
-
-  **Next Steps:**
-
-  **Questions & Feedback:**
-
-  **Published link:**
-
-  **Tweet link:**
-
-
-  ## Week 7
-
-  ***
-
-  **Progress Report:**
-
-  **Next Steps:**
-
-  **Questions & Feedback:**
-
-  **Published link:**
-
-  **Tweet link:**
-
-
-  ## Week 8
-
-  ***
-
-  **Progress Report:**
-
-  **Next Steps:**
-
-  **Questions & Feedback:**
-
-  **Published link:**
-
-  **Tweet link:**
+  ### 4. [DENT](https://drive.google.com/file/d/0B7XC9TPzyTmOd0pqQ3hRLUM0UzQ/view?resourcekey=0-kbEcLwIrJ2XTRNi4AKS4Zw)
 
 
 # eSIM
