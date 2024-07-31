@@ -373,9 +373,9 @@ And also the difference
 
 In 2021, [Deutsche Telekom](https://en.wikipedia.org/wiki/Deutsche_Telekom) introduced an alternative to eSIMs for smaller devices and the Internet of Things in form of integrated SIMs (iSIMs) fully integrated into a security enclave of the modem SoC (System on Chip). Called nuSIM they are smaller, cheaper and more eco-friendly since no extra hardware and plastic is required. In addition they can meet the same security requirements than a classical or eSIMs; they ease the logistics and production of small devices. It can be expected that because of these advantages iSIMs will also replace the (e)SIMs in mobile phones and other connected consumer devices in future.
 
-The process of eSIM profile download: <https://www.esim.net/helpdesk/sm-dp-subscription-manager-for-data-preparation/>
+The process of eSIM profile download: [link](https://www.esim.net/helpdesk/sm-dp-subscription-manager-for-data-preparation/)
 
-!<https://www.esim.net/helpdesk/wp-content/uploads/2018/10/img_5bb3881adcfd1.png>
+![diagram](https://www.esim.net/helpdesk/wp-content/uploads/2018/10/img_5bb3881adcfd1.png)
 
 
 ## Security Concern in the Telecom Industry
