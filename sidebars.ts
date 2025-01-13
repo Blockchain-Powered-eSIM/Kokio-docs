@@ -1,4 +1,4 @@
-import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';
+import type { SidebarsConfig } from "@docusaurus/plugin-content-docs";
 
 /**
  * Creating a sidebar enables you to:
@@ -16,18 +16,89 @@ const sidebars: SidebarsConfig = {
 
   // But you can create a sidebar manually
   kokioSidebar: [
-    'intro',
-    'Architecture',
+    "intro",
+    // 'Architecture',
     {
-      type: 'category',
-      label: 'Smart Contracts',
+      type: "category",
+      label: "eSIM",
       items: [
         {
-          type: 'doc',
-          id: 'SmartContracts/Intro',
+          type: "doc",
+          id: "eSIM/intro",
+        },
+        {
+          type: "doc",
+          id: "eSIM/problem",
+        },
+        {
+          type: "doc",
+          id: "eSIM/solution",
+        },
+        {
+          type: "doc",
+          id: "eSIM/working",
         },
       ],
     },
+    {
+      type: "category",
+      label: "Smart Contracts",
+      items: [
+        {
+          type: "doc",
+          id: "SmartContracts/intro",
+        },
+        {
+          type: "doc",
+          id: "SmartContracts/walletSuite",
+        },
+        {
+          type: "doc",
+          id: "SmartContracts/registryContract",
+        },
+        {
+          type: "doc",
+          id: "SmartContracts/lazyWalletRegistry",
+        },
+        {
+          type: "doc",
+          id: "SmartContracts/deviceWalletFactory",
+        },
+        {
+          type: "doc",
+          id: "SmartContracts/deviceWalletSmartContract",
+        },
+        {
+          type: "doc",
+          id: "SmartContracts/esimWalletFactory",
+        },
+        {
+          type: "doc",
+          id: "SmartContracts/esimWalletSmartContract",
+        },
+        {
+          type: "doc",
+          id: "SmartContracts/p256verifier",
+        },
+        {
+          type: "doc",
+          id: "SmartContracts/webAuthnLibrary",
+        },
+        {
+          type: "doc",
+          id: "SmartContracts/userFlow",
+        },
+        {
+          type: "doc",
+          id: "SmartContracts/contractSpecs",
+        },
+        {
+          type: "doc",
+          id: "SmartContracts/futureProspects",
+        },
+      ],
+    },
+    "resources",
   ],
 };
 
