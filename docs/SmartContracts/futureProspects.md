@@ -1,4 +1,4 @@
-# Future Prospects:
+# Future Prospects
 
 - **Asset Recovery**:  
    Currently, users own their Device and eSIM Wallets and can transfer ownership to another Ethereum address. In the future, recovery rights may be assigned to a secondary keystore, allowing users to recover wallets in case of device loss.
