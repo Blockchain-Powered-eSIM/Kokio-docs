@@ -46,6 +46,8 @@ With a mobile-first approach, the wallet is designed for everyday users, offerin
 
 Parternship with eSIM providers and aggregators helps kokio to provide eSIM in bundles which provides flexibility and better user experience in selecting different eSIM plans and simple checkout via FIAT or Cryptocurrencies.
 
+TEMP CHANGE
+
 ## Components
 
 - [eSIM](https://github.com/Blockchain-Powered-eSIM/eSIM-Wallet/wiki/eSIM-and-Key-Integration-Point)
