@@ -16,7 +16,7 @@ const sidebars: SidebarsConfig = {
 
   // But you can create a sidebar manually
   kokioSidebar: [
-    "intro",
+    "landingIntro",
     // 'Architecture',
     {
       type: "category",
@@ -46,7 +46,7 @@ const sidebars: SidebarsConfig = {
       items: [
         {
           type: "doc",
-          id: "SmartContracts/intro",
+          id: "SmartContracts/Intro",
         },
         {
           type: "doc",
