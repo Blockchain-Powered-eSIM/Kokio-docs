@@ -86,7 +86,7 @@ const config: Config = {
           items: [
             {
               label: 'What is Kokio?',
-              to: '/docs/intro',
+              to: '/docs/landingIntro',
             },
           ],
         },
@@ -113,7 +113,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Kokio Ltd., Built with Docusaurus.`,
     },
     prism: {
       theme: prismThemes.github,
