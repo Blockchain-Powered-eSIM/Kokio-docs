@@ -1,6 +1,6 @@
 # The Problem with eSIMs
 
-The rise of **`eSIMs`** (embedded SIMs) has brought a new era of convenience to mobile connectivity, solving many of the limitations of traditional **`SIM cards`**. With eSIMs, consumers can remotely connect devices—like smartwatches, tablets, and IoT gadgets—to their preferred mobile networks, eliminating the need for physical SIM cards.
+The rise of **`eSIMs`** (embedded SIMs) has brought a new era of convenience to mobile connectivity, solving many of the limitations of traditional **SIM cards**. With eSIMs, consumers can remotely connect devices—like smartwatches, tablets, and IoT gadgets—to their preferred mobile networks, eliminating the need for physical SIM cards.
 
 The eSIM specification also introduces the possibility of **Independent** service providers to transmit commands to generate and store **`eSIM Profiles`** on certified data centers (Subscription Managers) and also load these profiles onto end-user devices, reducing the complexity of distribuitng telecommunication services and enabling more service providers to enter the market.
 
@@ -8,7 +8,7 @@ eSIMs come with several advantages, such as easier carrier switching, reduced de
 
 ### Security and Privacy Challenges
 
-One of the most pressing issues with eSIMs is their reliance on **remote SIM provisioning**. While this feature allows users to switch carriers seamlessly, it also opens the door to **unauthorized activation** or **profile switching** by attackers. For example, during the provisioning process, a **Man-In-The-Middle (MITM)** attack could intercept communication between the device and the carrier, compromising the **eSIM profile**. This vulnerability highlights the need for stronger encryption and authentication mechanisms.
+One of the most pressing issues with eSIMs is their reliance on **`Remote SIM Provisioning`**. While this feature allows users to switch carriers seamlessly, it also opens the door to **unauthorized activation** or **profile switching** by attackers. For example, during the provisioning process, a **Man-In-The-Middle (MITM)** attack could intercept communication between the device and the carrier, compromising the **eSIM profile**. This vulnerability highlights the need for stronger encryption and authentication mechanisms.
 
 Another concern is the **device and carrier dependence** of eSIMs. The device hosting the **eSIM** becomes a **single point of failure**—if compromised, the **eSIM profile** could be misused, manipulated, or stolen before the user can take action. Additionally, weak security practices by mobile carriers can expose consumer **eSIM profiles** to hacking or unauthorized access.
 
