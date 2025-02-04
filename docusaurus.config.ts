@@ -8,14 +8,14 @@ const config: Config = {
   favicon: 'images/KokioLogo',
 
   // Set the production url of your site here
-  url: 'https://your-docusaurus-site.example.com',
+  url: 'https://docs.kokio.app',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'facebook', // Usually your GitHub org/user name.
+  organizationName: 'Kokio', // Usually your GitHub org/user name.
   projectName: 'Kokio', // Usually your repo name.
 
   onBrokenLinks: 'throw',
@@ -86,7 +86,7 @@ const config: Config = {
           items: [
             {
               label: 'What is Kokio?',
-              to: '/docs/intro',
+              to: '/docs/landingIntro',
             },
           ],
         },
@@ -113,7 +113,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Kokio Ltd., Built with Docusaurus.`,
     },
     prism: {
       theme: prismThemes.github,
