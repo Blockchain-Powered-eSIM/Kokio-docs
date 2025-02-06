@@ -40,13 +40,13 @@ const config: Config = {
           editUrl:
             'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
         },
-        blog: {
-          showReadingTime: true,
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
-        },
+        //blog: {
+        //  showReadingTime: true,
+        //  // Please change this to your repo.
+        //  // Remove this to remove the "edit this page" links.
+        //  editUrl:
+        //    'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+        //},
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -58,19 +58,24 @@ const config: Config = {
     // Replace with your project's social card
     image: 'img/docusaurus-social-card.jpg',
     navbar: {
-      title: 'Home',
       logo: {
         alt: 'Kokio Logo',
         src: 'images/KokioLogo.svg',
+        href: 'https://www.kokio.app'
       },
       items: [
+        {
+          href: 'https://docs.kokio.app',
+          label: 'Home',
+          position: 'left',
+        },
+        //{to: '/docs', label: 'Docs', position: 'left'},
         {
           type: 'docSidebar',
           sidebarId: 'kokioSidebar',
           position: 'left',
           label: 'Docs',
         },
-        {to: '/blog', label: 'Blog', position: 'left'},
         {
           href: 'https://github.com/facebook/docusaurus',
           label: 'GitHub',
