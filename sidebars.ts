@@ -46,7 +46,7 @@ const sidebars: SidebarsConfig = {
       items: [
         {
           type: "doc",
-          id: "SmartContracts/Intro",
+          id: "SmartContracts/intro",
         },
         {
           type: "doc",

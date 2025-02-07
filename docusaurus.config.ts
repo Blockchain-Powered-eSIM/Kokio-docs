@@ -65,7 +65,7 @@ const config: Config = {
       },
       items: [
         {
-          href: 'https://docs.kokio.app',
+          to: '/',
           label: 'Home',
           position: 'left',
         },
