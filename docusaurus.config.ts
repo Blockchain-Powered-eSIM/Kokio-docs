@@ -65,7 +65,7 @@ const config: Config = {
       },
       items: [
         {
-          href: 'https://docs.kokio.app',
+          to: '/',
           label: 'Home',
           position: 'left',
         },
@@ -77,7 +77,7 @@ const config: Config = {
           label: 'Docs',
         },
         {
-          href: 'https://github.com/facebook/docusaurus',
+          href: 'https://github.com/Blockchain-Powered-eSIM',
           label: 'GitHub',
           position: 'right',
         },
