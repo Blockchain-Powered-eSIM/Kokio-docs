@@ -7,4 +7,4 @@ _Kokio provides **Self Custodial eSIM Wallets** that gives consumers the freedom
 
 ## Kokio mobile app Userflow
 
-![](../../resources/Kokio-UserFlow-MobileApp.png)
+![](../../resources/KokioUserFlowMobileApp.png)
