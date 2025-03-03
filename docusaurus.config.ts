@@ -4,6 +4,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
   title: 'Kokio',
+  staticDirectories: ['static'],
   tagline: 'Blockchain powered eSIM',
   favicon: 'images/KokioLogo',
 
