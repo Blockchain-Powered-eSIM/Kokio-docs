@@ -19,7 +19,7 @@ function HomepageHeader() {
         <div className={styles.buttons}>
           <Link
             className="button button--secondary button--lg"
-            to="/docs/landingIntro"
+            to="/docs/kokio/landingIntro"
           >
             What is Kokio?
           </Link>

@@ -16,8 +16,24 @@ const sidebars: SidebarsConfig = {
 
   // But you can create a sidebar manually
   kokioSidebar: [
-    "landingIntro",
-    // 'Architecture',
+    {
+      type: "category",
+      label: "Kokio",
+      items: [
+        {
+          type: "doc",
+          id: "kokio/landingIntro",
+        },
+        {
+          type: "doc",
+          id: "kokio/mobileApp",
+        },
+        {
+          type: "doc",
+          id: "kokio/techStack",
+        },
+      ],
+    },
     {
       type: "category",
       label: "eSIM",
@@ -86,18 +102,11 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: "doc",
-          id: "SmartContracts/userFlow",
-        },
-        {
-          type: "doc",
           id: "SmartContracts/contractSpecs",
-        },
-        {
-          type: "doc",
-          id: "SmartContracts/futureProspects",
         },
       ],
     },
+    "futureProspects",
     "resources",
   ],
 };
