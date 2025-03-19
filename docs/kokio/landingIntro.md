@@ -2,11 +2,11 @@
 sidebar_position: 1
 ---
 
-# Kokio
+# Overview
 
 Fostering **True Ownership, Privacy and Security** in global connectivity.
 
-Koki'o allows users to purchase eSIMs and data bundles using both **crypto and FIAT**.
+Koki'o allows users to purchase eSIMs and data bundles using both **crypto and FIAT**.  
 With coverage in 200+ countries, including specialized regional and global plans, Koki'o provides users with the freedom to stay connected wherever they go.
 
 The application is entirely **Passwordless and keyless**, allowing users to authenticate and complete payments using their biometrics.

@@ -1,45 +1,45 @@
-import {themes as prismThemes} from 'prism-react-renderer';
-import type {Config} from '@docusaurus/types';
-import type * as Preset from '@docusaurus/preset-classic';
+import { themes as prismThemes } from "prism-react-renderer";
+import type { Config } from "@docusaurus/types";
+import type * as Preset from "@docusaurus/preset-classic";
 
 const config: Config = {
-  title: 'Kokio',
-  staticDirectories: ['static'],
-  tagline: 'Blockchain powered eSIM',
-  favicon: 'images/KokioLogo',
+  title: "Kokio",
+  staticDirectories: ["static"],
+  tagline: "Blockchain powered eSIM",
+  favicon: "images/KokioLogo",
 
   // Set the production url of your site here
-  url: 'https://docs.kokio.app',
+  url: "https://docs.kokio.app",
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/',
+  baseUrl: "/",
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'Kokio', // Usually your GitHub org/user name.
-  projectName: 'Kokio', // Usually your repo name.
+  organizationName: "Kokio", // Usually your GitHub org/user name.
+  projectName: "Kokio", // Usually your repo name.
 
-  onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
+  onBrokenLinks: "throw",
+  onBrokenMarkdownLinks: "warn",
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
   // may want to replace "en" with "zh-Hans".
   i18n: {
-    defaultLocale: 'en',
-    locales: ['en'],
+    defaultLocale: "en",
+    locales: ["en"],
   },
 
   presets: [
     [
-      'classic',
+      "classic",
       {
         docs: {
-          sidebarPath: './sidebars.ts',
+          sidebarPath: "./sidebars.ts",
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
         },
         //blog: {
         //  showReadingTime: true,
@@ -49,7 +49,7 @@ const config: Config = {
         //    'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
         //},
         theme: {
-          customCss: './src/css/custom.css',
+          customCss: "./src/css/custom.css",
         },
       } satisfies Preset.Options,
     ],
@@ -57,64 +57,64 @@ const config: Config = {
 
   themeConfig: {
     // Replace with your project's social card
-    image: 'img/docusaurus-social-card.jpg',
+    image: "img/docusaurus-social-card.jpg",
     navbar: {
       logo: {
-        alt: 'Kokio Logo',
-        src: 'images/KokioLogo.svg',
-        href: 'https://www.kokio.app'
+        alt: "Kokio Logo",
+        src: "images/KokioLogo.svg",
+        href: "https://www.kokio.app",
       },
       items: [
         {
-          to: '/',
-          label: 'Home',
-          position: 'left',
+          to: "/",
+          label: "Home",
+          position: "left",
         },
         //{to: '/docs', label: 'Docs', position: 'left'},
         {
-          type: 'docSidebar',
-          sidebarId: 'kokioSidebar',
-          position: 'left',
-          label: 'Docs',
+          type: "docSidebar",
+          sidebarId: "kokioSidebar",
+          position: "left",
+          label: "Docs",
         },
         {
-          href: 'https://github.com/Blockchain-Powered-eSIM',
-          label: 'GitHub',
-          position: 'right',
+          href: "https://github.com/Blockchain-Powered-eSIM",
+          label: "GitHub",
+          position: "right",
         },
       ],
     },
     footer: {
-      style: 'dark',
+      style: "dark",
       links: [
         {
-          title: 'Docs',
+          title: "Docs",
           items: [
             {
-              label: 'What is Kokio?',
-              to: '/docs/landingIntro',
+              label: "What is Kokio?",
+              to: "/docs/kokio/landingIntro",
             },
           ],
         },
         {
-          title: 'Community',
+          title: "Community",
           items: [
             {
-              label: 'Discord',
-              href: 'https://discord.gg/hkXvABaG',
+              label: "Discord",
+              href: "https://discord.gg/hkXvABaG",
             },
             {
-              label: 'Twitter',
-              href: 'https://twitter.com/docusaurus',
+              label: "Twitter",
+              href: "https://twitter.com/docusaurus",
             },
           ],
         },
         {
-          title: 'More',
+          title: "More",
           items: [
             {
-              label: 'GitHub',
-              href: 'https://github.com/Blockchain-Powered-eSIM',
+              label: "GitHub",
+              href: "https://github.com/Blockchain-Powered-eSIM",
             },
           ],
         },
