@@ -1,14 +1,11 @@
 [
   {
-    "relation": [
-      "delegate_permission/common.handle_all_urls",
-      "delegate_permission/common.get_login_creds"
-    ],
+    "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "app.kokio",
+      "package_name": "com.kokio",
       "sha256_cert_fingerprints": [
-        "48:3C:51:50:74:39:61:6B:7E:76:E7:A0:0D:2C:C6:7D:0F:C6:58:4F:C0:17:51:15:CA:79:BE:92:C4:CD:18:65"
+        "D5:A4:9B:44:27:79:35:49:9E:B1:38:D0:B5:58:15:BD:B4:FE:99:9A:17:3F:3B:01:E1:2F:82:E1:29:0A:69:A3"
       ]
     }
   }
