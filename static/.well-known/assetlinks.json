@@ -3,9 +3,9 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "com.kokio",
+      "package_name": "app.kokio",
       "sha256_cert_fingerprints": [
-        "D5:A4:9B:44:27:79:35:49:9E:B1:38:D0:B5:58:15:BD:B4:FE:99:9A:17:3F:3B:01:E1:2F:82:E1:29:0A:69:A3"
+        "F4:9D:57:98:EF:D3:AE:F4:E0:3D:55:FC:97:1E:7F:2A:68:60:CD:F3:82:DC:42:40:68:76:0F:03:E2:6D:D7:CA"
       ]
     }
   }
