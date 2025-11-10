@@ -4,7 +4,6 @@
       {
         "appIDs": [
           "XSQ2GAB4RW.app.kokio",
-          "FAKETEAMID.app.kokio"
         ],
         "components": [
           {
@@ -19,18 +18,11 @@
           "*"
         ]
       },
-      {
-        "appID": "FAKETEAMID.app.kokio",
-        "paths": [
-          "*"
-        ]
-      }
     ]
   },
   "webcredentials": {
     "apps": [
       "XSQ2GAB4RW.app.kokio",
-      "FAKETEAMID.app.kokio"
     ]
   }
 }
