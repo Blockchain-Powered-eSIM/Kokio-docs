@@ -3,7 +3,7 @@
     "details": [
       {
         "appIDs": [
-          "XSQ2GAB4RW.app.kokio",
+          "XSQ2GAB4RW.app.kokio"
         ],
         "components": [
           {
@@ -17,12 +17,12 @@
         "paths": [
           "*"
         ]
-      },
+      }
     ]
   },
   "webcredentials": {
     "apps": [
-      "XSQ2GAB4RW.app.kokio",
+      "XSQ2GAB4RW.app.kokio"
     ]
   }
 }
