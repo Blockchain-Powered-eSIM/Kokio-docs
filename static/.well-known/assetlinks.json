@@ -5,7 +5,8 @@
       "namespace": "android_app",
       "package_name": "app.kokio",
       "sha256_cert_fingerprints": [
-        "0E:67:0F:CE:9A:1C:B9:6C:3D:45:30:DD:7A:28:29:85:B6:D1:B7:D1:BB:30:B8:DA:DB:CE:7A:8E:93:0B:3D:CC"
+        "0E:67:0F:CE:9A:1C:B9:6C:3D:45:30:DD:7A:28:29:85:B6:D1:B7:D1:BB:30:B8:DA:DB:CE:7A:8E:93:0B:3D:CC",
+        "B8:BC:83:6D:8D:20:37:06:8D:01:33:0A:5E:92:40:78:58:B4:02:4E:41:07:8E:4F:A2:3D:80:71:1E:AE:DF:6C"
       ]
     }
   }
