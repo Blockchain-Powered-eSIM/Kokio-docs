@@ -1,0 +1,28 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": [
+          "XSQ2GAB4RW.app.kokio"
+        ],
+        "components": [
+          {
+            "/": "*",
+            "comment": "Matches all routes."
+          }
+        ]
+      },
+      {
+        "appID": "XSQ2GAB4RW.app.kokio",
+        "paths": [
+          "*"
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "XSQ2GAB4RW.app.kokio"
+    ]
+  }
+}
