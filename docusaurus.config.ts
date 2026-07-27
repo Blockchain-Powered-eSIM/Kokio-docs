@@ -36,10 +36,8 @@ const config: Config = {
       {
         docs: {
           sidebarPath: "./sidebars.ts",
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
           editUrl:
-            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
+            "https://github.com/Blockchain-Powered-eSIM/Kokio-docs/tree/main/",
         },
         //blog: {
         //  showReadingTime: true,
@@ -56,8 +54,7 @@ const config: Config = {
   ],
 
   themeConfig: {
-    // Replace with your project's social card
-    image: "img/docusaurus-social-card.jpg",
+    image: "images/kokio-social-card.png",
     navbar: {
       logo: {
         alt: "Kokio Logo",
@@ -105,7 +102,11 @@ const config: Config = {
             },
             {
               label: "Twitter",
-              href: "https://twitter.com/docusaurus",
+              href: "https://x.com/kokiodotapp",
+            },
+            {
+              label: "Telegram",
+              href: "https://t.me/+b44BXiy8d5k4M2Q1",
             },
           ],
         },
@@ -119,7 +120,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Kokio Ltd., Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Kokio SG Pte. Ltd.`,
     },
     prism: {
       theme: prismThemes.github,
