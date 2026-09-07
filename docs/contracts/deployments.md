@@ -16,7 +16,7 @@ Kokio is deployed on Base Sepolia and nowhere else. There is no mainnet deployme
 | ERC-4337 EntryPoint | v0.8.0 |
 | Explorer | [sepolia.basescan.org](https://sepolia.basescan.org) |
 
-## Addresses to call
+## Addresses to call {#addresses-to-call}
 
 These are the addresses an app talks to. Five of them are proxies, so the code they run lives somewhere else and can be replaced by an upgrade. Point your app at the address in this table and it keeps working across upgrades.
 
@@ -31,7 +31,7 @@ These are the addresses an app talks to. Five of them are proxies, so the code t
 | ProtocolAdmin | [`0xdDeCC2C1345BC966337B5f4Fe57EC2D5bfad751A`](https://sepolia.basescan.org/address/0xdDeCC2C1345BC966337B5f4Fe57EC2D5bfad751A) | timelock, owns the five proxies |
 | EntryPoint | [`0x4337084D9E255Ff0702461CF8895CE9E3b5Ff108`](https://sepolia.basescan.org/address/0x4337084D9E255Ff0702461CF8895CE9E3b5Ff108) | ERC-4337 v0.8.0, not ours |
 
-## Implementations behind them
+## Implementations behind them {#implementations-behind-them}
 
 You do not call these. They are listed so anyone can read the source that actually runs, and so an upgrade is visible as a change to this table.
 
@@ -47,7 +47,7 @@ You do not call these. They are listed so anyone can read the source that actual
 
 Device wallets and eSIM wallets have no single address, because there is one per device and one per eSIM. Each is a beacon proxy deployed by its factory, and all of them follow the beacon in this table, so one upgrade moves every wallet at once. To find a specific wallet, ask the [Registry](./registry.md) or ask the factory for the counterfactual address.
 
-## Settings the contracts were deployed with
+## Settings the contracts were deployed with {#settings-the-contracts-were-deployed-with}
 
 | Setting | Value |
 |---|---|
@@ -58,7 +58,7 @@ Device wallets and eSIM wallets have no single address, because there is one per
 
 The PaymentAdapter accepts two assets. `USDC` is the ERC-20 above and settles onchain. `USD` has no token address and two decimals, and stands for a card or bank payment taken outside the contracts, recorded so the purchase history is complete either way.
 
-## Who can change things
+## Who can change things {#who-can-change-things}
 
 Every proxy is owned by ProtocolAdmin, a timelock. Nobody holds a key that upgrades a contract on the spot.
 
@@ -72,7 +72,7 @@ Every proxy is owned by ProtocolAdmin, a timelock. Nobody holds a key that upgra
 
 A proposer queues a change and it becomes executable two days later. A guardian can cancel it during those two days. This is a testnet setup with a small number of signers, so treat the two day window as the only real protection here, not the signer list.
 
-## Build
+## Build {#build}
 
 | | |
 |---|---|
@@ -83,7 +83,7 @@ A proposer queues a change and it becomes executable two days later. A guardian 
 
 Every contract in both tables is verified on Basescan, so the source is readable next to the bytecode without trusting this page.
 
-## Checking these yourself
+## Checking these yourself {#checking-these-yourself}
 
 Do not take an address from a documentation page on faith, here or anywhere. Each of these can be checked in a few seconds:
 
