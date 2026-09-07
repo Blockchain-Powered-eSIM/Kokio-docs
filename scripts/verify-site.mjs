@@ -227,16 +227,22 @@ const lastmod = new Map(
 
 for (const pathname of sitemapPaths) {
   const stamp = lastmod.get(pathname);
+  const page = byRoute.get(pathname);
+  const committed = page && lastCommitDay(page.file);
+
   if (!stamp) {
-    fail(
-      "freshness",
-      `${pathname} has no lastmod. The build needs full git history: fetch-depth: 0 in CI.`
-    );
+    // A page with no commit yet has nothing to read a date from, which is
+    // normal while writing one. Only a committed page missing its date means
+    // the clone was shallow, and in CI every page is committed.
+    const message = `${pathname} has no lastmod`;
+    if (committed) {
+      fail("freshness", `${message}. The build needs full git history: fetch-depth: 0 in CI.`);
+    } else {
+      warn("freshness", `${message}, because it is not committed yet.`);
+    }
     continue;
   }
 
-  const page = byRoute.get(pathname);
-  const committed = page && lastCommitDay(page.file);
   if (committed && committed !== stamp) {
     warn("freshness", `${pathname} says ${stamp} but its last commit was ${committed}.`);
   }
