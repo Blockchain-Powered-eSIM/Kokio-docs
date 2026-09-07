@@ -6,8 +6,6 @@ Product site: https://kokio.app. Contract source: https://github.com/Blockchain-
 
 Any page here is also available as raw markdown. Swap `/docs/` for `/md/` and add `.md`, so https://docs.kokio.app/docs/kokio/mobileApp becomes https://docs.kokio.app/md/kokio/mobileApp.md.
 
-The smart contract pages below are short. They describe what each contract is for, not its functions. For the full generated reference, including every external function, read the contract source repository above. That gap is being closed.
-
 ## Start here
 
 - [Overview](https://docs.kokio.app/docs/Overview): what the project is, and the three layers of the eSIM stack (LPA, RSP, eUICC)
@@ -25,16 +23,23 @@ The smart contract pages below are short. They describe what each contract is fo
 
 ## Smart contracts
 
-- [Why smart contracts](https://docs.kokio.app/docs/contracts/intro): what they change about profile handling, and what self-custodial means here
-- [Wallet suite overview](https://docs.kokio.app/docs/contracts/overview): the contracts that make up the suite and how they fit together
-- [Registry](https://docs.kokio.app/docs/contracts/registry): the central record of every device and eSIM wallet
+Every page below carries the full generated reference for its contract: every state variable, event, modifier and function, with parameter and return tables.
+
+- [Wallet suite overview](https://docs.kokio.app/docs/contracts/overview): all 18 units, what each does, which proxy pattern it uses, and the terms used throughout
+- [Registry](https://docs.kokio.app/docs/contracts/registry): the central record of every device and eSIM wallet, plus the admin, vault, pause flag and price ceiling
 - [LazyWalletRegistry](https://docs.kokio.app/docs/contracts/lazy-wallet-registry): purchase history for fiat users before a wallet exists
 - [Device wallet](https://docs.kokio.app/docs/contracts/device-wallet): one per phone, owned by a P256 passkey
-- [Device wallet factory](https://docs.kokio.app/docs/contracts/device-wallet-factory): deploys device wallets
+- [Device wallet factory](https://docs.kokio.app/docs/contracts/device-wallet-factory): deploys device wallets, and predicts their addresses before they exist
 - [eSIM wallet](https://docs.kokio.app/docs/contracts/esim-wallet): one per eSIM, buys data bundles and keeps the record
 - [eSIM wallet factory](https://docs.kokio.app/docs/contracts/esim-wallet-factory): deploys eSIM wallets, and defines which ones count as valid
+- [Payment adapter](https://docs.kokio.app/docs/contracts/payment-adapter): the accepted currencies, and the one place a price in US cents becomes a token amount
+- [Protocol admin](https://docs.kokio.app/docs/contracts/protocol-admin): the timelock owning the upgradeable contracts, and the three things a guardian can do without waiting
+- [ERC-4337 account](https://docs.kokio.app/docs/contracts/account-4337): the account abstraction and ERC-1271 base every device wallet inherits
 - [P256 verifier](https://docs.kokio.app/docs/contracts/p256-verifier): one address accounts verify passkey signatures through
 - [WebAuthn library](https://docs.kokio.app/docs/contracts/webauthn): assertion verification, RIP-7212 precompile with a FreshCryptoLib fallback
+- [Interfaces](https://docs.kokio.app/docs/contracts/interfaces): the four narrow interfaces between the contracts, and why each leaves out more than it includes
+- [Custom errors](https://docs.kokio.app/docs/contracts/errors): all 92 revert reasons, how to decode one, and what the common ones mean
+- [Types and structs](https://docs.kokio.app/docs/contracts/types): the shared structs and the Settlement enum
 - [Deployed addresses](https://docs.kokio.app/docs/contracts/deployments): every address on Base Sepolia, chain 84532, with proxies, implementations, timelock settings and the build they came from
 
 ## TypeScript SDK

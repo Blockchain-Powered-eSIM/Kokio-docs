@@ -31,6 +31,12 @@ const config: Config = {
   onBrokenLinks: "throw",
 
   markdown: {
+    // Plain CommonMark, not MDX. Most of the contract reference is generated
+    // from Solidity NatSpec, and it is full of text MDX reads as JSX: `<20-byte>`
+    // in a return description, braces in a type. None of the docs use JSX, so
+    // there is nothing to give up by parsing them as ordinary markdown.
+    format: "md",
+
     hooks: {
       // A dead link in a doc is a dead end for a reader and a 404 for a
       // crawler. Cheaper to fail the build than to find it in the logs.

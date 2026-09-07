@@ -15,3 +15,6 @@ jobs:
         node-version: lts/*
     - run: npm ci
     - run: npm run build
+    # The build only warns when a contract page is behind its source repo. Here
+    # a person is already looking at a diff, so it fails instead.
+    - run: node scripts/sync-reference.mjs --strict

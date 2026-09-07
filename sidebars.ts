@@ -61,10 +61,6 @@ const sidebars: SidebarsConfig = {
       items: [
         {
           type: "doc",
-          id: "contracts/intro",
-        },
-        {
-          type: "doc",
           id: "contracts/overview",
         },
         {
@@ -93,11 +89,35 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: "doc",
+          id: "contracts/payment-adapter",
+        },
+        {
+          type: "doc",
+          id: "contracts/protocol-admin",
+        },
+        {
+          type: "doc",
+          id: "contracts/account-4337",
+        },
+        {
+          type: "doc",
           id: "contracts/p256-verifier",
         },
         {
           type: "doc",
           id: "contracts/webauthn",
+        },
+        {
+          type: "doc",
+          id: "contracts/interfaces",
+        },
+        {
+          type: "doc",
+          id: "contracts/errors",
+        },
+        {
+          type: "doc",
+          id: "contracts/types",
         },
         {
           type: "doc",
