@@ -9,6 +9,7 @@ import {
   ORGANIZATION_ID,
   SITE_URL,
   WEBSITE_ID,
+  WEBSITE_SCHEMA,
 } from "@site/src/siteCopy.mjs";
 
 type Props = WrapperProps<typeof LayoutType>;
@@ -36,7 +37,6 @@ export default function LayoutWrapper(props: Props): ReactNode {
   const url = `${SITE_URL}${metadata.permalink}`;
 
   const article = {
-    "@context": "https://schema.org",
     "@type": "TechArticle",
     // The page URL, with no fragment. A fragment in an @id is a citation
     // target, so it has to match a real element id or the citation lands at
@@ -63,7 +63,21 @@ export default function LayoutWrapper(props: Props): ReactNode {
   return (
     <>
       <Head>
-        <script type="application/ld+json">{JSON.stringify(article)}</script>
+        {/* The plain-text copy of this page, written by scripts/build-text.mjs.
+            Without this link an agent has to guess the /md/ pattern. */}
+        <link
+          rel="alternate"
+          type="text/markdown"
+          href={`${SITE_URL}/md/${metadata.id}.md`}
+        />
+        {/* One graph, not two scripts. The article names the site it belongs
+            to, so the site has to be defined on the same page to resolve. */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@graph": [article, WEBSITE_SCHEMA],
+          })}
+        </script>
       </Head>
       <Layout {...props} />
     </>

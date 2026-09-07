@@ -53,6 +53,25 @@ export const DOCS_META_DESCRIPTION =
 
 export const DOCS_TITLE = `${PRODUCT_NAME} documentation`;
 
+/**
+ * The site itself, as a schema node.
+ *
+ * Every page carries a copy rather than referencing one defined on the home
+ * page. A crawler reads one page at a time, so an `@id` whose definition lives
+ * on a different URL resolves to nothing on the page that names it.
+ */
+export const WEBSITE_SCHEMA = {
+  "@type": "WebSite",
+  "@id": WEBSITE_ID,
+  url: SITE_URL,
+  name: DOCS_TITLE,
+  description: DOCS_DESCRIPTION,
+  // Every spelling people actually type has to resolve to this product.
+  alternateName: PRODUCT_NAME_VARIANTS.map((variant) => `${variant} documentation`),
+  publisher: { "@id": ORGANIZATION_ID },
+  inLanguage: "en",
+};
+
 /** Source repositories, and the one place their URLs are written down. */
 export const GITHUB_ORG = "https://github.com/Blockchain-Powered-eSIM";
 export const CONTRACTS_REPO = `${GITHUB_ORG}/smart-contract-suite`;
