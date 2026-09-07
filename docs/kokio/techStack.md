@@ -10,9 +10,9 @@
   - Other digital wallet and QR payment methods
 - Crypto Payments
   - On-ramp solution
-- Passkey enbaled payments
+- Passkey enabled payments
 
-### eSIM Smart Wallet Suite (Smart Contacts)
+### eSIM Smart Wallet Suite (Smart Contracts)
 
 - Creates an account abstracted self custodial wallet
 - Handles crypto payment confirmations
