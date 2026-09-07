@@ -15,7 +15,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, relative } from "node:path";
 
-import { SITE_URL } from "../src/siteCopy.mjs";
+import { PRODUCT_NAME, SITE_URL } from "../src/siteCopy.mjs";
 
 const BUILD = "build";
 const DOCS = "docs";
@@ -245,6 +245,34 @@ for (const pathname of sitemapPaths) {
 
   if (committed && committed !== stamp) {
     warn("freshness", `${pathname} says ${stamp} but its last commit was ${committed}.`);
+  }
+}
+
+// 8. A page has to answer on its own, because that is how it is retrieved. A
+//    model is handed one chunk, not the sidebar around it, so a page that is
+//    too short to say anything or never names the product is retrieved and
+//    then discarded. Measured on the markdown output rather than the source:
+//    frontmatter is stripped there, so a name that only appears in a
+//    `description` does not count, and that is the surface agents read.
+const MIN_WORDS = 100;
+const NAMED_WITHIN = 60;
+
+for (const page of pages) {
+  const markdown = join(BUILD, "md", `${page.id}.md`);
+  if (!existsSync(markdown)) continue; // already reported by check 2
+
+  const words = readFileSync(markdown, "utf8")
+    .replace(/```[\s\S]*?```/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (words.length < MIN_WORDS) {
+    fail("standalone", `${page.route} is ${words.length} words. Under ${MIN_WORDS} is one chunk that answers nothing.`);
+  }
+
+  const opening = words.slice(0, NAMED_WITHIN).join(" ");
+  if (!new RegExp(PRODUCT_NAME, "i").test(opening)) {
+    fail("standalone", `${page.route} does not name ${PRODUCT_NAME} in its first ${NAMED_WITHIN} words.`);
   }
 }
 
