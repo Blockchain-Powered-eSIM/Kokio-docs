@@ -1,41 +1,45 @@
-# Website
+# Kokio documentation
 
-This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
+Source for [docs.kokio.app](https://docs.kokio.app), built with [Docusaurus](https://docusaurus.io/).
 
-### Installation
+npm only. There is one lockfile, `package-lock.json`, and Vercel picks the package manager from it.
 
-```
-$ yarn
-```
-
-### Local Development
+### Install
 
 ```
-$ yarn start
+npm ci
 ```
 
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
+### Local development
+
+```
+npm start
+```
+
+Starts a dev server on port 3000 and reloads on save.
 
 ### Build
 
 ```
-$ yarn build
+npm run build
 ```
 
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
+Writes the static site to `build/`. The prebuild step regenerates the plain-text surfaces that AI crawlers read: one `.md` file per page under `static/md/`, plus `static/llms-full.txt`. Both are gitignored, so build before serving locally or those routes 404.
+
+Serve the result with:
+
+```
+npm run serve
+```
 
 ### Deployment
 
-Using SSH:
+Vercel builds `main` and deploys it. Nothing to run by hand. Open a PR, merge it, and the change is live.
+
+### Other commands
 
 ```
-$ USE_SSH=true yarn deploy
+npm run typecheck          # tsc, no emit
+npm run write-heading-ids  # regenerate explicit heading anchors after editing headings
+npm run clear              # drop the .docusaurus cache
 ```
-
-Not using SSH:
-
-```
-$ GIT_USER=<Your GitHub username> yarn deploy
-```
-
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
