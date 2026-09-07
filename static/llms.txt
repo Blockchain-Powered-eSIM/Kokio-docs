@@ -1,0 +1,43 @@
+# Kokio documentation
+
+> Technical documentation for Kokio, a privacy-first travel eSIM app. Covers how eSIM provisioning works, the Kokio mobile app flow, and the onchain wallet suite: ERC-4337 smart accounts controlled by a device passkey, one wallet per device and one per eSIM, with data bundle purchases recorded onchain.
+
+Product site: https://kokio.app. Contract source: https://github.com/Blockchain-Powered-eSIM/smart-contract-suite. TypeScript client: https://github.com/Blockchain-Powered-eSIM/kokio-sdk.
+
+Any page here is also available as raw markdown. Swap `/docs/` for `/md/` and add `.md`, so https://docs.kokio.app/docs/kokio/mobileApp becomes https://docs.kokio.app/md/kokio/mobileApp.md.
+
+The smart contract pages below are short. They describe what each contract is for, not its functions. For the full generated reference, including every external function, read the contract source repository above. That gap is being closed.
+
+## Start here
+
+- [Overview](https://docs.kokio.app/docs/Overview): what the project is, and the three layers of the eSIM stack (LPA, RSP, eUICC)
+- [What is Kokio](https://docs.kokio.app/docs/kokio/landingIntro): what the app does, paying with crypto or fiat, and why the wallet is passwordless
+- [Setup and motivation](https://docs.kokio.app/docs/setup): the principles behind the project, and who it is for
+- [Mobile app flow](https://docs.kokio.app/docs/kokio/mobileApp): install, passkey registration, wallet deployment, purchase, eSIM activation
+- [Tech stack](https://docs.kokio.app/docs/kokio/techStack): the React Native app, the contract suite, and the backend aggregator
+
+## eSIM background
+
+- [What an eSIM is](https://docs.kokio.app/docs/eSIM/intro): definition, and who benefits from one
+- [How eSIM provisioning works](https://docs.kokio.app/docs/eSIM/working): the MNO, SM-DP+, LPA and eUICC, step by step
+- [Problems with eSIMs](https://docs.kokio.app/docs/eSIM/problem): provisioning and privacy weaknesses in the current model
+- [How Kokio addresses them](https://docs.kokio.app/docs/eSIM/solution): self-custodial eSIM wallets
+
+## Smart contracts
+
+- [Why smart contracts](https://docs.kokio.app/docs/SmartContracts/intro): what they change about profile handling, and what self-custodial means here
+- [Wallet suite overview](https://docs.kokio.app/docs/SmartContracts/walletSuite): the contracts that make up the suite and how they fit together
+- [Registry](https://docs.kokio.app/docs/SmartContracts/registryContract): the central record of every device and eSIM wallet
+- [LazyWalletRegistry](https://docs.kokio.app/docs/SmartContracts/lazyWalletRegistry): purchase history for fiat users before a wallet exists
+- [Device wallet](https://docs.kokio.app/docs/SmartContracts/deviceWalletSmartContract): one per phone, owned by a P256 passkey
+- [Device wallet factory](https://docs.kokio.app/docs/SmartContracts/deviceWalletFactory): deploys device wallets
+- [eSIM wallet](https://docs.kokio.app/docs/SmartContracts/esimWalletSmartContract): one per eSIM, buys data bundles and keeps the record
+- [eSIM wallet factory](https://docs.kokio.app/docs/SmartContracts/esimWalletFactory): deploys eSIM wallets, and defines which ones count as valid
+- [P256 verifier](https://docs.kokio.app/docs/SmartContracts/p256verifier): one address accounts verify passkey signatures through
+- [WebAuthn library](https://docs.kokio.app/docs/SmartContracts/webAuthnLibrary): assertion verification, RIP-7212 precompile with a FreshCryptoLib fallback
+
+## More
+
+- [Future prospects](https://docs.kokio.app/docs/futureProspects): onboarding eSIM providers onchain, and what Kokio's role is today
+- [Resources](https://docs.kokio.app/docs/resources): related repositories and wikis
+- [Full text](https://docs.kokio.app/llms-full.txt): every page above in one file
