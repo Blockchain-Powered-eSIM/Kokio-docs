@@ -106,6 +106,92 @@ const sidebars: SidebarsConfig = {
       ],
     },
     {
+      type: "category",
+      label: "SDK",
+      items: [
+        {
+          type: "doc",
+          id: "sdk/overview",
+        },
+        {
+          type: "category",
+          label: "Mobile",
+          items: [
+            {
+              type: "doc",
+              id: "sdk/mobile/setup",
+            },
+            {
+              type: "doc",
+              id: "sdk/mobile/smart-account",
+            },
+            {
+              type: "doc",
+              id: "sdk/mobile/device-wallet",
+            },
+            {
+              type: "doc",
+              id: "sdk/mobile/device-wallet-factory",
+            },
+            {
+              type: "doc",
+              id: "sdk/mobile/esim-wallet",
+            },
+            {
+              type: "doc",
+              id: "sdk/mobile/registry",
+            },
+            {
+              type: "doc",
+              id: "sdk/mobile/payments",
+            },
+          ],
+        },
+        {
+          type: "category",
+          label: "Backend",
+          items: [
+            {
+              type: "doc",
+              id: "sdk/backend/setup",
+            },
+            {
+              type: "doc",
+              id: "sdk/backend/device-wallet",
+            },
+            {
+              type: "doc",
+              id: "sdk/backend/device-wallet-factory",
+            },
+            {
+              type: "doc",
+              id: "sdk/backend/esim-wallet",
+            },
+            {
+              type: "doc",
+              id: "sdk/backend/registry",
+            },
+            {
+              type: "doc",
+              id: "sdk/backend/lazy-wallet-registry",
+            },
+            {
+              type: "doc",
+              id: "sdk/backend/payments",
+            },
+            {
+              type: "doc",
+              id: "sdk/backend/protocol-admin",
+            },
+          ],
+        },
+        {
+          type: "doc",
+          id: "sdk/calldata-builder",
+        },
+      ],
+    },
+    {
       type: "doc",
       id: "futureProspects",
     },
