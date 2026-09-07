@@ -57,7 +57,6 @@ The smart contract pages below are short. They describe what each contract is fo
 - [Lazy wallet registry](https://docs.kokio.app/docs/sdk/backend/lazy-wallet-registry): wallets and history for users who paid before they had one
 - [Payments, backend](https://docs.kokio.app/docs/sdk/backend/payments): register and change the currencies a bundle can be paid in
 - [Protocol admin](https://docs.kokio.app/docs/sdk/backend/protocol-admin): the timelock, scheduling and executing privileged calls
-- [Backend-built calldata](https://docs.kokio.app/docs/sdk/calldata-builder): build a call the app signs, and track it onchain
 
 ## More
 

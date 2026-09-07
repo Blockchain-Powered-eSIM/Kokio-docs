@@ -185,10 +185,6 @@ const sidebars: SidebarsConfig = {
             },
           ],
         },
-        {
-          type: "doc",
-          id: "sdk/calldata-builder",
-        },
       ],
     },
     {

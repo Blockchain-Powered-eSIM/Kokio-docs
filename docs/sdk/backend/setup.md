@@ -104,4 +104,4 @@ Mint it and store it against the order before calling `buyDataBundleWithToken` o
 
 ## Where to go next {#next}
 
-[Device wallet](./device-wallet.md), [device wallet factory](./device-wallet-factory.md), [eSIM wallet](./esim-wallet.md), [registry](./registry.md), [lazy wallet registry](./lazy-wallet-registry.md), [payments](./payments.md), [protocol admin](./protocol-admin.md). To prepare a call the app signs rather than signing it here, see [building calldata](../calldata-builder.md).
+[Device wallet](./device-wallet.md), [device wallet factory](./device-wallet-factory.md), [eSIM wallet](./esim-wallet.md), [registry](./registry.md), [lazy wallet registry](./lazy-wallet-registry.md), [payments](./payments.md), [protocol admin](./protocol-admin.md).

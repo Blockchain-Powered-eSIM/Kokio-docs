@@ -75,8 +75,6 @@ Every method, with an example and a return type.
 
 **Backend, the `KokioAdmin` surface.** [Setup](./backend/setup.md), [device wallet](./backend/device-wallet.md), [device wallet factory](./backend/device-wallet-factory.md), [eSIM wallet](./backend/esim-wallet.md), [registry](./backend/registry.md), [lazy wallet registry](./backend/lazy-wallet-registry.md), [payments](./backend/payments.md), [protocol admin](./backend/protocol-admin.md).
 
-**Both.** [Building calldata without the client](./calldata-builder.md), for a backend that wants to prepare a call the app then signs.
-
 The contracts these methods reach are documented separately, starting at the [wallet suite overview](../contracts/overview.md).
 
 Source and issues: [github.com/Blockchain-Powered-eSIM/kokio-sdk](https://github.com/Blockchain-Powered-eSIM/kokio-sdk). MIT licensed.
