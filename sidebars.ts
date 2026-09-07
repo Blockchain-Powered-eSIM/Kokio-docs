@@ -101,8 +101,14 @@ const sidebars: SidebarsConfig = {
         },
       ],
     },
-    "futureProspects",
-    "resources",
+    {
+      type: "doc",
+      id: "futureProspects",
+    },
+    {
+      type: "doc",
+      id: "resources",
+    },
   ],
 };
 
