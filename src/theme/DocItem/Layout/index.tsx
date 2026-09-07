@@ -20,7 +20,7 @@ type Props = WrapperProps<typeof LayoutType>;
  * nothing, because it is a claim a retriever will act on.
  */
 function subjectOf(docId: string) {
-  if (docId.startsWith("SmartContracts/")) {
+  if (docId.startsWith("contracts/")) {
     return {
       about: { "@type": "Thing", name: "Ethereum smart contract" },
       programmingLanguage: "Solidity",

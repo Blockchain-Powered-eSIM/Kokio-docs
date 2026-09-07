@@ -25,16 +25,16 @@ The smart contract pages below are short. They describe what each contract is fo
 
 ## Smart contracts
 
-- [Why smart contracts](https://docs.kokio.app/docs/SmartContracts/intro): what they change about profile handling, and what self-custodial means here
-- [Wallet suite overview](https://docs.kokio.app/docs/SmartContracts/walletSuite): the contracts that make up the suite and how they fit together
-- [Registry](https://docs.kokio.app/docs/SmartContracts/registryContract): the central record of every device and eSIM wallet
-- [LazyWalletRegistry](https://docs.kokio.app/docs/SmartContracts/lazyWalletRegistry): purchase history for fiat users before a wallet exists
-- [Device wallet](https://docs.kokio.app/docs/SmartContracts/deviceWalletSmartContract): one per phone, owned by a P256 passkey
-- [Device wallet factory](https://docs.kokio.app/docs/SmartContracts/deviceWalletFactory): deploys device wallets
-- [eSIM wallet](https://docs.kokio.app/docs/SmartContracts/esimWalletSmartContract): one per eSIM, buys data bundles and keeps the record
-- [eSIM wallet factory](https://docs.kokio.app/docs/SmartContracts/esimWalletFactory): deploys eSIM wallets, and defines which ones count as valid
-- [P256 verifier](https://docs.kokio.app/docs/SmartContracts/p256verifier): one address accounts verify passkey signatures through
-- [WebAuthn library](https://docs.kokio.app/docs/SmartContracts/webAuthnLibrary): assertion verification, RIP-7212 precompile with a FreshCryptoLib fallback
+- [Why smart contracts](https://docs.kokio.app/docs/contracts/intro): what they change about profile handling, and what self-custodial means here
+- [Wallet suite overview](https://docs.kokio.app/docs/contracts/overview): the contracts that make up the suite and how they fit together
+- [Registry](https://docs.kokio.app/docs/contracts/registry): the central record of every device and eSIM wallet
+- [LazyWalletRegistry](https://docs.kokio.app/docs/contracts/lazy-wallet-registry): purchase history for fiat users before a wallet exists
+- [Device wallet](https://docs.kokio.app/docs/contracts/device-wallet): one per phone, owned by a P256 passkey
+- [Device wallet factory](https://docs.kokio.app/docs/contracts/device-wallet-factory): deploys device wallets
+- [eSIM wallet](https://docs.kokio.app/docs/contracts/esim-wallet): one per eSIM, buys data bundles and keeps the record
+- [eSIM wallet factory](https://docs.kokio.app/docs/contracts/esim-wallet-factory): deploys eSIM wallets, and defines which ones count as valid
+- [P256 verifier](https://docs.kokio.app/docs/contracts/p256-verifier): one address accounts verify passkey signatures through
+- [WebAuthn library](https://docs.kokio.app/docs/contracts/webauthn): assertion verification, RIP-7212 precompile with a FreshCryptoLib fallback
 
 ## More
 

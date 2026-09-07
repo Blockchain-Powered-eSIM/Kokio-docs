@@ -61,43 +61,43 @@ const sidebars: SidebarsConfig = {
       items: [
         {
           type: "doc",
-          id: "SmartContracts/intro",
+          id: "contracts/intro",
         },
         {
           type: "doc",
-          id: "SmartContracts/walletSuite",
+          id: "contracts/overview",
         },
         {
           type: "doc",
-          id: "SmartContracts/registryContract",
+          id: "contracts/registry",
         },
         {
           type: "doc",
-          id: "SmartContracts/lazyWalletRegistry",
+          id: "contracts/lazy-wallet-registry",
         },
         {
           type: "doc",
-          id: "SmartContracts/deviceWalletFactory",
+          id: "contracts/device-wallet-factory",
         },
         {
           type: "doc",
-          id: "SmartContracts/deviceWalletSmartContract",
+          id: "contracts/device-wallet",
         },
         {
           type: "doc",
-          id: "SmartContracts/esimWalletFactory",
+          id: "contracts/esim-wallet-factory",
         },
         {
           type: "doc",
-          id: "SmartContracts/esimWalletSmartContract",
+          id: "contracts/esim-wallet",
         },
         {
           type: "doc",
-          id: "SmartContracts/p256verifier",
+          id: "contracts/p256-verifier",
         },
         {
           type: "doc",
-          id: "SmartContracts/webAuthnLibrary",
+          id: "contracts/webauthn",
         },
       ],
     },
