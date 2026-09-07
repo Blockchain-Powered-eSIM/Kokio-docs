@@ -1,11 +1,11 @@
-import clsx from 'clsx';
+import type {ReactNode} from 'react';
 import Heading from '@theme/Heading';
 import styles from './styles.module.css';
 
 type FeatureItem = {
   title: string;
   image: string;
-  description: JSX.Element;
+  description: ReactNode;
 };
 
 const FeatureList: FeatureItem[] = [
@@ -14,7 +14,7 @@ const FeatureList: FeatureItem[] = [
     image: '/images/feature-easy-to-use.png',
     description: (
       <>
-        Set up your mobile plan quickly and easily with our new technology. Speed up the process even more by provisioning your new secure eSIM device wallet..
+        Set up your mobile plan in a few taps. Provisioning your device wallet happens in the background, so there is nothing extra to configure.
       </>
     ),
   },
@@ -23,7 +23,7 @@ const FeatureList: FeatureItem[] = [
     image: '/images/feature-esim-wallet.png',
     description: (
       <>
-        When you purchase your first Kokio travel data bundle, a secure eSIM crypto wallet is created. Not ready for crypto? No worries—the eSIM wallet is optional and can be activated whenever you choose..
+        Buying your first Kokio data bundle creates an eSIM wallet that holds the plan. You own it, not a provider database, and you never handle a seed phrase.
       </>
     ),
   },
@@ -32,7 +32,7 @@ const FeatureList: FeatureItem[] = [
     image: '/images/feature-quick-pay.png',
     description: (
       <>
-        Enjoy flexible payment options including credit cards, Apple Pay, Google Pay, and PayPal. You can fund your eSIM wallet and check out even faster!.
+        Pay by card, Apple Pay, Google Pay or stablecoins. No KYC, and no personal information collected at checkout.
       </>
     ),
   },
@@ -40,7 +40,7 @@ const FeatureList: FeatureItem[] = [
 
 function Feature({title, image, description}: FeatureItem) {
   return (
-    <div className={clsx('col col--4')}>
+    <div className="col col--4">
       <div className="text--center">
         <img src={image} className={styles.featureImg} alt={title} />
       </div>
@@ -52,7 +52,7 @@ function Feature({title, image, description}: FeatureItem) {
   );
 }
 
-export default function HomepageFeatures(): JSX.Element {
+export default function HomepageFeatures(): ReactNode {
   return (
     <section className={styles.features}>
       <div className="container">
