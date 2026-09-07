@@ -1,0 +1,92 @@
+# robots.txt for docs.kokio.app
+#
+# Ported from Kokio-web/app/robots.ts, which is the maintained list. Keep the
+# two consistent or the stance reads as accidental rather than decided.
+#
+# The stance is yes: retrieval crawlers and training crawlers both get
+# everything. The wildcard group below is what actually grants that, including
+# to every crawler not named here. The named groups exist so the decision is
+# auditable, and so blocking any one of them later is a one-line edit rather
+# than a research task.
+#
+# One rule for adding an entry: the operator publishes a crawler page naming
+# the token. That keeps the list checkable and finite. It is deliberately not
+# exhaustive and cannot be, because most labs publish no user agent at all.
+#
+# WARNING, if you ever add a Disallow: groups in robots.txt are independent. A
+# crawler that matches a named group reads only that group and never sees the
+# wildcard rules. A Disallow written once here applies only where it is
+# written, so it has to be repeated in every group below.
+
+User-agent: *
+Allow: /
+
+# OpenAI, developers.openai.com/api/docs/bots
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-AdsBot
+Allow: /
+
+# Anthropic, support.claude.com/en/articles/8896518
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+# Perplexity, docs.perplexity.ai/docs/resources/perplexity-crawlers
+# Perplexity-User is listed for completeness. Perplexity says it generally
+# ignores robots.txt for that agent because the fetch is user-initiated.
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+# Google and Apple. These two are training opt-out tokens rather than
+# crawlers, and they have no user agent of their own. Allowing them is a no-op
+# because permitted is already the default. The lines record the opt-in where
+# someone auditing this file will look for it.
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# Meta, Amazon, Mistral
+User-agent: meta-externalagent
+Allow: /
+
+User-agent: Meta-ExternalFetcher
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: MistralAI-User
+Allow: /
+
+# Allen Institute, allenai.org/crawler. Feeds the Dolma corpus and the OLMo
+# open models.
+User-agent: AI2Bot
+Allow: /
+
+# Common Crawl. The most consequential entry here for open-weight models: most
+# open training sets, C4, RefinedWeb, FineWeb and Dolma among them, are built
+# from Common Crawl rather than from their own crawls. Allowing it is close to
+# irreversible, because a page that lands in the archive is copied into derived
+# datasets that have no recall mechanism.
+User-agent: CCBot
+Allow: /
+
+Sitemap: https://docs.kokio.app/sitemap.xml
