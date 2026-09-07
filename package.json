@@ -5,11 +5,12 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
-    "prebuild": "node scripts/build-text.mjs",
+    "prebuild": "node scripts/check-conventions.mjs && node scripts/build-text.mjs",
     "build": "docusaurus build",
     "postbuild": "node scripts/verify-site.mjs && node scripts/sync-reference.mjs",
     "build:text": "node scripts/build-text.mjs",
     "verify": "node scripts/verify-site.mjs",
+    "check:conventions": "node scripts/check-conventions.mjs",
     "sync:reference": "node scripts/sync-reference.mjs",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
