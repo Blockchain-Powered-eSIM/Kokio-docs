@@ -99,6 +99,10 @@ const sidebars: SidebarsConfig = {
           type: "doc",
           id: "contracts/webauthn",
         },
+        {
+          type: "doc",
+          id: "contracts/deployments",
+        },
       ],
     },
     {

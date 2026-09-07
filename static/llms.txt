@@ -35,6 +35,7 @@ The smart contract pages below are short. They describe what each contract is fo
 - [eSIM wallet factory](https://docs.kokio.app/docs/contracts/esim-wallet-factory): deploys eSIM wallets, and defines which ones count as valid
 - [P256 verifier](https://docs.kokio.app/docs/contracts/p256-verifier): one address accounts verify passkey signatures through
 - [WebAuthn library](https://docs.kokio.app/docs/contracts/webauthn): assertion verification, RIP-7212 precompile with a FreshCryptoLib fallback
+- [Deployed addresses](https://docs.kokio.app/docs/contracts/deployments): every address on Base Sepolia, chain 84532, with proxies, implementations, timelock settings and the build they came from
 
 ## More
 
