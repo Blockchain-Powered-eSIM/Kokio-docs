@@ -65,6 +65,6 @@ Every page below carries the full generated reference for its contract: every st
 
 ## More
 
-- [Future prospects](https://docs.kokio.app/docs/future-prospects): onboarding eSIM providers onchain, and what Kokio's role is today
+- [Future prospects](https://docs.kokio.app/docs/future-prospects): onboarding eSIM providers onchain, and a sketch of paying per request with x402
 - [Resources](https://docs.kokio.app/docs/resources): the source repositories, and the wikis covering eSIM provisioning and key management
 - [Full text](https://docs.kokio.app/llms-full.txt): every page above in one file
