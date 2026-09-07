@@ -6,6 +6,7 @@ import HomepageFeatures from "@site/src/components/HomepageFeatures";
 import Heading from "@theme/Heading";
 
 import styles from "./index.module.css";
+import { DOCS_META_DESCRIPTION, DOCS_TITLE } from "@site/src/siteCopy.mjs";
 
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
@@ -30,12 +31,8 @@ function HomepageHeader() {
 }
 
 export default function Home(): JSX.Element {
-  const { siteConfig } = useDocusaurusContext();
   return (
-    <Layout
-      title={`Hello from ${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />"
-    >
+    <Layout title={DOCS_TITLE} description={DOCS_META_DESCRIPTION}>
       <HomepageHeader />
       <main>
         <HomepageFeatures />

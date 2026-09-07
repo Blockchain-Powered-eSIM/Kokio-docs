@@ -2,14 +2,23 @@ import { themes as prismThemes } from "prism-react-renderer";
 import type { Config } from "@docusaurus/types";
 import type * as Preset from "@docusaurus/preset-classic";
 
-const config: Config = {
-  title: "Kokio",
-  staticDirectories: ["static"],
-  tagline: "Blockchain powered eSIM",
-  favicon: "images/KokioLogo",
+import {
+  DOCS_META_DESCRIPTION,
+  DOCS_TITLE,
+  GITHUB_ORG,
+  MARKETING_URL,
+  SITE_URL,
+} from "./src/siteCopy.mjs";
 
-  // Set the production url of your site here
-  url: "https://docs.kokio.app",
+const config: Config = {
+  title: DOCS_TITLE,
+  staticDirectories: ["static"],
+  tagline: DOCS_META_DESCRIPTION,
+  // The extension is not optional. Without it the page emits
+  // <link rel="icon" href="/images/KokioLogo"> and that URL is a 404.
+  favicon: "images/KokioLogo.svg",
+
+  url: SITE_URL,
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: "/",
@@ -60,7 +69,7 @@ const config: Config = {
       logo: {
         alt: "Kokio Logo",
         src: "images/KokioLogo.svg",
-        href: "https://www.kokio.app",
+        href: MARKETING_URL,
       },
       items: [
         {
@@ -76,7 +85,7 @@ const config: Config = {
           label: "Docs",
         },
         {
-          href: "https://github.com/Blockchain-Powered-eSIM",
+          href: GITHUB_ORG,
           label: "GitHub",
           position: "right",
         },
@@ -116,7 +125,7 @@ const config: Config = {
           items: [
             {
               label: "GitHub",
-              href: "https://github.com/Blockchain-Powered-eSIM",
+              href: GITHUB_ORG,
             },
           ],
         },
