@@ -20,7 +20,14 @@ const config: Config = {
   projectName: "Kokio", // Usually your repo name.
 
   onBrokenLinks: "throw",
-  onBrokenMarkdownLinks: "warn",
+
+  markdown: {
+    hooks: {
+      // A dead link in a doc is a dead end for a reader and a 404 for a
+      // crawler. Cheaper to fail the build than to find it in the logs.
+      onBrokenMarkdownLinks: "throw",
+    },
+  },
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
@@ -39,13 +46,7 @@ const config: Config = {
           editUrl:
             "https://github.com/Blockchain-Powered-eSIM/Kokio-docs/tree/main/",
         },
-        //blog: {
-        //  showReadingTime: true,
-        //  // Please change this to your repo.
-        //  // Remove this to remove the "edit this page" links.
-        //  editUrl:
-        //    'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
-        //},
+        blog: false,
         theme: {
           customCss: "./src/css/custom.css",
         },
