@@ -54,6 +54,9 @@ const config: Config = {
           sidebarPath: "./sidebars.ts",
           editUrl:
             "https://github.com/Blockchain-Powered-eSIM/Kokio-docs/tree/main/",
+          // Read from git. Feeds the dateModified in each page's TechArticle,
+          // which is what tells a retriever the page is current.
+          showLastUpdateTime: true,
         },
         blog: false,
         theme: {

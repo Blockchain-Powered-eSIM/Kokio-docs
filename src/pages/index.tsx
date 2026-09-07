@@ -5,8 +5,31 @@ import Layout from "@theme/Layout";
 import HomepageFeatures from "@site/src/components/HomepageFeatures";
 import Heading from "@theme/Heading";
 
+import Head from "@docusaurus/Head";
+
 import styles from "./index.module.css";
-import { DOCS_META_DESCRIPTION, DOCS_TITLE } from "@site/src/siteCopy.mjs";
+import {
+  DOCS_DESCRIPTION,
+  DOCS_META_DESCRIPTION,
+  DOCS_TITLE,
+  ORGANIZATION_ID,
+  PRODUCT_NAME_VARIANTS,
+  SITE_URL,
+  WEBSITE_ID,
+} from "@site/src/siteCopy.mjs";
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": WEBSITE_ID,
+  url: SITE_URL,
+  name: DOCS_TITLE,
+  description: DOCS_DESCRIPTION,
+  // Every spelling people actually type has to resolve to this product.
+  alternateName: PRODUCT_NAME_VARIANTS.map((v) => `${v} documentation`),
+  publisher: { "@id": ORGANIZATION_ID },
+  inLanguage: "en",
+};
 
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
@@ -33,6 +56,11 @@ function HomepageHeader() {
 export default function Home(): JSX.Element {
   return (
     <Layout title={DOCS_TITLE} description={DOCS_META_DESCRIPTION}>
+      <Head>
+        <script type="application/ld+json">
+          {JSON.stringify(websiteSchema)}
+        </script>
+      </Head>
       <HomepageHeader />
       <main>
         <HomepageFeatures />
