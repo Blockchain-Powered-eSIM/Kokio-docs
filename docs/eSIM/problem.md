@@ -4,4 +4,4 @@ eSIMs (embedded SIMs) offer convenience by enabling remote connectivity for devi
 
 Even with ongoing improvements, the **security of consumer eSIM data** has not kept pace with evolving threats, leaving users vulnerable to privacy invasion, fraud and unauthorised access of sensitive information.
 
-Read more about the [problems with eSIMs](https://github.com/Blockchain-Powered-eSIM/Kokio-docs.wiki.git).
+Read more about the [problems with eSIMs](https://github.com/Blockchain-Powered-eSIM/Kokio-docs/wiki).
