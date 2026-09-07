@@ -27,6 +27,9 @@ const KEBAB = /^[a-z0-9]+(?:-[a-z0-9]+)*(?:\.[a-z0-9]+)?$/;
 /** Long enough to say something, short enough that no surface truncates it. */
 const DESCRIPTION_RANGE = [60, 320];
 
+/** Enough to describe a diagram rather than label it. */
+const MIN_ALT_TEXT = 40;
+
 /**
  * Words that make writing sound generated. Each is banned because a plainer
  * word always exists, not because the concept is wrong.
@@ -177,7 +180,17 @@ for (const file of docs) {
     }
   }
 
-  // 4. Wording. Prose only, so nothing here judges a code sample.
+  // 4. Images. A diagram is invisible to a screen reader and to every text
+  //    surface this site generates, so what it shows has to be written down
+  //    as well. Short alt text is a caption, not a description.
+  for (const image of body.matchAll(/!\[([^\]]*)\]\(([^)]+)\)/g)) {
+    const [, alt, src] = image;
+    if (alt.trim().length < MIN_ALT_TEXT) {
+      fail("images", at(image.index), `${src} has ${alt.trim().length ? "alt text too short to describe it" : "no alt text"}.`);
+    }
+  }
+
+  // 5. Wording. Prose only, so nothing here judges a code sample.
   const text = prose(body);
 
   if (text.includes("—")) fail("wording", file, "contains an em dash. Use a comma, a full stop or parentheses.");
@@ -209,7 +222,7 @@ for (const file of docs) {
   const dollar = text.match(/(?<!\\)\$\d/);
   if (dollar) fail("wording", file, `has an unescaped "${dollar[0]}". Write it as \\$.`);
 
-  // 5. Layout. Prose is one line per paragraph, wrapped by the reader's editor
+  // 6. Layout. Prose is one line per paragraph, wrapped by the reader's editor
   //    rather than by us, and a trailing space is an invisible line break.
   for (const [line, content] of body.split("\n").entries()) {
     if (/\s+$/.test(content)) {
