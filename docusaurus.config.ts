@@ -59,6 +59,15 @@ const config: Config = {
         theme: {
           customCss: "./src/css/custom.css",
         },
+        sitemap: {
+          // Read from git, per file. This needs full history in CI:
+          // a shallow clone gives every page the same date or none.
+          lastmod: "date",
+          // Google ignores both, and every URL carried the same value
+          // anyway, so they were bytes carrying no signal.
+          changefreq: null,
+          priority: null,
+        },
       } satisfies Preset.Options,
     ],
   ],

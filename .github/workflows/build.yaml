@@ -6,6 +6,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+      with:
+        # The sitemap reads each page's last commit date from git. The default
+        # shallow clone has no history, so every lastmod would be missing.
+        fetch-depth: 0
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
