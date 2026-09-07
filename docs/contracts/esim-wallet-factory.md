@@ -5,7 +5,7 @@ description: Deploys Kokio eSIM wallets, owns the beacon they all follow, and is
 
 # eSIM wallet factory {#esim-wallet-factory}
 
-`ESIMWalletFactory` deploys [eSIM wallets](./esim-wallet.md) and owns the beacon they all point at. It is a UUPS singleton, one per chain, sitting under the [Registry](./registry.md) in the [suite](./overview.md).
+`ESIMWalletFactory` deploys [eSIM wallets](./esim-wallet.md) and owns the beacon they all point at. Every eSIM Kokio sells ends up owned by a wallet this contract deployed. It is a UUPS singleton, one per chain, sitting under the [Registry](./registry.md) in the [suite](./overview.md).
 
 It is also what makes "valid" mean something. A wallet is only a real eSIM wallet if this factory deployed it, and `isESIMWalletDeployed` is the record. Anything else with the same bytecode at a different address is not in that mapping, and every guarded path in the protocol rejects it. Copying the code is not the attack this stops; claiming to be part of the suite is.
 

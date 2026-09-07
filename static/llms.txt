@@ -4,22 +4,22 @@
 
 Product site: https://kokio.app. Contract source: https://github.com/Blockchain-Powered-eSIM/smart-contract-suite. TypeScript client: https://github.com/Blockchain-Powered-eSIM/kokio-sdk.
 
-Any page here is also available as raw markdown. Swap `/docs/` for `/md/` and add `.md`, so https://docs.kokio.app/docs/kokio/mobileApp becomes https://docs.kokio.app/md/kokio/mobileApp.md.
+Any page here is also available as raw markdown. Swap `/docs/` for `/md/` and add `.md`, so https://docs.kokio.app/docs/kokio/mobile-app becomes https://docs.kokio.app/md/kokio/mobile-app.md.
 
 ## Start here
 
-- [Overview](https://docs.kokio.app/docs/Overview): what the project is, and the three layers of the eSIM stack (LPA, RSP, eUICC)
-- [What is Kokio](https://docs.kokio.app/docs/kokio/landingIntro): what the app does, paying with crypto or fiat, and why the wallet is passwordless
-- [Setup and motivation](https://docs.kokio.app/docs/setup): the principles behind the project, and who it is for
-- [Mobile app flow](https://docs.kokio.app/docs/kokio/mobileApp): install, passkey registration, wallet deployment, purchase, eSIM activation
-- [Tech stack](https://docs.kokio.app/docs/kokio/techStack): the React Native app, the contract suite, and the backend aggregator
+- [Kokio and the eSIM stack](https://docs.kokio.app/docs/overview): what the project is, and the three layers every eSIM runs on (LPA, RSP, eUICC)
+- [What is Kokio](https://docs.kokio.app/docs/kokio/landing-intro): what the app does, paying with crypto or fiat, and why the wallet is passwordless
+- [Principles and motivation](https://docs.kokio.app/docs/setup): why it was built this way, and who it is for
+- [Mobile app flow](https://docs.kokio.app/docs/kokio/mobile-app): install, passkey registration, wallet deployment, purchase, eSIM activation
+- [Tech stack](https://docs.kokio.app/docs/kokio/tech-stack): the React Native app, the 18-unit contract suite, and the Node.js provider aggregator
 
 ## eSIM background
 
-- [What an eSIM is](https://docs.kokio.app/docs/eSIM/intro): definition, and who benefits from one
-- [How eSIM provisioning works](https://docs.kokio.app/docs/eSIM/working): the MNO, SM-DP+, LPA and eUICC, step by step
-- [Problems with eSIMs](https://docs.kokio.app/docs/eSIM/problem): provisioning and privacy weaknesses in the current model
-- [How Kokio addresses them](https://docs.kokio.app/docs/eSIM/solution): self-custodial eSIM wallets
+- [What an eSIM is](https://docs.kokio.app/docs/esim/intro): definition, and who benefits from one
+- [How eSIM provisioning works](https://docs.kokio.app/docs/esim/working): the MNO, SM-DP+, LPA and eUICC, step by step
+- [The problem with eSIMs](https://docs.kokio.app/docs/esim/problem): provisioning and privacy weaknesses in the current model
+- [How Kokio solves it](https://docs.kokio.app/docs/esim/solution): local pricing, an onchain purchase record, and passkey-owned wallets
 
 ## Smart contracts
 
@@ -65,6 +65,6 @@ Every page below carries the full generated reference for its contract: every st
 
 ## More
 
-- [Future prospects](https://docs.kokio.app/docs/futureProspects): onboarding eSIM providers onchain, and what Kokio's role is today
-- [Resources](https://docs.kokio.app/docs/resources): related repositories and wikis
+- [Future prospects](https://docs.kokio.app/docs/future-prospects): onboarding eSIM providers onchain, and what Kokio's role is today
+- [Resources](https://docs.kokio.app/docs/resources): the source repositories, and the wikis covering eSIM provisioning and key management
 - [Full text](https://docs.kokio.app/llms-full.txt): every page above in one file

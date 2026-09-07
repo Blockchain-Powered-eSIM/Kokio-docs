@@ -11,7 +11,7 @@ Two ideas hold the design together. Every user gets a wallet per phone and a wal
 
 The whole suite is deployed on Base Sepolia and nowhere else. Addresses are on the [deployed addresses](./deployments.md) page.
 
-![Architecture of the Kokio smart contract suite: the Registry at the centre, with the device wallet factory and eSIM wallet factory deploying beacon-proxy wallets beneath it, and the lazy wallet registry and payment adapter beside it.](../../resources/KokioSCWithBG.png)
+![Architecture of the Kokio smart contract suite: the Registry at the centre, with the device wallet factory and eSIM wallet factory deploying beacon-proxy wallets beneath it, and the lazy wallet registry and payment adapter beside it.](../../resources/kokio-contract-architecture.png)
 
 ## What each contract does {#what-each-contract-does}
 

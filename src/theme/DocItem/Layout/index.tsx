@@ -26,7 +26,7 @@ function subjectOf(docId: string) {
       programmingLanguage: "Solidity",
     };
   }
-  if (docId.startsWith("eSIM/")) {
+  if (docId.startsWith("esim/")) {
     return { about: { "@type": "Thing", name: "eSIM" } };
   }
   return { about: { "@type": "Thing", name: "Kokio" } };

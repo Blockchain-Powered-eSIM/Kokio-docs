@@ -9,7 +9,7 @@ const sidebars: SidebarsConfig = {
   kokioSidebar: [
     {
       type: "doc",
-      id: "Overview",
+      id: "overview",
     },
     {
       type: "category",
@@ -17,7 +17,7 @@ const sidebars: SidebarsConfig = {
       items: [
         {
           type: "doc",
-          id: "kokio/landingIntro",
+          id: "kokio/landing-intro",
         },
         {
           type: "doc",
@@ -25,11 +25,11 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: "doc",
-          id: "kokio/mobileApp",
+          id: "kokio/mobile-app",
         },
         {
           type: "doc",
-          id: "kokio/techStack",
+          id: "kokio/tech-stack",
         },
       ],
     },
@@ -39,19 +39,19 @@ const sidebars: SidebarsConfig = {
       items: [
         {
           type: "doc",
-          id: "eSIM/intro",
+          id: "esim/intro",
         },
         {
           type: "doc",
-          id: "eSIM/problem",
+          id: "esim/problem",
         },
         {
           type: "doc",
-          id: "eSIM/solution",
+          id: "esim/solution",
         },
         {
           type: "doc",
-          id: "eSIM/working",
+          id: "esim/working",
         },
       ],
     },
@@ -209,7 +209,7 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: "doc",
-      id: "futureProspects",
+      id: "future-prospects",
     },
     {
       type: "doc",

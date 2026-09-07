@@ -117,7 +117,7 @@ const config: Config = {
           items: [
             {
               label: "What is Kokio?",
-              to: "/docs/kokio/landingIntro",
+              to: "/docs/kokio/landing-intro",
             },
           ],
         },

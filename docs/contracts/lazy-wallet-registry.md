@@ -5,7 +5,7 @@ description: Where a Kokio purchase is recorded when the buyer paid by card and 
 
 # Lazy wallet registry {#lazy-wallet-registry}
 
-`LazyWalletRegistry` solves an ordering problem. Someone buys an eSIM with a card, on a phone that has never touched a blockchain, and the purchase has to be recorded before there is anything to record it on. This contract holds that history until wallets exist, then deploys them and copies the record across.
+`LazyWalletRegistry` solves an ordering problem Kokio has with every card payment. Someone buys an eSIM with a card, on a phone that has never touched a blockchain, and the purchase has to be recorded before there is anything to record it on. This contract holds that history until wallets exist, then deploys them and copies the record across.
 
 Everything here is keyed by string identifiers rather than by addresses, because a user in this state has no address yet. A device identifier stands in for the phone and an eSIM identifier for the eSIM, and the [Registry](./registry.md) resolves both to real wallets once `deployLazyWalletAndSetESIMIdentifier` has run. From that point the user's purchases live on their own [eSIM wallet](./esim-wallet.md) and this contract is out of the path.
 

@@ -3,7 +3,7 @@ title: Deployed contract addresses
 description: Every Kokio contract address on Base Sepolia, chain 84532, with the proxy and implementation for each, the admin timelock settings, and the compiler build they were deployed from.
 ---
 
-# Deployed contract addresses
+# Deployed contract addresses {#deployed-contract-addresses}
 
 Kokio is deployed on Base Sepolia and nowhere else. There is no mainnet deployment yet. Everything below is a testnet address, the balances behind it are worth nothing, and any of it can be redeployed without notice.
 

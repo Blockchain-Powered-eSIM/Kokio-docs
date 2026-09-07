@@ -5,7 +5,7 @@ description: The Kokio library that checks a WebAuthn assertion onchain, trying 
 
 # WebAuthn library {#webauthn-library}
 
-`WebAuthn` is the library that checks a passkey assertion onchain. It is built on Daimo's work, and it is reached through the [P256 verifier](./p256-verifier.md) rather than linked into each wallet, so every [device wallet](./device-wallet.md) in the [suite](./overview.md) verifies through one address.
+`WebAuthn` is the library that checks a passkey assertion onchain, and it is what makes a Kokio wallet controllable by a fingerprint instead of a seed phrase. It is built on Daimo's work, and it is reached through the [P256 verifier](./p256-verifier.md) rather than linked into each wallet, so every [device wallet](./device-wallet.md) in the [suite](./overview.md) verifies through one address.
 
 Two functions. `tryDecodeSignature` turns calldata into a `WebAuthnSignature` struct, and `verifySignature` decides whether that assertion is valid for a given P-256 key.
 

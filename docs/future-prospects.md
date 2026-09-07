@@ -1,6 +1,11 @@
-# Future Prospects
+---
+title: Future prospects
+description: "Where Kokio is heading: onboarding eSIM providers directly onchain so users pay them without Kokio holding the money in between, and what stays the same for the user when that happens."
+---
 
-## Onboarding eSIM providers onchain {#onboarding-esim-providers-on-chain}
+# Future prospects {#future-prospects}
+
+## Onboarding eSIM providers onchain {#onboarding-esim-providers-onchain}
 
 Currently, Kokio operates as an intermediary, partnering with eSIM providers to facilitate transactions. When users purchase eSIMs or data bundles, Kokio collects the payments and transfers them to the respective eSIM provider.
 
