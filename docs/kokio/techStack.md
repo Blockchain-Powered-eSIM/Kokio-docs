@@ -16,8 +16,8 @@
 
 - Creates an account abstracted self custodial wallet
 - Handles crypto payment confirmations
-- On-chain registry for wallets and unique user identity
-- Integrated via Koki'o SDK
+- Onchain registry for wallets and unique user identity
+- Integrated via the Kokio SDK
 
 ### Unified Backend Service (NodeJS) {#unified-backend-service-nodejs}
 

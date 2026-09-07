@@ -12,11 +12,7 @@
 
 - **Public Good**, giving users a way to spend their crypto on daily necessities while also _upgrading_ non-crypto users.
 - **Safeguarding Consumers’ Information** while purchasing eSIMs.
-- **Mass Adoption**, bringing users on chain via eSIM purchase with Smart Wallets.
-- **Seamless UX**, Biometrics enabled transactions submitted on-chain.
+- **Mass Adoption**, bringing users onchain via eSIM purchase with Smart Wallets.
+- **Fewer steps**, transactions signed with biometrics and submitted onchain.
 
-<!-- Koki'o gives you an account which is,
-An entry point in the **network state** (using eSIMs) and
-The entry point in the **ownership state** (using smart contracts). -->
-
-> Koki'o is more than just a connectivity app—it is a platform that empowers users with control, transparency, and flexibility while advancing the adoption of blockchain technology in the telecom industry.
+> Kokio is more than a connectivity app. It hands users control of their eSIMs, keeps the record of what they bought somewhere they can check it, and moves a piece of telecom onto public infrastructure.
