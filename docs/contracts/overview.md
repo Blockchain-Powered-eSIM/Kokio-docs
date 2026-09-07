@@ -11,7 +11,9 @@ Two ideas hold the design together. Every user gets a wallet per phone and a wal
 
 The whole suite is deployed on Base Sepolia and nowhere else. Addresses are on the [deployed addresses](./deployments.md) page.
 
-![Architecture of the Kokio smart contract suite: the Registry at the centre, with the device wallet factory and eSIM wallet factory deploying beacon-proxy wallets beneath it, and the lazy wallet registry and payment adapter beside it.](../../resources/kokio-contract-architecture.png)
+![Architecture of the Kokio smart contract suite. A fiat user and a crypto user both start in the mobile app. The crypto user reaches the Registry, which maps every valid wallet address; the fiat user reaches the lazy wallet registry, which holds their purchase history and deploys their wallet through the Registry when they ask for one. Beneath the Registry sit the eSIM wallet factory and the device wallet factory, which deploy the eSIM wallets and the device wallet. The device wallet owns the eSIM wallets, and the user owns the device wallet through a passkey and can use it as a primary wallet across other protocols.](../../resources/kokio-contract-architecture.png)
+
+The diagram predates the payment and governance contracts, so [PaymentAdapter](./payment-adapter.md) and the [ProtocolAdmin](./protocol-admin.md) timelock are not in it. The table below is the complete list.
 
 ## What each contract does {#what-each-contract-does}
 
