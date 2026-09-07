@@ -1,6 +1,6 @@
 # Tech Stack
 
-### Mobile Application
+### Mobile Application {#mobile-application}
 
 - React Native Application
 - Onboards users using passkeys
@@ -12,13 +12,13 @@
   - On-ramp solution
 - Passkey enabled payments
 
-### eSIM Smart Wallet Suite (Smart Contracts)
+### eSIM Smart Wallet Suite (Smart Contracts) {#esim-smart-wallet-suite-smart-contracts}
 
 - Creates an account abstracted self custodial wallet
 - Handles crypto payment confirmations
 - On-chain registry for wallets and unique user identity
 - Integrated via Koki'o SDK
 
-### Unified Backend Service (NodeJS)
+### Unified Backend Service (NodeJS) {#unified-backend-service-nodejs}
 
 - Aggregates multiple providers, Suppliers API

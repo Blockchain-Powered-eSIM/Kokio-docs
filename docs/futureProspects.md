@@ -1,6 +1,6 @@
 # Future Prospects
 
-## Onboarding eSIM providers on-chain
+## Onboarding eSIM providers on-chain {#onboarding-esim-providers-on-chain}
 
 Currently, Koki'o operates as an intermediary, partnering with eSIM providers to facilitate transactions. When users purchase eSIMs or data bundles, Koki'o collects the payments and transfers them to the respective eSIM provider.
 

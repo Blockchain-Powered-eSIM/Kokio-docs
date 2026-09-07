@@ -6,7 +6,7 @@ sidebar_position: 2
 
 An [eSIM](https://en.wikipedia.org/wiki/ESIM) (embedded SIM) is a digital SIM embedded directly into devices like phones or smartwatches, enabling remote connectivity to mobile networks and simplifying the process for wearables and innovative devices.
 
-### Benefits of eSIMs
+### Benefits of eSIMs {#benefits-of-esims}
 
 - **Security**: Offers equivalent security to removable SIMs, ensuring secure network access, privacy, and billing integrity, especially in roaming.
 - **End Users**: Simplifies subscription management, eliminating the need for multiple physical SIM cards.

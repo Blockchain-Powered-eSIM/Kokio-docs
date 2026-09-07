@@ -1,6 +1,6 @@
 # Mobile App
 
-## Userflow
+## Userflow {#userflow}
 
 ![](../../resources/KokioUserFlowMobileApp.png)
 

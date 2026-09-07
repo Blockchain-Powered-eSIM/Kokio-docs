@@ -1,6 +1,6 @@
 # Setup and Motivation
 
-### Setup
+### Setup {#setup}
 
 - Embodies the ethos of **Open Source**,
 - **Friendly & Practical** by design,
@@ -8,7 +8,7 @@
 
 > Contributing to the evolution of open-source technology and security awareness as a shared resource, fostering a more inclusive and secure digital future where privacy and control over personal data are paramount.
 
-### Motivations
+### Motivations {#motivations}
 
 - **Public Good**, giving users a way to spend their crypto on daily necessities while also _upgrading_ non-crypto users.
 - **Safeguarding Consumers’ Information** while purchasing eSIMs.
