@@ -5,11 +5,12 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
-    "prebuild": "node scripts/check-conventions.mjs && node scripts/build-text.mjs",
+    "prebuild": "node scripts/check-conventions.mjs && node lib/docs-answer.test.mjs && node scripts/build-text.mjs",
     "build": "docusaurus build",
     "postbuild": "node scripts/verify-site.mjs && node scripts/sync-reference.mjs",
     "build:text": "node scripts/build-text.mjs",
     "verify": "node scripts/verify-site.mjs",
+    "test:answer": "node lib/docs-answer.test.mjs",
     "check:conventions": "node scripts/check-conventions.mjs",
     "sync:reference": "node scripts/sync-reference.mjs",
     "swizzle": "docusaurus swizzle",
@@ -23,7 +24,6 @@
   "dependencies": {
     "@docusaurus/core": "3.10.2",
     "@docusaurus/preset-classic": "3.10.2",
-    "@easyops-cn/docusaurus-search-local": "0.55.3",
     "@mdx-js/react": "3.1.1",
     "prism-react-renderer": "2.4.1",
     "react": "19.2.8",

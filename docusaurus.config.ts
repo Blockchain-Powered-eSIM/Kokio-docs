@@ -96,9 +96,6 @@ const config: Config = {
           customCss: "./src/css/custom.css",
         },
         sitemap: {
-          // The search page renders results in the browser, so a crawler sees
-          // an empty box. Nothing to index, and it holds no text of its own.
-          ignorePatterns: ["/search"],
           // Read from git, per file. This needs full history in CI:
           // a shallow clone gives every page the same date or none.
           lastmod: "date",
@@ -108,25 +105,6 @@ const config: Config = {
           priority: null,
         },
       } satisfies Preset.Options,
-    ],
-  ],
-
-  // Search runs in the reader's browser against an index built here, so no
-  // query ever leaves the site and there is no service to keep alive.
-  themes: [
-    [
-      "@easyops-cn/docusaurus-search-local",
-      {
-        indexDocs: true,
-        indexPages: true,
-        indexBlog: false,
-        docsRouteBasePath: "/docs",
-        // Puts a content hash in the index file name, so a reader with the old
-        // one cached does not search last week's docs.
-        hashed: true,
-        highlightSearchTermsOnTargetPage: true,
-        searchResultLimits: 8,
-      },
     ],
   ],
 
@@ -154,6 +132,9 @@ const config: Config = {
           position: "left",
           label: "Docs",
         },
+        // Renders src/theme/SearchBar.tsx, which asks /api/ask rather than
+        // searching an index shipped to the browser.
+        { type: "search", position: "right" },
         // The icon is drawn by CSS on the class, so these carry no label. The
         // aria-label is the only name a screen reader gets.
         {
