@@ -5,7 +5,14 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
+    "prebuild": "node scripts/check-conventions.mjs && node lib/docs-answer.test.mjs && node scripts/build-text.mjs",
     "build": "docusaurus build",
+    "postbuild": "node scripts/verify-site.mjs && node scripts/sync-reference.mjs",
+    "build:text": "node scripts/build-text.mjs",
+    "verify": "node scripts/verify-site.mjs",
+    "test:answer": "node lib/docs-answer.test.mjs",
+    "check:conventions": "node scripts/check-conventions.mjs",
+    "sync:reference": "node scripts/sync-reference.mjs",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
@@ -15,19 +22,23 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@docusaurus/core": "^3.10.2",
-    "@docusaurus/preset-classic": "^3.10.2",
-    "@mdx-js/react": "^3.0.0",
-    "clsx": "^2.0.0",
-    "prism-react-renderer": "^2.3.0",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "@docusaurus/core": "3.10.2",
+    "@docusaurus/preset-classic": "3.10.2",
+    "@mdx-js/react": "3.1.1",
+    "prism-react-renderer": "2.4.1",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "overrides": {
+    "serialize-javascript": "7.1.1",
+    "qs": "6.16.0",
+    "uuid": "11.1.1"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "^3.10.2",
-    "@docusaurus/tsconfig": "^3.10.2",
-    "@docusaurus/types": "^3.10.2",
-    "typescript": "~5.2.2"
+    "@docusaurus/module-type-aliases": "3.10.2",
+    "@docusaurus/tsconfig": "3.10.2",
+    "@docusaurus/types": "3.10.2",
+    "typescript": "5.9.3"
   },
   "browserslist": {
     "production": [
@@ -42,6 +53,6 @@
     ]
   },
   "engines": {
-    "node": ">=18.0"
+    "node": ">=20.0"
   }
 }

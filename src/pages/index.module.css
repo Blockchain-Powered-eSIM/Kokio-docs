@@ -1,29 +1,77 @@
 /**
- * CSS files with the .module.css suffix will be treated as CSS modules
- * and scoped locally.
+ * The home page banner, laid out like the hero on kokio.app/blog: flat brand
+ * background, an orange label above the title, and dark text on top of it.
  */
 
 .heroBanner {
-  padding: 4rem 0;
+  padding: 5rem 1rem 4rem;
   text-align: center;
-  position: relative;
-  overflow: hidden;
-  background-image: linear-gradient(
-      rgba(0, 0, 0, 0.15),
-      rgba(0, 0, 0, 0.15)
-    ), url("/images/kokio-hero-bg.png");
-  background-size: cover;
-  background-position: center;
+  background-color: var(--kokio-hero-background);
 }
 
-@media screen and (max-width: 996px) {
-  .heroBanner {
-    padding: 2rem;
+/* Same drawing the blog hero opens with, at the same size. */
+.heroArt {
+  height: 5rem;
+  width: auto;
+  margin-bottom: 1rem;
+}
+
+@media screen and (min-width: 997px) {
+  .heroArt {
+    height: 6rem;
   }
+}
+
+.eyebrow {
+  margin-bottom: 0.75rem;
+  font-family: var(--ifm-heading-font-family);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--kokio-hero-eyebrow);
+}
+
+.title {
+  margin-bottom: 1rem;
+  font-size: clamp(2.25rem, 5vw, 3.25rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  max-width: 42rem;
+  margin: 0 auto 2rem;
+  font-size: 1.125rem;
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--ifm-color-content-secondary);
 }
 
 .buttons {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Infima's own button colours are tuned for a white page, so the brand orange
+   is set here rather than through --ifm-color-primary. */
+.primaryButton {
+  background-color: var(--kokio-cashmere-600);
+  border-color: var(--kokio-cashmere-600);
+  color: #ffffff;
+}
+
+.primaryButton:hover {
+  background-color: var(--kokio-cashmere-700);
+  border-color: var(--kokio-cashmere-700);
+  color: #ffffff;
+}
+
+@media screen and (max-width: 996px) {
+  .heroBanner {
+    padding: 3rem 1rem 2.5rem;
+  }
 }

@@ -1,22 +1,24 @@
-# Setup and Motivation
+---
+title: Principles and motivation
+description: "Why Kokio was built the way it was, what it commits to as an open source project, and who it is for: people already holding crypto with little to spend it on, and people holding none."
+---
 
-### Setup
+# Principles and motivation {#principles-and-motivation}
 
-- Embodies the ethos of **Open Source**,
-- **Friendly & Practical** by design,
-- Nurturing the [**Infinite Garden**](https://ethereum.foundation/infinitegarden).
+Kokio is a travel eSIM app whose purchase records live onchain and whose wallets are controlled by a passkey on the user's phone. This page is about why it was built that way. For what it does rather than why, read [what is Kokio](./kokio/landing-intro.md).
 
-> Contributing to the evolution of open-source technology and security awareness as a shared resource, fostering a more inclusive and secure digital future where privacy and control over personal data are paramount.
+## What the project commits to {#what-the-project-commits-to}
 
-### Motivations
+- **Open source.** The contracts, the SDK and this documentation are public. Anyone can check what the app does with a purchase instead of taking our word for it.
+- **Friendly and practical.** Somebody buying a data plan for a trip should not have to learn what a wallet is. The onchain part is real and it is checkable, and it stays out of the way.
+- **The [infinite garden](https://ethereum.foundation/infinitegarden).** Public infrastructure, contributed to as a shared resource rather than fenced off.
 
-- **Public Good**, giving users a way to spend their crypto on daily necessities while also _upgrading_ non-crypto users.
-- **Safeguarding Consumers’ Information** while purchasing eSIMs.
-- **Mass Adoption**, bringing users on chain via eSIM purchase with Smart Wallets.
-- **Seamless UX**, Biometrics enabled transactions submitted on-chain.
+Privacy and control over your own data are the point rather than a feature. Buying mobile data should not require handing over a name, an address or an identity document, and Kokio asks for none of them.
 
-<!-- Koki'o gives you an account which is,
-An entry point in the **network state** (using eSIMs) and
-The entry point in the **ownership state** (using smart contracts). -->
+## Who it is for {#who-it-is-for}
 
-> Koki'o is more than just a connectivity app—it is a platform that empowers users with control, transparency, and flexibility while advancing the adoption of blockchain technology in the telecom industry.
+**People who already hold crypto** and have very little to spend it on. Mobile data is something everyone actually buys, it costs a few dollars, and Kokio takes stablecoins for it directly.
+
+**People who hold none.** They pay by card, Apple Pay or Google Pay and never see a wallet. One is still created for them, their purchases are still recorded, and if they want the keys later the history is already there. [The lazy wallet registry](./contracts/lazy-wallet-registry.md) is the contract that makes that work.
+
+**Both, in fewer steps than either is used to.** A purchase is authorised with a fingerprint or a face, signed by the phone's secure enclave, and submitted onchain with no seed phrase, no browser extension and no gas balance to top up.

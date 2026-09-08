@@ -1,4 +1,10 @@
 {
+  "functions": {
+    "api/ask.mjs": {
+      "includeFiles": "static/llms-full.txt",
+      "maxDuration": 20
+    }
+  },
   "headers": [
     {
       "source": "/.well-known/apple-app-site-association",
@@ -6,6 +12,33 @@
         {
           "key": "Content-Type",
           "value": "application/json"
+        }
+      ]
+    },
+    {
+      "source": "/md/(.*)",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/markdown; charset=utf-8"
+        }
+      ]
+    },
+    {
+      "source": "/llms-full.txt",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/plain; charset=utf-8"
+        }
+      ]
+    },
+    {
+      "source": "/llms.txt",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/plain; charset=utf-8"
         }
       ]
     }
