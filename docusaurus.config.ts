@@ -7,6 +7,7 @@ import {
   DOCS_META_DESCRIPTION,
   DOCS_TITLE,
   GITHUB_ORG,
+  MANIFESTO_URL,
   MARKETING_URL,
   SITE_URL,
   TELEGRAM_URL,
@@ -197,6 +198,10 @@ const config: Config = {
             {
               label: "Blogs",
               href: BLOG_URL,
+            },
+            {
+              label: "Manifesto",
+              href: MANIFESTO_URL,
             },
           ],
         },

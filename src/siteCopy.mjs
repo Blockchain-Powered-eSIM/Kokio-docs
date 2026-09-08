@@ -81,3 +81,4 @@ export const SDK_REPO = `${GITHUB_ORG}/kokio-sdk`;
 export const TWITTER_URL = "https://x.com/kokiodotapp";
 export const TELEGRAM_URL = "https://t.me/+b44BXiy8d5k4M2Q1";
 export const BLOG_URL = `${MARKETING_URL}/blogs`;
+export const MANIFESTO_URL = `${MARKETING_URL}/manifesto`;
