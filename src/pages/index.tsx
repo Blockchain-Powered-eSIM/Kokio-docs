@@ -19,18 +19,28 @@ const websiteSchema = { "@context": "https://schema.org", ...WEBSITE_SCHEMA };
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
   return (
-    <header className={`hero hero--primary ${styles.heroBanner}`}>
+    <header className={styles.heroBanner}>
       <div className="container">
-        <Heading as="h1" className="hero__title">
+        <img
+          src="/images/beach-fun.svg"
+          alt=""
+          aria-hidden="true"
+          className={styles.heroArt}
+        />
+        <p className={styles.eyebrow}>Documentation</p>
+        <Heading as="h1" className={styles.title}>
           {siteConfig.title}
         </Heading>
-        <p className="hero__subtitle">{siteConfig.tagline}</p>
+        <p className={styles.subtitle}>{siteConfig.tagline}</p>
         <div className={styles.buttons}>
           <Link
-            className="button button--secondary button--lg"
+            className={`button button--lg ${styles.primaryButton}`}
             to="/docs/kokio/landing-intro"
           >
             What is Kokio?
+          </Link>
+          <Link className="button button--outline button--lg" to="/docs/contracts/overview">
+            Contract reference
           </Link>
         </div>
       </div>

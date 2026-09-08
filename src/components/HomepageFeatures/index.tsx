@@ -40,13 +40,15 @@ const FeatureList: FeatureItem[] = [
 
 function Feature({title, image, description}: FeatureItem) {
   return (
-    <div className="col col--4">
-      <div className="text--center">
-        <img src={image} className={styles.featureImg} alt={title} />
-      </div>
-      <div className="text--center padding-horiz--md">
-        <Heading as="h3">{title}</Heading>
-        <p>{description}</p>
+    <div className={`col col--4 ${styles.cardColumn}`}>
+      <div className={`${styles.card} text--center`}>
+        <div className={styles.imageFrame}>
+          <img src={image} className={styles.featureImg} alt={title} />
+        </div>
+        <Heading as="h3" className={styles.cardTitle}>
+          {title}
+        </Heading>
+        <p className={styles.cardText}>{description}</p>
       </div>
     </div>
   );
