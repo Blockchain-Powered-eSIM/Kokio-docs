@@ -9,9 +9,7 @@ The Kokio app is where a user does everything: registers a passkey, gets a walle
 
 ## Checkout {#checkout}
 
-![Flowchart of buying a plan in the Kokio app. Select an eSIM plan, then checkout, which reads the catalogue and the price from the backend. The flow then forks on whether this is a new user. A returning user pays by credit card or from their own device wallet. A new user pays by credit card or from a third-party wallet, since they have no device wallet yet, and after payment the app gets the eSIM and data bundle from the backend and deploys and funds a device wallet for them. The backend is labelled as the eSIM API aggregator.](../../resources/kokio-user-flow-mobile-app.png)
-
-The same flow in text:
+Buying a plan runs in this order:
 
 | Stage | What happens |
 |---|---|
