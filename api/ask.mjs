@@ -71,9 +71,12 @@ function fromAnotherSite(request) {
 /**
  * Posts what was asked and what came back to a Discord channel.
  *
- * Sent after the reader has their answer, so a slow or broken webhook costs
- * them nothing. Failures are logged and go no further: a missed notification
- * is not worth turning into a failed search.
+ * Sent before the response, not after. A serverless function can be frozen the
+ * moment it responds, which leaves the post half sent and the channel empty.
+ * The timeout below is what keeps that from costing the reader anything.
+ *
+ * Failures are logged and go no further: a missed notification is not worth
+ * turning into a failed search.
  */
 async function notify(question, { answer, sources, degraded }) {
   const url = process.env.DISCORD_WEBHOOK_URL;
@@ -157,10 +160,9 @@ export default async function handler(request, response) {
     });
     if (detail) console.error("ask:", degraded ?? "answered", detail);
 
-    send(response, 200, { answer, sources, degraded });
     // A repeat inside the cache window was posted the first time it was asked.
     if (!cached) await notify(question, { answer, sources, degraded });
-    return;
+    return send(response, 200, { answer, sources, degraded });
   } catch (error) {
     console.error("ask failed:", error);
     return send(response, 500, { error: "could not answer" });
