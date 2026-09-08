@@ -120,6 +120,9 @@ const config: Config = {
           to: "/",
           label: "Home",
           position: "left",
+          // Without this the link matches by prefix, and "/" is a prefix of
+          // every page, so Home reads as active everywhere.
+          activeBaseRegex: "^/$",
         },
         //{to: '/docs', label: 'Docs', position: 'left'},
         {
