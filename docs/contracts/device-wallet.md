@@ -32,7 +32,7 @@ The practical consequence for anyone reading storage: the layout of this contrac
 
 A user's device: an ERC-4337 account that owns the eSIM wallets bought for that device
 
-_A beacon proxy deployed by `DeviceWalletFactory`, owned by a P256 key the user holds. It funds its eSIM wallets, decides which of them may spend its money, and is the only party that can move one to another device. Its own owner key rotates through `transferOwnership`, which also tells the registry so the two records cannot drift apart._
+A beacon proxy deployed by `DeviceWalletFactory`, owned by a P256 key the user holds. It funds its eSIM wallets, decides which of them may spend its money, and is the only party that can move one to another device. Its own owner key rotates through `transferOwnership`, which also tells the registry so the two records cannot drift apart.
 
 ### registry {#devicewallet-registry}
 
@@ -74,7 +74,7 @@ mapping(address => bool) canPullFunds
 
 Tracks if an associated eSIM wallet may pull this wallet's tokens
 
-_A wallet trusted with the funds can already drain the owner, so a second flag per asset would cost another signature and limit nothing._
+A wallet trusted with the funds can already drain the owner, so a second flag per asset would cost another signature and limit nothing.
 
 ### FundsAccessUpdated {#devicewallet-fundsaccessupdated}
 
@@ -92,7 +92,7 @@ event TokenSent(address _token, address _eSIMWalletAddress, uint256 _amount)
 
 Emitted when an ERC-20 leaves this contract
 
-_mostly when an eSIM wallet pulls tokens to pay for a data bundle_
+mostly when an eSIM wallet pulls tokens to pay for a data bundle
 
 ### ESIMWalletAdded {#devicewallet-esimwalletadded}
 
@@ -158,7 +158,7 @@ modifier onlyESIMWalletAdmin()
 
 Restricts a call to the eSIM wallet admin
 
-_Read from the registry on every call, so a rotation there takes effect immediately._
+Read from the registry on every call, so a rotation there takes effect immediately.
 
 ### constructor {#devicewallet-constructor}
 
@@ -183,7 +183,7 @@ function init(address _registry, bytes32[2] _deviceWalletOwnerKey, string _devic
 
 Wires the wallet to the registry and the factory, and sets its owner key
 
-_Called as the beacon proxy's constructor argument, so it always runs in the same transaction as the deployment. `Account4337.initialize` is internal, and this is the only path to it._
+Called as the beacon proxy's constructor argument, so it always runs in the same transaction as the deployment. `Account4337.initialize` is internal, and this is the only path to it.
 
 **Parameters**
 
@@ -202,11 +202,11 @@ function deployESIMWallet(bool _hasAccessToFunds, uint256 _salt) external return
 
 Deploys an eSIM wallet for this device and binds it
 
-_The new wallet has no eSIM identifier yet. That arrives through `setESIMUniqueIdentifierForAnESIMWallet` once the eSIM itself has been created.
+The new wallet has no eSIM identifier yet. That arrives through `setESIMUniqueIdentifierForAnESIMWallet` once the eSIM itself has been created.
 
 Access to this wallet's money is granted only afterwards, by the owner, with `toggleAccessToFunds`.
 
-The admin gate here is a workflow convenience, not a security boundary against this wallet's own owner: `ESIMWalletFactory.deployESIMWallet` also accepts a call from any device wallet the registry knows, so the owner can reach the same outcome directly through `execute` with no admin involved. Closing that would need the deployment triggered by the admin rather than by this wallet, since nothing downstream of a device wallet's own call can tell one caller's signed intent from another's._
+The admin gate here is a workflow convenience, not a security boundary against this wallet's own owner: `ESIMWalletFactory.deployESIMWallet` also accepts a call from any device wallet the registry knows, so the owner can reach the same outcome directly through `execute` with no admin involved. Closing that would need the deployment triggered by the admin rather than by this wallet, since nothing downstream of a device wallet's own call can tell one caller's signed intent from another's.
 
 **Parameters**
 
@@ -229,7 +229,7 @@ function pullToken(address _token, uint256 _amount) external returns (uint256)
 
 Allow an associated eSIM wallet to pull an ERC-20 (for data bundles)
 
-_Refused while the protocol is paused, and refused for a wallet whose access the owner has revoked. It exists so the admin can charge this wallet without an owner signature in that transaction; an owner buying for themselves can batch the transfer and the purchase through `executeBatch` instead._
+Refused while the protocol is paused, and refused for a wallet whose access the owner has revoked. It exists so the admin can charge this wallet without an owner signature in that transaction; an owner buying for themselves can batch the transfer and the purchase through `executeBatch` instead.
 
 **Parameters**
 
@@ -252,9 +252,9 @@ function transferOwnership(bytes32[2] newOwner) public returns (bytes32[2])
 
 Replaces the P256 key that owns this account
 
-_The registry holds its own record of which key owns this wallet, and the deploy paths keep one key to one wallet. Rotating without telling it leaves the retired key named as the owner and leaves the key taking over unregistered, free for a second wallet to claim. `super` runs after the key check because it carries the `onlySelf` guard and because the registry call is an external one, so the local write has to land before it.
+The registry holds its own record of which key owns this wallet, and the deploy paths keep one key to one wallet. Rotating without telling it leaves the retired key named as the owner and leaves the key taking over unregistered, free for a second wallet to claim. `super` runs after the key check because it carries the `onlySelf` guard and because the registry call is an external one, so the local write has to land before it.
 
-A key that cannot verify a signature bricks the wallet for good: this function is reachable only through `execute`, which needs a signature, so there is no rotating back and no reaching the balance. The deploy paths reject such a key and this path writes the same storage, so it has to reject it too._
+A key that cannot verify a signature bricks the wallet for good: this function is reachable only through `execute`, which needs a signature, so there is no rotating back and no reaching the balance. The deploy paths reject such a key and this path writes the same storage, so it has to reject it too.
 
 **Parameters**
 
@@ -276,7 +276,7 @@ function toggleAccessToFunds(address _eSIMWalletAddress, bool _hasAccessToFunds)
 
 Allow owner to revoke or give an associated eSIM wallet access to this wallet's money
 
-_The only way that access is ever granted. Binding a wallet never carries it, so a revocation stands until the owner signs a grant._
+The only way that access is ever granted. Binding a wallet never carries it, so a revocation stands until the owner signs a grant.
 
 **Parameters**
 
@@ -323,9 +323,9 @@ function _addESIMWallet(address _eSIMWalletAddress, bool _hasAccessToFunds) inte
 
 Binds an eSIM wallet to this device wallet and records it with the registry
 
-_Refuses a wallet this device wallet does not already own, so binding cannot run ahead of the ownership handover.
+Refuses a wallet this device wallet does not already own, so binding cannot run ahead of the ownership handover.
 
-A bind never carries access to this wallet's money. `toggleAccessToFunds` is `onlySelf` and the only writer of a `true`, so no bind can undo the owner's revocation. Asking for access here reverts rather than being downgraded in silence._
+A bind never carries access to this wallet's money. `toggleAccessToFunds` is `onlySelf` and the only writer of a `true`, so no bind can undo the owner's revocation. Asking for access here reverts rather than being downgraded in silence.
 
 **Parameters**
 
@@ -342,7 +342,7 @@ function getVaultAddress() public view returns (address)
 
 Fetches the vault address that receives payment for data bundles
 
-_Read through to the registry rather than cached, so a vault change reaches every wallet at once. The associated eSIM wallets call this before paying._
+Read through to the registry rather than cached, so a vault change reaches every wallet at once. The associated eSIM wallets call this before paying.
 
 **Return Values**
 

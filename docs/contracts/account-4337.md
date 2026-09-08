@@ -44,7 +44,7 @@ The EntryPoint address is immutable too, which keeps validation cheap. It also m
 
 ERC-4337 account owned by a P256 key rather than by an address
 
-_The owner never sends a transaction itself. It signs a WebAuthn assertion, and either the EntryPoint or this account calling into itself turns that into a call. Two entry points read signatures, `validateUserOp` for user operations and `isValidSignature` for ERC-1271, and each hashes a different precursor, so a signature made for one is not accepted by the other._
+The owner never sends a transaction itself. It signs a WebAuthn assertion, and either the EntryPoint or this account calling into itself turns that into a call. Two entry points read signatures, `validateUserOp` for user operations and `isValidSignature` for ERC-1271, and each hashes a different precursor, so a signature made for one is not accepted by the other.
 
 ### entryPoint {#account4337-entrypoint}
 
@@ -54,7 +54,7 @@ contract IEntryPoint entryPoint
 
 The ERC-4337 EntryPoint singleton this account answers to
 
-_Immutable to keep validation cheap, which means moving to a new EntryPoint version is a new implementation rather than a setter call._
+Immutable to keep validation cheap, which means moving to a new EntryPoint version is a new implementation rather than a setter call.
 
 ### verifier {#account4337-verifier}
 
@@ -72,7 +72,7 @@ bytes32[2] owner
 
 X and Y co-ordinates of the P256 key that owns this account
 
-_DeviceWallet inherits this contract, and base storage comes first, so its own variables begin immediately after this one. A state variable added here moves all of them on wallets that are already deployed, which then read back as zero. Anything this contract needs later belongs in its own ERC-7201 namespace, not in a slot following `owner`._
+DeviceWallet inherits this contract, and base storage comes first, so its own variables begin immediately after this one. A state variable added here moves all of them on wallets that are already deployed, which then read back as zero. Anything this contract needs later belongs in its own ERC-7201 namespace, not in a slot following `owner`.
 
 ### Account4337Initialized {#account4337-account4337initialized}
 
@@ -98,7 +98,7 @@ modifier onlySelf()
 
 Restricts a call to the account itself
 
-_The only way to satisfy this from outside is `execute` or `executeBatch` targeting this address, which the owner key has to have signed for._
+The only way to satisfy this from outside is `execute` or `executeBatch` targeting this address, which the owner key has to have signed for.
 
 ### onlyEntryPoint {#account4337-onlyentrypoint}
 
@@ -131,7 +131,7 @@ function initialize(bytes32[2] anOwner) internal virtual
 
 Sets the owner key on a freshly deployed account
 
-_Internal on purpose. A public setup function guarded only by `initializer` names no caller, so a proxy created without its init call in the same transaction could be claimed by anyone with an owner key of their choosing and none of the protocol wiring. Internal keeps the subclass path working and leaves no other way in._
+Internal on purpose. A public setup function guarded only by `initializer` names no caller, so a proxy created without its init call in the same transaction could be claimed by anyone with an owner key of their choosing and none of the protocol wiring. Internal keeps the subclass path working and leaves no other way in.
 
 **Parameters**
 
@@ -147,7 +147,7 @@ function _initialize(bytes32[2] anOwner) internal virtual
 
 Writes the owner key without the initializer guard
 
-_Split out so a subclass can reuse the write from its own initializer._
+Split out so a subclass can reuse the write from its own initializer.
 
 **Parameters**
 
@@ -163,7 +163,7 @@ function execute(struct Call call) external
 
 Makes one call from this account
 
-_Callable by the EntryPoint or by this account. There is no path here for the P256 key directly: it holds no address, so it reaches this only by signing a user operation._
+Callable by the EntryPoint or by this account. There is no path here for the P256 key directly: it holds no address, so it reaches this only by signing a user operation.
 
 **Parameters**
 
@@ -179,7 +179,7 @@ function executeBatch(struct Call[] calls) external
 
 Makes a sequence of calls from this account, reverting all of them if one fails
 
-_Same callers as `execute`. Each entry carries its own value, so a batch that moves no ETH simply leaves every value at zero._
+Same callers as `execute`. Each entry carries its own value, so a batch that moves no ETH simply leaves every value at zero.
 
 **Parameters**
 
@@ -195,7 +195,7 @@ function isValidSignature(bytes32 _messageHash, bytes _signature) external view 
 
 Validates a signature over an arbitrary message, per ERC-1271
 
-_The challenge inside `clientDataJSON` is not `_messageHash`. It is the EIP-191 digest over version, validUntil, chain id, this address and `_messageHash`, so an offchain signer needs all five. Signature layout is version (1 byte) then validUntil (6 bytes) then the ABI-encoded WebAuthn assertion._
+The challenge inside `clientDataJSON` is not `_messageHash`. It is the EIP-191 digest over version, validUntil, chain id, this address and `_messageHash`, so an offchain signer needs all five. Signature layout is version (1 byte) then validUntil (6 bytes) then the ABI-encoded WebAuthn assertion.
 
 **Parameters**
 
@@ -218,7 +218,7 @@ function validateUserOp(struct PackedUserOperation userOp, bytes32 userOpHash, u
 
 Validate user's signature and nonce the entryPoint will make the call to the recipient only if this validation call returns successfully. signature failure should be reported by returning SIG_VALIDATION_FAILED (1). This allows making a "simulation call" without a valid signature Other failures (e.g. nonce mismatch, or invalid signature format) should still revert to signal failure.
 
-_Must stay within the ERC-4337 validation rules: no banned opcodes, no external calls to other contracts, no TIMESTAMP. Expiry is handed to the EntryPoint through the packed return value instead of being checked here._
+Must stay within the ERC-4337 validation rules: no banned opcodes, no external calls to other contracts, no TIMESTAMP. Expiry is handed to the EntryPoint through the packed return value instead of being checked here.
 
 **Parameters**
 
@@ -242,7 +242,7 @@ function transferOwnership(bytes32[2] newOwner) public virtual returns (bytes32[
 
 Replaces the P256 key that owns this account
 
-_Reachable only through `execute` or `executeBatch` with this account as the target, so the current owner has to sign for it. Nothing outside this contract is told: a subclass holding its own record of the owner has to override this and keep that record in step._
+Reachable only through `execute` or `executeBatch` with this account as the target, so the current owner has to sign for it. Nothing outside this contract is told: a subclass holding its own record of the owner has to override this and keep that record in step.
 
 **Parameters**
 
@@ -278,7 +278,7 @@ function addDeposit() public payable
 
 Tops up this account's gas deposit at the EntryPoint
 
-_Open to anyone, since paying another account's gas costs the payer and nobody else._
+Open to anyone, since paying another account's gas costs the payer and nobody else.
 
 ### withdrawDepositTo {#account4337-withdrawdepositto}
 
@@ -303,7 +303,7 @@ function _requireFromEntryPointOrOwner() internal view
 
 Reverts unless the caller is the EntryPoint or this account itself
 
-_"Owner" in the name means `address(this)`, not the P256 key, which has no address to call from._
+"Owner" in the name means `address(this)`, not the P256 key, which has no address to call from.
 
 ### _call {#account4337-_call}
 

@@ -90,6 +90,7 @@ function findBlocks(file) {
  * 4. Wrapped prose is joined back into one line per paragraph. docgen re-emits
  *    the source comment's own line breaks, indented, and five spaces of indent
  *    after a blank line is a code block to any other markdown reader.
+ * 5. The italics around a `@dev` note go. See `unwrapDevNotes`.
  */
 export function transform(markdown) {
   const out = [];
@@ -138,7 +139,46 @@ export function transform(markdown) {
     out.push(line);
   }
 
-  return out.join("\n").replace(/\n{3,}/g, "\n\n").trim();
+  return unwrapDevNotes(out).join("\n").replace(/\n{3,}/g, "\n\n").trim();
+}
+
+/**
+ * Drops the italics docgen puts around a `@dev` note. A note of more than one
+ * paragraph opens on the first and closes on the last, and emphasis cannot
+ * cross a blank line, so both markers reach the page as literal underscores.
+ * The 142 notes that do close read as a page of italics, which is no better.
+ *
+ * An unclosed marker is left alone rather than guessed at, so upstream can
+ * write a stray underscore without this eating the paragraph after it.
+ */
+function unwrapDevNotes(lines) {
+  const out = [...lines];
+  let fenced = false;
+  let open = -1;
+
+  for (let i = 0; i < out.length; i += 1) {
+    if (out[i].startsWith("```")) {
+      fenced = !fenced;
+      continue;
+    }
+    if (fenced) continue;
+
+    // A note never runs past a heading, so a marker still open at one was never
+    // a note.
+    if (out[i].startsWith("#")) {
+      open = -1;
+      continue;
+    }
+
+    if (open === -1 && out[i].startsWith("_")) open = i;
+    if (open === -1 || !out[i].endsWith("_")) continue;
+
+    out[open] = out[open].slice(1);
+    out[i] = out[i].slice(0, -1);
+    open = -1;
+  }
+
+  return out;
 }
 
 /** A heading, a table row or a label is finished; nothing gets appended to it. */
@@ -167,56 +207,61 @@ async function fetchSource(source) {
   return response.text();
 }
 
-const pages = findFiles(DOCS).map(findBlocks).filter(Boolean);
-const sources = new Set(pages.flatMap((page) => page.blocks.map((block) => block.source)));
+async function main() {
+  const pages = findFiles(DOCS).map(findBlocks).filter(Boolean);
+  const sources = new Set(pages.flatMap((page) => page.blocks.map((block) => block.source)));
 
-if (!sources.size) {
-  console.log("sync-reference: no docgen blocks to check.");
-  process.exit(0);
-}
-
-/** A build must not fail because GitHub was briefly unreachable. */
-const bodies = new Map();
-try {
-  await Promise.all(
-    [...sources].map(async (source) => bodies.set(source, transform(await fetchSource(source))))
-  );
-} catch (error) {
-  console.warn(`sync-reference: skipped, upstream unreadable. ${error.message}`);
-  process.exit(0);
-}
-
-const drifted = [];
-
-for (const page of pages) {
-  const lines = [...page.lines];
-  let changed = false;
-
-  // Back to front, so an earlier block's replacement does not move a later one.
-  for (const block of [...page.blocks].reverse()) {
-    const upstream = bodies.get(block.source).split("\n");
-    const committed = lines.slice(block.from, block.to);
-    if (committed.join("\n") === upstream.join("\n")) continue;
-
-    drifted.push(`${page.file} ← ${block.source}`);
-    changed = true;
-    if (write) lines.splice(block.from, block.to - block.from, ...upstream);
+  if (!sources.size) {
+    console.log("sync-reference: no docgen blocks to check.");
+    process.exit(0);
   }
 
-  if (changed && write) writeFileSync(page.file, lines.join("\n"));
+  /** A build must not fail because GitHub was briefly unreachable. */
+  const bodies = new Map();
+  try {
+    await Promise.all(
+      [...sources].map(async (source) => bodies.set(source, transform(await fetchSource(source))))
+    );
+  } catch (error) {
+    console.warn(`sync-reference: skipped, upstream unreadable. ${error.message}`);
+    process.exit(0);
+  }
+
+  const drifted = [];
+
+  for (const page of pages) {
+    const lines = [...page.lines];
+    let changed = false;
+
+    // Back to front, so an earlier block's replacement does not move a later one.
+    for (const block of [...page.blocks].reverse()) {
+      const upstream = bodies.get(block.source).split("\n");
+      const committed = lines.slice(block.from, block.to);
+      if (committed.join("\n") === upstream.join("\n")) continue;
+
+      drifted.push(`${page.file} ← ${block.source}`);
+      changed = true;
+      if (write) lines.splice(block.from, block.to - block.from, ...upstream);
+    }
+
+    if (changed && write) writeFileSync(page.file, lines.join("\n"));
+  }
+
+  if (!drifted.length) {
+    console.log(`sync-reference: ${sources.size} reference file(s) up to date.`);
+    process.exit(0);
+  }
+
+  for (const entry of drifted) console.warn(`${write ? "updated " : "drifted "} ${entry}`);
+
+  if (write) {
+    console.log(`\nsync-reference: rewrote ${drifted.length} block(s). Review the diff before committing.`);
+    process.exit(0);
+  }
+
+  console.warn(`\nsync-reference: ${drifted.length} block(s) behind ${BRANCH}. Run with --write to update.`);
+  process.exit(strict ? 1 : 0);
 }
 
-if (!drifted.length) {
-  console.log(`sync-reference: ${sources.size} reference file(s) up to date.`);
-  process.exit(0);
-}
-
-for (const entry of drifted) console.warn(`${write ? "updated " : "drifted "} ${entry}`);
-
-if (write) {
-  console.log(`\nsync-reference: rewrote ${drifted.length} block(s). Review the diff before committing.`);
-  process.exit(0);
-}
-
-console.warn(`\nsync-reference: ${drifted.length} block(s) behind ${BRANCH}. Run with --write to update.`);
-process.exit(strict ? 1 : 0);
+// Running the file syncs. Importing it borrows `transform` and runs nothing.
+if (process.argv[1]?.endsWith("sync-reference.mjs")) await main();

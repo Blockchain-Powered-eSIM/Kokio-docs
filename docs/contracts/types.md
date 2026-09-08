@@ -48,7 +48,7 @@ It is decoded from calldata by [`WebAuthn.tryDecodeSignature`](./webauthn.md), w
 
 Which contract, if any, saw the money for a data bundle move
 
-_Only `DeviceWallet` can be proven onchain. The other two are the admin's word, so the price cap is the only check on them._
+Only `DeviceWallet` can be proven onchain. The other two are the admin's word, so the price cap is the only check on them.
 
 ```solidity
 enum Settlement {
@@ -62,7 +62,7 @@ enum Settlement {
 
 Data Bundle related details stored in the eSIM wallet
 
-_Two slots: `id`, then `priceUSDCents` and `settlement` packed together. `id` is `bytes32` because the provider's ids fit in 32 bytes and a `string` would cost an extra slot on every entry. No timestamp field: the event log already has one._
+Two slots: `id`, then `priceUSDCents` and `settlement` packed together. `id` is `bytes32` because the provider's ids fit in 32 bytes and a `string` would cost an extra slot on every entry. No timestamp field: the event log already has one.
 
 ```solidity
 struct DataBundleDetails {
@@ -87,7 +87,7 @@ struct Wallets {
 
 One WebAuthn assertion, as the authenticator produced it
 
-_Decoded from calldata by `WebAuthn.tryDecodeSignature`, which zeroes the whole struct on a malformed body rather than reverting. A zeroed struct fails verification._
+Decoded from calldata by `WebAuthn.tryDecodeSignature`, which zeroes the whole struct on a malformed body rather than reverting. A zeroed struct fails verification.
 
 ```solidity
 struct WebAuthnSignature {

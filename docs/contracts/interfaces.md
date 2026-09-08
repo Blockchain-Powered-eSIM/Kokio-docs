@@ -33,7 +33,7 @@ They are worth reading for what they leave out. Each of these is a list of the o
 
 Minimal view of the pause a guardian is allowed to release
 
-_Only `unpause()` is here. Raising a pause is the hot admin key's lever and releasing one is the timelock's, so the two are deliberately not offered through the same interface._
+Only `unpause()` is here. Raising a pause is the hot admin key's lever and releasing one is the timelock's, so the two are deliberately not offered through the same interface.
 
 ### unpause {#ipausable-unpause}
 
@@ -49,7 +49,7 @@ Clears the pause
 
 Minimal view of the admin role the protocol owner controls
 
-_Holds only the two calls `ProtocolAdmin` makes. `enableAdmin` is deliberately absent: the owner reaches it as an ordinary scheduled payload, and putting it here would invite a named function beside the guardian's, which is the one place a fast path could be added by accident. Suspending is instant and restoring waits, and the split is what stops a compromised key from undoing its own suspension._
+Holds only the two calls `ProtocolAdmin` makes. `enableAdmin` is deliberately absent: the owner reaches it as an ordinary scheduled payload, and putting it here would invite a named function beside the guardian's, which is the one place a fast path could be added by accident. Suspending is instant and restoring waits, and the split is what stops a compromised key from undoing its own suspension.
 
 ### disableAdmin {#iregistryadmin-disableadmin}
 
@@ -79,7 +79,7 @@ Nominates a new admin, which strips the incumbent until the nominee accepts
 
 The two things the payment adapter asks the registry on a settlement
 
-_An interface rather than an import of `Registry`, which already imports the adapter. It also keeps the adapter's view of the registry down to what it reads._
+An interface rather than an import of `Registry`, which already imports the adapter. It also keeps the adapter's view of the registry down to what it reads.
 
 ### vault {#ipaymentregistry-vault}
 
@@ -121,7 +121,7 @@ The device wallet an eSIM wallet belongs to, or zero if the registry has no reco
 
 Minimal view of the two-step ownership handover the protocol contracts use
 
-_Matches the part of OpenZeppelin's `Ownable2Step` an incoming owner needs. The offer is made by the current owner and completed by the nominee, so a contract taking ownership only ever calls these two._
+Matches the part of OpenZeppelin's `Ownable2Step` an incoming owner needs. The offer is made by the current owner and completed by the nominee, so a contract taking ownership only ever calls these two.
 
 ### acceptOwnership {#iownable2step-acceptownership}
 
