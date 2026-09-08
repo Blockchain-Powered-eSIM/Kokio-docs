@@ -7,11 +7,20 @@
  *
  * The response never carries the reason. It can name the key or the model, so
  * it goes to the logs instead.
+ *
+ * Every question is also posted to Discord when `DISCORD_WEBHOOK_URL` is set,
+ * which is how gaps in the docs get noticed.
  */
 
 import { answerQuestion, MAX_QUESTION_LENGTH } from "../lib/docs-answer.mjs";
 
 const WINDOW_MS = 60 * 1000;
+
+/** Long enough for Discord on a bad day, short enough to never matter. */
+const NOTIFY_TIMEOUT_MS = 1500;
+
+/** Discord refuses a message over 2000 characters. */
+const DISCORD_MAX_CHARS = 1990;
 
 /** Per reader, and for everyone this instance is serving. */
 const MAX_PER_ADDRESS = 8;
@@ -58,6 +67,38 @@ function fromAnotherSite(request) {
   }
 }
 
+/**
+ * Posts what was asked and what came back to a Discord channel.
+ *
+ * Sent after the reader has their answer, so a slow or broken webhook costs
+ * them nothing. Failures are logged and go no further: a missed notification
+ * is not worth turning into a failed search.
+ */
+async function notify(question, { answer, sources, degraded }) {
+  const url = process.env.DISCORD_WEBHOOK_URL;
+  if (!url) return;
+
+  const pages = sources.map((source) => source.url).join(", ") || "none";
+  const outcome = answer ? "answered" : (degraded ?? "no match");
+  const content = `**Q:** ${question}\n\`${outcome}\` · ${pages}\n${answer ?? ""}`;
+
+  try {
+    await fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        content: content.slice(0, DISCORD_MAX_CHARS),
+        // The question is whatever a reader typed, so it must not be able to
+        // ping the server.
+        allowed_mentions: { parse: [] },
+      }),
+      signal: AbortSignal.timeout(NOTIFY_TIMEOUT_MS),
+    });
+  } catch (error) {
+    console.error("discord notify failed:", error.message);
+  }
+}
+
 function send(response, status, body) {
   response.status(status);
   response.setHeader("content-type", "application/json; charset=utf-8");
@@ -97,11 +138,15 @@ export default async function handler(request, response) {
   }
 
   try {
-    const { answer, sources, degraded, detail } = await answerQuestion(question, {
+    const { answer, sources, degraded, detail, cached } = await answerQuestion(question, {
       apiKey: process.env.GEMINI_API_KEY,
     });
     if (detail) console.error("ask:", degraded ?? "answered", detail);
-    return send(response, 200, { answer, sources, degraded });
+
+    send(response, 200, { answer, sources, degraded });
+    // A repeat inside the cache window was posted the first time it was asked.
+    if (!cached) await notify(question, { answer, sources, degraded });
+    return;
   } catch (error) {
     console.error("ask failed:", error);
     return send(response, 500, { error: "could not answer" });
