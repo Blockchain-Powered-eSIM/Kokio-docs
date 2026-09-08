@@ -23,6 +23,7 @@ const DOCS = "docs";
 /** Built pages deliberately outside the sitemap. Each entry needs a reason. */
 const NOT_INDEXED = {
   "/404": "error page, has no content of its own",
+  "/search": "search box, its results are the doc pages that are indexed already",
 };
 
 /**
