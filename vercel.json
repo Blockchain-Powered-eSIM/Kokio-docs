@@ -1,7 +1,8 @@
 {
   "functions": {
     "api/ask.mjs": {
-      "includeFiles": "static/llms-full.txt"
+      "includeFiles": "static/llms-full.txt",
+      "maxDuration": 20
     }
   },
   "headers": [
