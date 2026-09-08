@@ -60,9 +60,9 @@ export default async function handler(request, response) {
     const { answer, sources, degraded, detail } = await answerQuestion(question, {
       apiKey: process.env.GEMINI_API_KEY,
     });
-    // Why the model refused stays in the logs. It can name the key or the
-    // model, and neither belongs in a public response.
-    if (detail) console.error("ask degraded:", degraded, detail);
+    // Why the model refused, or cut an answer short, stays in the logs. It can
+    // name the key or the model, and neither belongs in a public response.
+    if (detail) console.error("ask:", degraded ?? "answered", detail);
     return send(response, 200, { answer, sources, degraded });
   } catch (error) {
     console.error("ask failed:", error);
