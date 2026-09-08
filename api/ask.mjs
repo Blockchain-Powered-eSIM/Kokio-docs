@@ -28,6 +28,7 @@ const MAX_PER_INSTANCE = 60;
 
 const recent = new Map();
 let instanceHits = [];
+let warnedNoWebhook = false;
 
 /**
  * Requests per address, kept in memory.
@@ -76,14 +77,22 @@ function fromAnotherSite(request) {
  */
 async function notify(question, { answer, sources, degraded }) {
   const url = process.env.DISCORD_WEBHOOK_URL;
-  if (!url) return;
+  if (!url) {
+    // Once per instance. Silence here is indistinguishable from a webhook that
+    // is set but refused, and both look the same from the channel.
+    if (!warnedNoWebhook) {
+      warnedNoWebhook = true;
+      console.error("discord notify skipped: DISCORD_WEBHOOK_URL is not set");
+    }
+    return;
+  }
 
   const pages = sources.map((source) => source.url).join(", ") || "none";
   const outcome = answer ? "answered" : (degraded ?? "no match");
   const content = `**Q:** ${question}\n\`${outcome}\` · ${pages}\n${answer ?? ""}`;
 
   try {
-    await fetch(url, {
+    const posted = await fetch(url, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
@@ -94,6 +103,11 @@ async function notify(question, { answer, sources, degraded }) {
       }),
       signal: AbortSignal.timeout(NOTIFY_TIMEOUT_MS),
     });
+    // A deleted or mistyped webhook answers 401 or 404 rather than throwing,
+    // so without this the channel just stays empty.
+    if (!posted.ok) {
+      console.error(`discord notify rejected: ${posted.status} ${await posted.text()}`);
+    }
   } catch (error) {
     console.error("discord notify failed:", error.message);
   }
