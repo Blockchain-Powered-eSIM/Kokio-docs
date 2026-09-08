@@ -76,3 +76,8 @@ export const WEBSITE_SCHEMA = {
 export const GITHUB_ORG = "https://github.com/Blockchain-Powered-eSIM";
 export const CONTRACTS_REPO = `${GITHUB_ORG}/smart-contract-suite`;
 export const SDK_REPO = `${GITHUB_ORG}/kokio-sdk`;
+
+/** Where Kokio is elsewhere. Written once, used by the navbar and the footer. */
+export const TWITTER_URL = "https://x.com/kokiodotapp";
+export const TELEGRAM_URL = "https://t.me/+b44BXiy8d5k4M2Q1";
+export const BLOG_URL = `${MARKETING_URL}/blogs`;
