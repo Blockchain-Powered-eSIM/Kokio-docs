@@ -13,14 +13,25 @@
  */
 
 import { answerQuestion, MAX_QUESTION_LENGTH } from "../lib/docs-answer.mjs";
+import { SITE_URL } from "../src/siteCopy.mjs";
 
 const WINDOW_MS = 60 * 1000;
 
 /** Long enough for Discord on a bad day, short enough to never matter. */
 const NOTIFY_TIMEOUT_MS = 1500;
 
-/** Discord refuses a message over 2000 characters. */
-const DISCORD_MAX_CHARS = 1990;
+/** Discord's limits on the parts of an embed this uses. */
+const EMBED_TITLE_MAX = 250;
+const EMBED_DESCRIPTION_MAX = 4000;
+const EMBED_FIELD_MAX = 1000;
+
+/** Discord's own green and red, which stay legible in both themes. */
+const COLOUR_ANSWERED = 0x57f287;
+const COLOUR_UNANSWERED = 0xed4245;
+
+function clip(text, max) {
+  return text.length > max ? `${text.slice(0, max - 1)}…` : text;
+}
 
 /** Per reader, and for everyone this instance is serving. */
 const MAX_PER_ADDRESS = 8;
@@ -90,16 +101,29 @@ async function notify(question, { answer, sources, degraded }) {
     return;
   }
 
-  const pages = sources.map((source) => source.url).join(", ") || "none";
-  const outcome = answer ? "answered" : (degraded ?? "no match");
-  const content = `**Q:** ${question}\n\`${outcome}\` · ${pages}\n${answer ?? ""}`;
+  const embed = {
+    // The stripe down the side is the whole point: a channel of these can be
+    // skimmed for the red ones without reading a word.
+    color: answer ? COLOUR_ANSWERED : COLOUR_UNANSWERED,
+    title: clip(question, EMBED_TITLE_MAX),
+    description: clip(answer ?? "No answer. Closest pages below.", EMBED_DESCRIPTION_MAX),
+    footer: { text: answer ? "answered" : (degraded ?? "no match") },
+    timestamp: new Date().toISOString(),
+  };
+
+  const links = sources
+    .map((source) => `[${source.title}](${SITE_URL}${source.url})`)
+    .join(" · ");
+  if (links) {
+    embed.fields = [{ name: "Pages", value: clip(links, EMBED_FIELD_MAX) }];
+  }
 
   try {
     const posted = await fetch(url, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        content: content.slice(0, DISCORD_MAX_CHARS),
+        embeds: [embed],
         // The question is whatever a reader typed, so it must not be able to
         // ping the server.
         allowed_mentions: { parse: [] },
