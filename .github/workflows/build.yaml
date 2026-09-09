@@ -6,8 +6,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+      with:
+        # The sitemap reads each page's last commit date from git. The default
+        # shallow clone has no history, so every lastmod would be missing.
+        fetch-depth: 0
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
-    - run: yarn install
-    - run: yarn build
+    - run: npm ci
+    - run: npm run build
+    # The build only warns when a contract page is behind its source repo. Here
+    # a person is already looking at a diff, so it fails instead.
+    - run: node scripts/sync-reference.mjs --strict

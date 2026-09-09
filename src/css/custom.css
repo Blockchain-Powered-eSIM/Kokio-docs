@@ -1,30 +1,215 @@
 /**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
+ * Kokio's colours and type, so this site reads as part of kokio.app rather
+ * than as a stock Docusaurus install.
+ *
+ * The `--kokio-*` names below are the marketing site's own palette names,
+ * copied from its compiled CSS. Keep them if that palette changes, so the two
+ * sites stay one thing.
+ *
+ * Everything under them maps that palette onto Infima variables. Nothing here
+ * styles an element directly, so a component only ever reads a variable.
  */
 
-/* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
-  --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --kokio-beach-sky: #ceeff8;
+  --kokio-ocean: #6dd2e8;
+
+  --kokio-ship-cove-50: #f4f9fa;
+  --kokio-ship-cove-100: #e9f2f6;
+  --kokio-ship-cove-200: #d8e6ee;
+  --kokio-ship-cove-300: #bfd7e3;
+
+  --kokio-outer-space-300: #9ac0c6;
+  --kokio-outer-space-700: #3b5963;
+  --kokio-outer-space-800: #364c54;
+  --kokio-outer-space-900: #324249;
+  --kokio-outer-space-950: #1d2a2f;
+
+  --kokio-cashmere-50: #fdf4ed;
+  --kokio-cashmere-200: #f0c3a3;
+  --kokio-cashmere-300: #ebad84;
+  --kokio-cashmere-500: #dc6232;
+  --kokio-cashmere-600: #cc4f28;
+  --kokio-cashmere-700: #a93b23;
+  --kokio-cashmere-800: #893224;
+
+  /* The dark ground from Kokio-web's own `.dark` block. It is warm, hue 17 at
+     low saturation, not a neutral grey, which is what keeps the orange in it. */
+  --kokio-dark-base: #1c1817;
+  --kokio-dark-surface: #24201e;
+  --kokio-dark-raised: #2d2725;
+  --kokio-dark-border: #433b37;
+  --kokio-dark-text: #f5f0ec;
+  --kokio-dark-text-muted: #afa29d;
+
+  --ifm-font-family-base: Lexend, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", sans-serif;
+  --ifm-heading-font-family: Anybody, var(--ifm-font-family-base);
+  --ifm-heading-font-weight: 700;
+  --ifm-font-size-base: 17px;
+  --ifm-code-font-size: 90%;
+
+  /* The marketing site rounds everything generously. Cards there are 1.5rem. */
+  --ifm-global-radius: 0.75rem;
+  --ifm-button-border-radius: 999px;
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
-[data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+html[data-theme="light"] {
+  /* cashmere-700 rather than the brand cashmere-500, which is a 3:1 orange
+     against this background and fails contrast at body size. */
+  --ifm-color-primary: #a93b23;
+  --ifm-color-primary-dark: #98351f;
+  --ifm-color-primary-darker: #893224;
+  --ifm-color-primary-darkest: #6f2819;
+  --ifm-color-primary-light: #cc4f28;
+  --ifm-color-primary-lighter: #dc6232;
+  --ifm-color-primary-lightest: #e28455;
+
+  --ifm-background-color: var(--kokio-beach-sky);
+  --ifm-background-surface-color: #ffffff;
+  --ifm-navbar-background-color: var(--kokio-ship-cove-50);
+  --ifm-footer-background-color: var(--kokio-ship-cove-50);
+  --ifm-footer-color: var(--kokio-outer-space-700);
+  --ifm-footer-link-color: var(--kokio-outer-space-700);
+  --ifm-footer-title-color: var(--kokio-outer-space-950);
+
+  --ifm-color-content: var(--kokio-outer-space-950);
+  --ifm-color-content-secondary: var(--kokio-outer-space-700);
+  --ifm-heading-color: var(--kokio-outer-space-950);
+
+  --ifm-toc-border-color: var(--kokio-ship-cove-300);
+  --ifm-hr-background-color: var(--kokio-ship-cove-300);
+  --ifm-table-stripe-background: rgba(255, 255, 255, 0.55);
+  --ifm-blockquote-color: var(--kokio-outer-space-700);
+  --ifm-code-background: rgba(255, 255, 255, 0.7);
+  --docusaurus-highlighted-code-line-bg: rgba(29, 42, 47, 0.1);
+
+  --kokio-hero-background: var(--kokio-beach-sky);
+  --kokio-hero-eyebrow: var(--kokio-cashmere-700);
+  --kokio-card-background: #ffffff;
+  --kokio-card-border: var(--kokio-ship-cove-200);
+  --kokio-card-shadow: 0 1px 2px rgba(29, 42, 47, 0.08);
+  --kokio-card-shadow-hover: 0 8px 24px rgba(29, 42, 47, 0.14);
+}
+
+/* Infima declares its dark values on `html[data-theme='dark']`, so a bare
+   `[data-theme='dark']` here loses on specificity for anything it also sets. */
+html[data-theme="dark"] {
+  /* cashmere-400, the lightest step that still reads as the brand orange
+     rather than as apricot, at 6.4:1 on the base. */
+  --ifm-color-primary: #e28455;
+  --ifm-color-primary-dark: #dc6232;
+  --ifm-color-primary-darker: #cc4f28;
+  --ifm-color-primary-darkest: #a93b23;
+  --ifm-color-primary-light: #ebad84;
+  --ifm-color-primary-lighter: #f0c3a3;
+  --ifm-color-primary-lightest: #fdf4ed;
+
+  --ifm-background-color: var(--kokio-dark-base);
+  --ifm-background-surface-color: var(--kokio-dark-surface);
+  --ifm-navbar-background-color: var(--kokio-dark-surface);
+  --ifm-footer-background-color: var(--kokio-dark-surface);
+  --ifm-footer-color: var(--kokio-dark-text-muted);
+  --ifm-footer-link-color: var(--kokio-dark-text-muted);
+  --ifm-footer-title-color: var(--kokio-dark-text);
+
+  --ifm-color-content: var(--kokio-dark-text);
+  --ifm-color-content-secondary: var(--kokio-dark-text-muted);
+  --ifm-heading-color: var(--kokio-dark-text);
+
+  --ifm-toc-border-color: var(--kokio-dark-border);
+  --ifm-hr-background-color: var(--kokio-dark-border);
+  --ifm-table-stripe-background: rgba(255, 255, 255, 0.03);
+  --ifm-blockquote-color: var(--kokio-dark-text-muted);
+  --ifm-code-background: rgba(220, 98, 50, 0.12);
+  --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.1);
+
+  --kokio-hero-background: var(--kokio-dark-surface);
+  --kokio-hero-eyebrow: var(--kokio-cashmere-300);
+  --kokio-card-background: var(--kokio-dark-raised);
+  --kokio-card-border: var(--kokio-dark-border);
+  --kokio-card-shadow: none;
+  --kokio-card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.35);
+
+  /* Infima's dark ramp is neutral grey, and it paints most of the chrome:
+     hover states, borders, the sidebar, table lines. Left alone it drains the
+     warmth out of everything the colours above set. */
+  --ifm-color-emphasis-0: #161312;
+  --ifm-color-emphasis-100: #1c1817;
+  --ifm-color-emphasis-200: #24201e;
+  --ifm-color-emphasis-300: #2d2725;
+  --ifm-color-emphasis-400: #433b37;
+  --ifm-color-emphasis-500: #5c524d;
+  --ifm-color-emphasis-600: #7d716b;
+  --ifm-color-emphasis-700: #9c8f89;
+  --ifm-color-emphasis-800: #c4b8b2;
+  --ifm-color-emphasis-900: #e6ded9;
+  --ifm-color-emphasis-1000: #f5f0ec;
+}
+
+/* Headings run a little tight at these sizes; Anybody is a wide face. */
+.markdown h1,
+.markdown h2,
+.markdown h3 {
+  letter-spacing: -0.01em;
+}
+
+/* Social links in the navbar are icons with no text. The glyph is a mask, not
+   an image, so it takes the navbar's own link colour in both themes.
+ *
+ * Each viewBox below is cropped to the drawing rather than left at the size the
+ * icon set shipped. Three sets draw at three different paddings, and a shared
+ * box renders them at three different sizes. `--kokio-icon-size` is then only
+ * for optical trims, not for undoing that padding. */
+.header-icon-link::before {
+  content: "";
+  display: block;
+  width: 1.375rem;
+  height: 1.375rem;
+  background-color: var(--ifm-navbar-link-color);
+  -webkit-mask: var(--kokio-icon) no-repeat center /
+    var(--kokio-icon-size, 100%);
+  mask: var(--kokio-icon) no-repeat center / var(--kokio-icon-size, 100%);
+  transition: background-color var(--ifm-transition-fast)
+    var(--ifm-transition-timing-default);
+}
+
+.header-icon-link:hover::before {
+  background-color: var(--ifm-navbar-link-hover-color);
+}
+
+/* Thin diagonals read heavier than a solid mark at the same width, so this one
+   is trimmed a little. */
+.header-icon-link--twitter {
+  --kokio-icon-size: 92%;
+  --kokio-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 1.15 24 21.7'%3E%3Cpath d='M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z'/%3E%3C/svg%3E");
+}
+
+/* The plane on its own. The icon set draws it as a hole in a filled circle,
+   and a mask fills the circle, so the disc subpath is dropped and what was the
+   hole becomes the glyph. */
+.header-icon-link--telegram {
+  --kokio-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='4.49 7.22 13.09 10.86'%3E%3Cpath d='M16.906 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z'/%3E%3C/svg%3E");
+}
+
+/* The same glyph the marketing site uses, from Kokio-web assets/icons. */
+.header-icon-link--github {
+  --kokio-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='3.83 3.64 33.34 32.65'%3E%3Cpath d='M20.5 3.642c-9.208 0-16.666 7.458-16.666 16.666A16.657 16.657 0 0 0 15.23 36.122c.834.145 1.145-.355 1.145-.794 0-.395-.021-1.706-.021-3.103-4.187.772-5.27-1.02-5.604-1.958-.188-.48-1-1.959-1.708-2.355-.583-.312-1.417-1.084-.022-1.104 1.314-.021 2.25 1.209 2.564 1.709 1.5 2.52 3.896 1.811 4.853 1.375.146-1.084.583-1.812 1.063-2.229-3.708-.416-7.583-1.855-7.583-8.23 0-1.813.645-3.311 1.708-4.48-.166-.416-.75-2.125.167-4.416 0 0 1.395-.437 4.583 1.71a15.463 15.463 0 0 1 4.167-.564c1.416 0 2.833.187 4.166.562 3.187-2.167 4.584-1.707 4.584-1.707.916 2.292.333 4 .166 4.417 1.062 1.167 1.709 2.645 1.709 4.478 0 6.397-3.895 7.814-7.604 8.23.604.52 1.126 1.52 1.126 3.084 0 2.228-.022 4.02-.022 4.583 0 .437.313.957 1.146.79a16.693 16.693 0 0 0 11.354-15.812c0-9.208-7.459-16.666-16.667-16.666Z'/%3E%3C/svg%3E");
+}
+
+/* The footer is the same surface as the navbar, so it needs a line to say
+   where the page stops. */
+.footer {
+  border-top: 1px solid var(--ifm-toc-border-color);
+}
+
+/* The sidebar sits on the page background, so it needs a line to hold its edge. */
+.theme-doc-sidebar-container {
+  border-right: 1px solid var(--ifm-toc-border-color);
+}
+
+/* Code blocks are the one place that stays a flat surface, or the tint fights
+   the syntax colours. */
+.theme-code-block {
+  border-radius: var(--ifm-global-radius);
 }

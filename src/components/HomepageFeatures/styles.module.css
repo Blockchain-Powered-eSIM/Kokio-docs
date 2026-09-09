@@ -1,13 +1,61 @@
 .features {
   display: flex;
   align-items: center;
-  padding: 2rem 0;
+  padding: 3rem 0 4rem;
   width: 100%;
+}
+
+/* Same card as the post list on kokio.app/blog: rounded hard, one hairline
+   border, and a shadow that only shows up on hover. */
+.card {
+  height: 100%;
+  padding: 1.5rem 1.5rem 1.75rem;
+  border: 1px solid var(--kokio-card-border);
+  border-radius: 1.5rem;
+  background-color: var(--kokio-card-background);
+  box-shadow: var(--kokio-card-shadow);
+  transition: box-shadow 200ms ease, transform 200ms ease;
+}
+
+.card:hover {
+  box-shadow: var(--kokio-card-shadow-hover);
+  transform: translateY(-2px);
+}
+
+.cardColumn {
+  display: flex;
+  margin-bottom: 2rem;
+}
+
+.imageFrame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  border-radius: 1rem;
+  background-color: var(--kokio-cashmere-50);
+}
+
+html[data-theme="dark"] .imageFrame {
+  background-color: rgba(255, 255, 255, 0.04);
 }
 
 .featureImg {
   width: 100%;
-  max-width: 320px;
+  max-width: 240px;
   height: auto;
   object-fit: contain;
+}
+
+.cardTitle {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.cardText {
+  margin-bottom: 0;
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--ifm-color-content-secondary);
 }
