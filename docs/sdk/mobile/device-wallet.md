@@ -1,6 +1,6 @@
 ---
 title: Device wallet (mobile)
-description: kokio.deviceWallet wraps one user's Kokio device wallet, the ERC-4337 smart account owned by a passkey, with methods to attach eSIM wallets, grant fund access, transfer ownership and manage the gas deposit.
+description: kokio.deviceWallet wraps one user's Kokio device wallet, the ERC-4337 smart account owned by a passkey, with methods to deploy and attach eSIM wallets, grant fund access, transfer ownership and manage the gas deposit.
 ---
 
 # Device wallet (mobile) {#device-wallet-mobile}
@@ -17,7 +17,7 @@ const receipt = await smartAccountClient.waitForUserOperationReceipt({ hash });
 if (!receipt.success) throw new Error("operation reverted");
 ```
 
-An operation whose calls revert is still mined and still returns a receipt, so check `success` rather than treating a resolved await as confirmation.
+A call the contract would refuse throws `ContractRevertError` before it is sent, with the error name in `err.decoded?.errorName`. If the chain changes between that check and inclusion, the operation can still revert onchain. It is then mined and returns a receipt, so check `success` rather than treating a resolved await as confirmation.
 
 ## sendUserOperation {#senduseroperation}
 
@@ -30,6 +30,22 @@ const hash = await kokio.deviceWallet!.sendUserOperation([
 ```
 
 Returns `Promise<Hash>`, the user operation hash.
+
+## deployAndBindESIMWallet {#deployandbindesimwallet}
+
+Deploys a new eSIM wallet for this device wallet and adds it to the device wallet's list, in one user operation and one passkey prompt. Use it when a user adds a new eSIM. Pass `grantAccessToFunds: true` to also let the new eSIM wallet pull tokens from this device wallet, which [`buyDataBundleWithToken`](./esim-wallet.md#buydatabundlewithtoken) needs when the eSIM wallet holds less than the price.
+
+The device wallet has to be registered first, by the backend's [`postCreateAccount`](../backend/device-wallet-factory.md#postcreateaccount) or by a backend deploy, or the operation reverts. Each salt gives one address, so use a new salt for each eSIM wallet on the same device.
+
+```ts
+const { userOpHash, eSIMWalletAddress } = await kokio.deviceWallet!.deployAndBindESIMWallet(
+  1n, // salt
+  { grantAccessToFunds: true },
+);
+kokio.setESIMWalletAddress(eSIMWalletAddress);
+```
+
+Returns `Promise<{ userOpHash: Hash; eSIMWalletAddress: Address }>`. The address is worked out before the operation lands, so wait for the receipt before reading from it.
 
 ## addESIMWallet {#addesimwallet}
 

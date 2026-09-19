@@ -29,7 +29,7 @@ const usdcSymbol = stringToHex("USDC", { size: 32 });
 // 0x5553444300000000000000000000000000000000000000000000000000000000
 ```
 
-The USDC registered on the current deployment is a test token, not Circle's. Its address is on the [deployed addresses](../../contracts/deployments.md) page, alongside the second registered asset, `USD`, which has no token and stands for a card or bank payment.
+`USDC` on the current deployment is Circle's Base Sepolia USDC. `USD` has no token and stands for a card or bank payment. Read any asset's token address with [`resolveAsset`](#resolveasset) rather than hardcoding it.
 
 ## registerAsset {#registerasset}
 
@@ -124,10 +124,10 @@ Returns `Promise<Address>`.
 
 ## settlementToken {#settlementtoken}
 
-Reads the ERC-20 registered under the `USDC` symbol at configure time.
+Reads the token set when the adapter was initialized, the one the vault is meant to end up holding. A purchase does not pay in it: it pays in the token of the asset it names, which `resolveAsset` returns.
 
 ```ts
-const usdc = await admin.paymentAdapter.settlementToken();
+const token = await admin.paymentAdapter.settlementToken();
 ```
 
 Returns `Promise<Address>`.
