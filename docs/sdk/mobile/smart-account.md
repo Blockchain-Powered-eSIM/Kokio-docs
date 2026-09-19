@@ -32,6 +32,8 @@ const account = await kokio.smartAccount.getSmartWallet(
 
 Returns `KokioSmartAccount`, a viem smart account object. Pass it to `getSmartWalletClient`.
 
+The wallet client given to `Kokio` does not need an `account`. The passkey signs, so a client with a chain and a transport is enough.
+
 ## getSmartWalletClient {#getsmartwalletclient}
 
 Builds the client that signs with the passkey and sends user operations through Pimlico's bundler and paymaster. Every write on every other mobile surface needs this client, so build it once and reuse it.
@@ -41,6 +43,16 @@ const smartAccountClient = await kokio.smartAccount.getSmartWalletClient(account
 ```
 
 Returns `KokioSmartAccountClient`, a bundler client that can also read contracts directly, since it carries viem's public actions too. Pass it as `smartAccountClient` to a new `Kokio(...)` call so `deviceWallet`, `eSIMWallet` and the rest become available.
+
+Gas is paid by the paymaster at the same endpoint, so the device wallet never needs ETH. The gas policy id given to `Kokio` is optional: pass `""` to send none, or a Pimlico sponsorship policy id to have its rules applied.
+
+To send user operations somewhere other than Pimlico, such as a local bundler in tests, pass `bundlerUrl`. That endpoint must also answer the ERC-7677 paymaster methods.
+
+```ts
+const smartAccountClient = await kokio.smartAccount.getSmartWalletClient(account, {
+  bundlerUrl: "http://127.0.0.1:4337",
+});
+```
 
 ## P256 verifier {#p256-verifier}
 

@@ -52,7 +52,9 @@ Returns `Promise<Hash>`.
 
 ## postCreateAccount {#postcreateaccount}
 
-Registers a device wallet with the factory after it deploys. Use it right after [`createAccountWithEOA`](../mobile/device-wallet-factory.md#createaccountwitheoa) on the mobile surface, because a wallet the app deployed is not registered until this runs.
+Registers a device wallet with the factory after it deploys. Use it after the app deploys the wallet itself, either with its first sponsored user operation or with [`createAccountWithEOA`](../mobile/device-wallet-factory.md#createaccountwitheoa), because a wallet the app deployed is not registered until this runs. Until then it cannot deploy eSIM wallets.
+
+On a hosted RPC, wait a few confirmations before telling the app to go ahead. A bundler that simulates the app's next operation against a node one block behind still sees the wallet as unregistered and rejects it.
 
 The salt has to match the one the deploy used. The factory recomputes the wallet's address from it to check the wallet is real.
 

@@ -20,7 +20,7 @@ const deployment = await admin.lazyWalletRegistry.deployLazyWalletAndSetESIMIden
 );
 ```
 
-Some errors here are not exported by name, `BatchSizeOutOfRangeError` among them. Catch them with `instanceof KokioError` and read `.code`.
+The errors these calls throw are exported by name from both entry points: `BatchSizeOutOfRangeError`, `DepositOnResumeError`, `ESIMWalletNotLazyDeployedError`, `MissingBatchEventError` and `StalledBatchError`. All extend `KokioError`.
 
 ## batchPopulateHistory {#batchpopulatehistory}
 
