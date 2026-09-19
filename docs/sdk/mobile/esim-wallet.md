@@ -1,6 +1,6 @@
 ---
 title: eSIM wallet (mobile)
-description: kokio.eSIMWallet buys data bundles for one Kokio eSIM, sets its price cap and moves it between devices, and kokio.eSIMWalletFactory deploys a new one.
+description: kokio.eSIMWallet buys data bundles for one Kokio eSIM, with or without access to the device wallet's funds, sets its price cap and moves it between devices, and kokio.eSIMWalletFactory predicts a new one's address.
 ---
 
 # eSIM wallet (mobile) {#esim-wallet-mobile}
@@ -26,6 +26,8 @@ Prices are whole US cents as a `bigint`, and a currency is named by a `bytes32` 
 
 Buys a data bundle for this eSIM, paid for in an ERC-20 the payment adapter accepts, which is USDC on Base Sepolia today. This is the everyday purchase flow.
 
+If this eSIM wallet holds less than the price, the contract pulls the rest from the device wallet. That needs fund access, granted by [`deviceWallet.toggleAccessToFunds`](./device-wallet.md#toggleaccesstofunds) or by `deployAndBindESIMWallet` with `grantAccessToFunds: true`. Without it the purchase reverts with `FundsAccessRevoked`, and [`buyDataBundleWithTransfer`](#buydatabundlewithtransfer) is the one to use.
+
 Check `priceCapUSDCents()` first, because a price above the cap reverts. Read [`kokio.paymentAdapter.quote(asset, priceUSDCents)`](./payments.md#quote) to size `maxAmountIn`, the most of `asset` this purchase may spend, in its smallest unit. Nothing moves the price between the quote and the purchase today, so passing that value straight through is enough. A swap path may show up later, which is why the contract takes a maximum rather than an exact amount.
 
 `paymentReference` ties the purchase to its offchain order and is spendable once per eSIM wallet. The backend hands this to the app. The SDK never invents one.
@@ -40,6 +42,20 @@ const hash = await kokio.eSIMWallet!.buyDataBundleWithToken(
   asset, // bytes32 symbol, e.g. "USDC"
   maxAmountIn, // from paymentAdapter.quote(asset, priceUSDCents)
   paymentReference, // bytes32, from the backend
+);
+```
+
+Returns `Promise<Hash>`, a user operation hash.
+
+## buyDataBundleWithTransfer {#buydatabundlewithtransfer}
+
+The same purchase as `buyDataBundleWithToken`, for an eSIM wallet with no access to the device wallet's funds. In one user operation the device wallet sends the eSIM wallet whatever it is short of the quote, then the purchase runs. The arguments are the same.
+
+The device wallet has to hold enough of the asset's token. Only the shortfall is sent, so tokens already on the eSIM wallet are spent first.
+
+```ts
+const hash = await kokio.eSIMWallet!.buyDataBundleWithTransfer(
+  dataBundleDetails, asset, maxAmountIn, paymentReference,
 );
 ```
 
@@ -143,11 +159,25 @@ Returns `Promise<DataBundleDetails>`, shaped `{ id, priceUSDCents, settlement }`
 
 `kokio.eSIMWalletFactory`
 
-Deploys a new eSIM wallet for a device wallet. Present as soon as `Kokio` has a `smartAccountClient`, chain-wide like the [device wallet factory](./device-wallet-factory.md). The contract is documented at [eSIM wallet factory](../../contracts/esim-wallet-factory.md).
+Predicts and deploys eSIM wallets for a device wallet. Present as soon as `Kokio` has a `smartAccountClient`, chain-wide like the [device wallet factory](./device-wallet-factory.md). The contract is documented at [eSIM wallet factory](../../contracts/esim-wallet-factory.md).
+
+To deploy a new eSIM wallet, use [`deviceWallet.deployAndBindESIMWallet`](./device-wallet.md#deployandbindesimwallet). It deploys and binds in one user operation and returns the new address.
+
+### getCounterFactualAddress {#getcounterfactualaddress}
+
+Works out the address an eSIM wallet will have for a device wallet and salt, before it is deployed. A plain read, no user operation.
+
+```ts
+const eSIMWalletAddress = await kokio.eSIMWalletFactory!.getCounterFactualAddress(deviceWalletAddress, 1n);
+```
+
+Returns `Promise<Address>`.
 
 ### deployESIMWalletWithUserOp {#deployesimwalletwithuserop}
 
-Deploys a new eSIM wallet, owned by the given device wallet. Use it when a user is adding a new eSIM to a device wallet they already have. The device wallet sending the user operation has to be one the registry recognizes.
+Deprecated. Use `deviceWallet.deployAndBindESIMWallet` instead. This deploys the eSIM wallet without adding it to the device wallet's list, so the device wallet does not treat it as its own until `addESIMWallet` runs.
+
+Deploys a new eSIM wallet, owned by the given device wallet. The device wallet sending the user operation has to be one the registry recognizes.
 
 ```ts
 const hash = await kokio.eSIMWalletFactory!.deployESIMWalletWithUserOp(

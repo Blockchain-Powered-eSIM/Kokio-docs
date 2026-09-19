@@ -7,11 +7,19 @@ description: kokio-sdk is the TypeScript client for the Kokio eSIM contracts, wi
 
 `kokio-sdk` is the TypeScript package for talking to the Kokio eSIM contracts. It wraps [viem](https://viem.sh), including viem's account abstraction module, so you do not assemble calldata or manage an ERC-4337 bundler yourself. Install it, construct one of the two entry points, and call methods.
 
+In the mobile app, install the passkey module alongside it:
+
+```sh
+npm install kokio-sdk react-native-passkey
+```
+
+A backend that only uses `kokio-sdk/admin` needs the SDK alone:
+
 ```sh
 npm install kokio-sdk
 ```
 
-Version 3.0.1. It ships as ES modules and needs Node 18 or newer, or a React Native runtime. `viem` comes with it, so there is nothing else to install.
+Version 3.1.0. It ships as ES modules and needs Node 18 or newer, or a React Native runtime. `viem` comes with it. `react-native-passkey` is a peer dependency because it is a native module: Expo only links native code for packages the app lists itself, and one copy avoids version clashes. The admin entry point never loads it.
 
 ## Two entry points {#two-entry-points}
 
@@ -46,14 +54,14 @@ try {
   await admin.registry.requestAdminUpdate(newAdmin);
 } catch (err) {
   if (err instanceof ContractRevertError) {
-    console.error("reverted:", err.message);
+    console.error("reverted:", err.decoded?.errorName); // e.g. "OwnableUnauthorizedAccount"
   }
 }
 ```
 
-`KokioError` is the base class. The named subclasses are `MissingSmartWalletError`, `MissingEOAWalletError`, `InvalidClientError`, `UnsupportedChainError`, `CounterfactualMismatchError` and `ContractRevertError`. `decodeContractRevert` turns raw revert data into a readable reason.
+A write the contract would refuse throws `ContractRevertError` before anything is sent, on both entry points. For a user operation the SDK reads the reason out of the bundler's simulation error, so the contract's own error name reaches the app instead of a generic bundler message. `decoded` is `null` only when the revert data matches no Kokio contract's errors.
 
-Some errors are not exported by name. The paginated `lazyWalletRegistry` calls can throw narrower subclasses such as `BatchSizeOutOfRangeError`. Catch those with `instanceof KokioError` and read `.code` rather than importing the class.
+`KokioError` is the base class. The named subclasses are `MissingSmartWalletError`, `MissingEOAWalletError`, `InvalidClientError`, `UnsupportedChainError`, `UnconfiguredChainError`, `CounterfactualMismatchError` and `ContractRevertError`, plus the ones the paginated `lazyWalletRegistry` calls throw: `BatchSizeOutOfRangeError`, `DepositOnResumeError`, `ESIMWalletNotLazyDeployedError`, `MissingBatchEventError` and `StalledBatchError`. `decodeContractRevert` turns raw revert data into a readable reason.
 
 ## Chains {#chains}
 

@@ -44,14 +44,14 @@ Every page below carries the full generated reference for its contract: every st
 
 ## TypeScript SDK
 
-`kokio-sdk` v3.0.1 is the client library for the contracts above. Two entry points: `Kokio` for a mobile app signing with a passkey, `KokioAdmin` for a backend signing with an admin key.
+`kokio-sdk` v3.1.0 is the client library for the contracts above. Two entry points: `Kokio` for a mobile app signing with a passkey, `KokioAdmin` for a backend signing with an admin key.
 
 - [SDK overview](https://docs.kokio.app/docs/sdk/overview): what the package is, the two entry points, install, errors, chains
-- [Mobile setup](https://docs.kokio.app/docs/sdk/mobile/setup): constructing `Kokio`, the wallet client, the passkey, the bundler keys
-- [Smart account](https://docs.kokio.app/docs/sdk/mobile/smart-account): resolving a passkey to its account, and verifying a signature
-- [Device wallet, mobile](https://docs.kokio.app/docs/sdk/mobile/device-wallet): attach eSIM wallets, grant fund access, transfer ownership, manage gas
+- [Mobile setup](https://docs.kokio.app/docs/sdk/mobile/setup): constructing `Kokio`, the wallet client, the passkey, the bundler keys, who deploys the device wallet
+- [Smart account](https://docs.kokio.app/docs/sdk/mobile/smart-account): resolving a passkey to its account, sponsored gas, a custom bundler URL, and verifying a signature
+- [Device wallet, mobile](https://docs.kokio.app/docs/sdk/mobile/device-wallet): deploy and bind an eSIM wallet in one operation, grant fund access, transfer ownership, manage gas
 - [Device wallet factory, mobile](https://docs.kokio.app/docs/sdk/mobile/device-wallet-factory): predict an address, check an identifier is free
-- [eSIM wallet, mobile](https://docs.kokio.app/docs/sdk/mobile/esim-wallet): buy a data bundle, set a price cap, move an eSIM between devices
+- [eSIM wallet, mobile](https://docs.kokio.app/docs/sdk/mobile/esim-wallet): buy a data bundle with or without fund access, set a price cap, move an eSIM between devices
 - [Registry, mobile](https://docs.kokio.app/docs/sdk/mobile/registry): bind an eSIM wallet, read the pause switch and price caps
 - [Payments, mobile](https://docs.kokio.app/docs/sdk/mobile/payments): which currencies are accepted, and how prices and symbols are encoded
 - [Backend setup](https://docs.kokio.app/docs/sdk/backend/setup): constructing `KokioAdmin`, and the trust boundary on the admin key
