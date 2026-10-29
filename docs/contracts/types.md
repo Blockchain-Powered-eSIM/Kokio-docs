@@ -21,7 +21,7 @@ Which contract, if any, saw the money for a data bundle move. Three values, and 
 | `1` | `ExternalWallet` | Paid from a wallet outside the protocol |
 | `2` | `Fiat` | Paid by card or bank, outside the contracts entirely |
 
-Only the first can be proven onchain. The other two are the admin's word that a payment happened, which is why the [price cap](./esim-wallet.md) is the only check on them and why the field is stored rather than inferred.
+Only the first can be proven onchain. The other two are the admin's word that a payment happened, which is why the field is stored rather than inferred. The only onchain check on them is the [price cap](./esim-wallet.md), on `recordSettledPurchase`. History copied in from the [lazy wallet registry](./lazy-wallet-registry.md) is not capped.
 
 ## DataBundleDetails {#databundledetails-explained}
 

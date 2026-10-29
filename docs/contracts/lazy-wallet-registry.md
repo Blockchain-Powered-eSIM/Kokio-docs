@@ -36,7 +36,11 @@ A call asking for more than the batch limit is rejected, not truncated.
 
 Only the eSIM wallet admin. A record in this contract is Kokio's word that a card payment happened, because a card payment leaves no trace a contract can check.
 
-That is why the [price ceiling](./registry.md) applies to these purchases too, and why the `Settlement` value stored against each entry says which of the three payment routes was used. The [types](./types.md) page lists them.
+That is why the `Settlement` value stored against each entry has to name a route paid outside the protocol, and `batchPopulateHistory` reverts with `SettlementNotAsserted` otherwise. The [types](./types.md) page lists the routes.
+
+:::note
+The [price ceiling](./registry.md) does not apply to this history. It records past payments, and no charge happens when it is copied onto a wallet.
+:::
 
 `LazyWalletRegistry` is a UUPS proxy owned by [`ProtocolAdmin`](./protocol-admin.md). Its address is on the [Base mainnet](../deployments/base.md) and [Base Sepolia](../deployments/base-sepolia.md) pages.
 

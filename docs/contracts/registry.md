@@ -30,7 +30,7 @@ One place, not several, and that is the point. Device wallets and eSIM wallets a
   :::
 
 - **Whether the protocol is paused.** `pause()` accepts the admin or the owner. The owner route is what lets a [guardian](./protocol-admin.md) pause through the timelock while the admin key is suspended. Releasing it is owner only, and a guardian can do that without waiting out the delay.
-- **What a purchase may cost.** `defaultPriceCapUSDCents` is the ceiling a new eSIM wallet starts with. A user can lower their own wallet's cap; nobody can raise it for them.
+- **What a purchase may cost.** `defaultPriceCapUSDCents` is the ceiling a new eSIM wallet starts with, set by the owner and never zero. The owning device wallet can set its own wallet's cap to any figure, and the admin cannot change it.
 - **What the admin may charge in total.** `defaultAdminAllowanceUSDCents` is the total the admin may charge a new [eSIM wallet](./esim-wallet.md#what-the-admin-can-and-cannot-do), set at `initialize` and changed by the owner. Wallets that already exist keep their own figure.
 - **Which wallets count.** `isDeviceWalletValid` and `isESIMWalletValid` answer for anything deployed through the two factories. A wallet deployed outside the suite is not in these mappings and every guarded path rejects it. When a device wallet registers a new owner key, the registry reads the key back from the wallet and refuses one the wallet does not hold (`OwnerKeyNotHeldByWallet`), so no wallet can claim someone else's key first.
 - **Which eSIM identifiers are spoken for.** An identifier reserved for a fiat user's lazy batch cannot be handed out through `assignESIMIdentifier`. Only the [lazy wallet registry](./lazy-wallet-registry.md) can claim it, through its own path.

@@ -182,7 +182,7 @@ Raised by an [eSIM wallet](./esim-wallet.md).
 | `ESIMIdentifierAlreadySet(string eSIMUniqueIdentifier)` | The eSIM identifier is set once and not replaced |
 | `EmptyDataBundleID()` | The bundle id is empty |
 | `ZeroDataBundlePrice()` | A bundle cannot be recorded at a price of zero |
-| `ZeroDataBundlePriceCap()` | A cap of zero means "follow the registry", so it cannot be set explicitly |
+| `ZeroDataBundlePriceCap()` | Raised by the Registry. Its default price cap cannot be zero, because zero reads as "no ceiling" for every wallet without a cap of its own |
 | `NotADeviceWallet(address account)` | An eSIM wallet's owner has to be a device wallet, and that address is not one. Also raised by `RegistryHelper` |
 | `OnlyRequestedOwner(address newRequestedOwner)` | Only the nominated owner may accept the handover |
 | `UseAcceptOwnershipTransfer()` | Ownership moves in two steps here. The one-step call is blocked |

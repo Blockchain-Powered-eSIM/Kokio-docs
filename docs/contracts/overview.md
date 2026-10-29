@@ -55,16 +55,16 @@ A user who pays by card has no wallet at the moment of purchase. That path runs 
 
 A smart contract wallet for an eSIM keeps activation, profile switching and payment under rules written in code rather than in a provider's terms of service. Transferring an eSIM, changing a plan or paying for data are all calls anyone can read and nobody can quietly reinterpret.
 
-**Self-custodial** means the key that authorises those calls is on the user's device and nowhere else. Kokio cannot sign for a user, cannot move their funds and cannot take an eSIM back.
+**Self-custodial** means the key that authorises those calls is on the user's device and nowhere else. Kokio cannot sign for a user, and cannot move an eSIM wallet to another device.
 
 What Kokio's admin key can do is narrow:
 
 | The admin key can | The admin key cannot |
 |---|---|
-| Charge an eSIM wallet for a data bundle, up to a per-purchase ceiling and a running total the user sets | Raise either limit |
-| Record a purchase made outside the contracts | Move money from a wallet the user has not granted access to their funds |
+| Charge an eSIM wallet for a data bundle, within its price cap and its admin allowance. The payment goes to the vault | Raise the price cap or the admin allowance. Only the owning device wallet sets them |
+| Record a purchase made outside the contracts, within the price cap | Pull a charge's shortfall from the device wallet, unless the device wallet has granted that eSIM wallet access to its funds |
 
-Every upgrade, and every change of the admin key itself, runs through the [ProtocolAdmin](./protocol-admin.md) timelock: an announcement, then a two day wait before anything moves.
+Every upgrade, and every replacement of the admin key, runs through the [ProtocolAdmin](./protocol-admin.md) timelock: an announcement, then a two day wait before anything moves.
 
 ## Terms used in this reference {#terms}
 

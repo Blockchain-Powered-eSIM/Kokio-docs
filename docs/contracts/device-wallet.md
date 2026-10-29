@@ -39,11 +39,12 @@ A lost phone is not a lost wallet. The passkey can be restored from the platform
 
 `toggleAccessToFunds` decides whether a given eSIM wallet may pull ETH from here to pay for a data bundle. It is off until the user turns it on. `canPullFunds` answers for any one wallet, and `pullToken` moves an ERC-20 balance the same way.
 
-This is one of the settings that limits what Kokio's admin can charge for. The admin can start a purchase against an eSIM wallet, but the money only moves if all three hold:
+This is one of the settings that limits what Kokio's admin can charge for. An admin purchase against an eSIM wallet goes through only if:
 
-1. This device wallet has granted that eSIM wallet access.
-2. The price is under the eSIM wallet's [ceiling](./esim-wallet.md).
-3. The eSIM wallet's [admin allowance](./esim-wallet.md#what-the-admin-can-and-cannot-do) still covers it.
+1. The price is under the eSIM wallet's [ceiling](./esim-wallet.md).
+2. The eSIM wallet's [admin allowance](./esim-wallet.md#what-the-admin-can-and-cannot-do) still covers it.
+
+The purchase spends the eSIM wallet's own token balance first. Only a shortfall is pulled from this device wallet, and only if this device wallet has granted that eSIM wallet access.
 
 ## A beacon proxy, and what that means for upgrades {#a-beacon-proxy}
 

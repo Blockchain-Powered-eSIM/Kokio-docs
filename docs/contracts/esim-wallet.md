@@ -36,7 +36,7 @@ The **admin allowance** stops the admin key repeating charges under the cap unti
 - A new wallet starts on the registry's `defaultAdminAllowanceUSDCents`.
 - Purchases the user signs through their own device wallet never touch it.
 
-On top of both limits, the money only moves if the device wallet has granted this wallet access to its funds.
+A purchase spends this wallet's own token balance first. A shortfall is pulled from the device wallet, which needs the device wallet to have granted this wallet access to its funds.
 
 ## Buying a data bundle {#buying-a-data-bundle}
 
@@ -55,17 +55,19 @@ Fee-on-transfer tokens are not supported. A token that delivers less than it was
 Reading the whole history means one of two things:
 
 - Index upwards until the call reverts.
-- Read the `DataBundleBoughtWithToken` and `DataBundleSettlementRecorded` events from the logs. This is cheaper and carries a timestamp the struct does not store. The [Kokio SDK](../sdk/mobile/esim-wallet.md) does this.
+- Read the `DataBundleBoughtWithToken`, `DataBundleSettlementRecorded` and `TransactionHistoryPopulated` events from the logs. This is cheaper and carries a timestamp the struct does not store.
+
+The [Kokio SDK](../sdk/mobile/esim-wallet.md#transactionhistory) reads one entry at a time, by index.
 
 Each entry records how the bundle was paid for, in a `Settlement` field:
 
 | Settlement | Provable onchain | Price cap applies | Admin allowance applies |
 |---|---|---|---|
 | Paid from this wallet onchain | Yes | Yes | Yes, for admin charges |
-| Paid from an external wallet | No, the admin's word | Yes | No |
-| Paid in fiat | No, the admin's word | Yes | No |
+| Paid from an external wallet | No, the admin's word | Yes, when recorded with `recordSettledPurchase` | No |
+| Paid in fiat | No, the admin's word | Yes, when recorded with `recordSettledPurchase` | No |
 
-The allowance skips the last two because recording a purchase paid elsewhere moves no money out of this wallet.
+The allowance skips the last two because recording a purchase paid elsewhere moves no money out of this wallet. History copied in from the [lazy wallet registry](./lazy-wallet-registry.md) is not held to the price cap either.
 
 ## Moving to another device {#moving-to-another-device}
 
