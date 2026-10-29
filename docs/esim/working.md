@@ -5,7 +5,15 @@ description: "The parties that turn a plan choice into a working eSIM, in order:
 
 # How eSIM provisioning works {#how-esim-provisioning-works}
 
-Buying an eSIM sets five parties in motion, and they are the same five whether you buy from a carrier or from Kokio. Understanding them is what makes the rest of this documentation readable: [Kokio's own contracts](../contracts/overview.md) sit alongside this chain rather than replacing it, recording who owns the purchase while the provisioning itself runs the standard way.
+The parties that turn a plan choice into a working eSIM, in the order they act.
+
+---
+
+Buying an eSIM sets five parties in motion, and they are the same five whether you buy from a carrier or from Kokio.
+
+:::note
+[Kokio's own contracts](../contracts/overview.md) sit alongside this chain rather than replacing it. They record who owns the purchase, while the provisioning itself runs the standard way.
+:::
 
 ![Diagram of the parties in eSIM provisioning. The user sends their plan choice to the mobile network operator, which orders a profile from the SM-DP+ server. The user starts the download through the LPA on their device, and the SM-DP+ delivers the profile to the eUICC chip. The LPA and the eUICC sit inside a box labelled user equipment. Below them, the GSMA certificate issuer certifies both the SM-DP+ and the eUICC manufacturer, and the manufacturer in turn certifies the eUICC.](../../resources/esim-working.png)
 
