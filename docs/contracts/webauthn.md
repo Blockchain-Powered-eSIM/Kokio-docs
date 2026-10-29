@@ -21,6 +21,8 @@ Both functions return rather than revert, and that is a deliberate hardening rat
 
 The decoder Solidity generates for a struct reverts when the bytes are not a well-formed encoding. A revert is not a rejection anywhere this gets called from: inside ERC-4337 validation it fails the whole bundle instead of the one operation, and behind `isValidSignature` it reaches an integrating contract as an error instead of as an invalid signature. So `tryDecodeSignature` does the bounds checking itself and returns a zeroed struct on anything malformed. A zeroed struct then fails verification, because an empty `clientDataJSON` cannot contain the index it is handed.
 
+One exception, inherited from solady's decoding: the length checks use wrapping arithmetic, so a crafted length near 2^256 can pass them and run the caller out of gas. That is a revert, never an accepted signature.
+
 ## What it checks, and what it does not {#what-it-checks}
 
 Worth reading before relying on it, because it verifies the parts of the WebAuthn specification that matter in Kokio's setting and skips the rest.

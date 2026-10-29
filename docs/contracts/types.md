@@ -41,7 +41,7 @@ It is decoded from calldata by [`WebAuthn.tryDecodeSignature`](./webauthn.md), w
 
 `Asset` is 23 bytes and fits one slot with nine to spare. Anything new has to stay inside those nine bytes, because a second slot moves every entry in a live mapping and a live table cannot be moved.
 
-`DataBundleDetails` has the same constraint for the same reason, and `priceCapUSDCents` on the eSIM wallet is declared where it is so it shares a slot with `newRequestedOwner`. Solidity packs in declaration order, so moving that line costs the slot.
+`DataBundleDetails` has the same constraint for the same reason, and `priceCapUSDCents` on the eSIM wallet is declared where it is so it shares a slot with `newRequestedOwner`. Solidity packs in declaration order, so moving that line costs the slot. `adminAllowanceUSDCents` comes next and starts a slot of its own, because 20 bytes of address plus two 8-byte figures do not fit in 32. That slot has 24 bytes free.
 
 <!-- docgen:start source=smart-contract-suite/docs/CustomStructs.md -->
 ## Settlement {#settlement}

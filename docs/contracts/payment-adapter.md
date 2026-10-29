@@ -33,13 +33,17 @@ The caller funding the contract first, rather than the contract pulling from the
 
 One thing to know if you are extending this. `_amountIn` is the caller's word for what it sent, checked only against the balance. What stops a caller from naming more than it sent and carrying off a token somebody left here by mistake is that there is exactly one path in: an [eSIM wallet](./esim-wallet.md) going through `quote`, with no way to supply a figure of its own choosing. That property is worth keeping.
 
+## Recovering stray tokens {#recovering-stray-tokens}
+
+`settle` is funded and spent in the same transaction, so a purchase never leaves anything here. Any balance this contract holds was sent to it by mistake. `recoverTokens(token, to, amount)` sends it back out and emits `TokensRecovered`. It is owner only, which means it runs through the [`ProtocolAdmin`](./protocol-admin.md) timelock and every recovery is public for the delay before it executes.
+
 ## Payment references {#payment-references}
 
 A payment reference is an offchain order id, spent once. Retrying a purchase call that already landed cannot charge a user twice, because the second attempt finds the reference already spent.
 
 The record of which references are spent lives on the [Registry](./registry.md), in `usedPaymentReferences`, not here. Two reasons, and both are worth knowing before you build against it. It survives an adapter rotation through `setPaymentAdapter`, where a mapping held here would reset with the contract. And it is keyed by the wallet and the reference together rather than by the reference alone, so one wallet spending a reference cannot burn it for another wallet's pending settlement.
 
-This contract's own `usedReferences` mapping and its `consumePaymentReference` are retired. Nothing in the protocol calls them any more. They stay declared because the storage layout behind the proxy is pinned by a test and removing the slot would shift every variable below it. The contract's own header comment still describes `usedReferences` as the live replay protection; it is out of date, and the field's own comment is the accurate one.
+This contract's own `usedReferences` mapping and its `consumePaymentReference` are retired. Nothing in the protocol calls them any more. They stay declared because the storage layout behind the proxy is pinned by a test and removing the slot would shift every variable below it.
 
 <!-- docgen:start source=smart-contract-suite/docs/payments/PaymentAdapter.md -->
 ## Asset {#asset}
