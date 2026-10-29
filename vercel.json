@@ -5,6 +5,18 @@
       "maxDuration": 20
     }
   },
+  "redirects": [
+    {
+      "source": "/docs/contracts/deployments",
+      "destination": "/docs/deployments/base",
+      "permanent": true
+    },
+    {
+      "source": "/md/contracts/deployments.md",
+      "destination": "/md/deployments/base.md",
+      "permanent": true
+    }
+  ],
   "headers": [
     {
       "source": "/.well-known/apple-app-site-association",

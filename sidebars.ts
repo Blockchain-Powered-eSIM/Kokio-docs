@@ -119,10 +119,6 @@ const sidebars: SidebarsConfig = {
           type: "doc",
           id: "contracts/types",
         },
-        {
-          type: "doc",
-          id: "contracts/deployments",
-        },
       ],
     },
     {

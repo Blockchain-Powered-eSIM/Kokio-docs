@@ -40,7 +40,11 @@ Every page below carries the full generated reference for its contract: every st
 - [Interfaces](https://docs.kokio.app/docs/contracts/interfaces): the four narrow interfaces between the contracts, and why each leaves out more than it includes
 - [Custom errors](https://docs.kokio.app/docs/contracts/errors): all 92 revert reasons, how to decode one, and what the common ones mean
 - [Types and structs](https://docs.kokio.app/docs/contracts/types): the shared structs and the Settlement enum
-- [Deployed addresses](https://docs.kokio.app/docs/contracts/deployments): every address on Base Sepolia, chain 84532, with proxies, implementations, timelock settings and the build they came from
+
+## Deployed addresses
+
+- [Base mainnet](https://docs.kokio.app/docs/deployments/base): the live contract addresses on chain 8453, accepted currencies and starting limits
+- [Base Sepolia](https://docs.kokio.app/docs/deployments/base-sepolia): the testnet contract addresses on chain 84532, accepted currencies and starting limits
 
 ## TypeScript SDK
 
