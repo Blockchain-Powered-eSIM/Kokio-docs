@@ -158,22 +158,27 @@ const sidebars: SidebarsConfig = {
             {
               type: "doc",
               id: "sdk/mobile/device-wallet",
+              label: "Device wallet",
             },
             {
               type: "doc",
               id: "sdk/mobile/device-wallet-factory",
+              label: "Device wallet factory",
             },
             {
               type: "doc",
               id: "sdk/mobile/esim-wallet",
+              label: "eSIM wallet",
             },
             {
               type: "doc",
               id: "sdk/mobile/registry",
+              label: "Registry",
             },
             {
               type: "doc",
               id: "sdk/mobile/payments",
+              label: "Payments",
             },
           ],
         },
@@ -188,38 +193,47 @@ const sidebars: SidebarsConfig = {
             {
               type: "doc",
               id: "sdk/backend/device-wallet",
+              label: "Device wallet",
             },
             {
               type: "doc",
               id: "sdk/backend/device-wallet-factory",
+              label: "Device wallet factory",
             },
             {
               type: "doc",
               id: "sdk/backend/esim-wallet",
+              label: "eSIM wallet",
             },
             {
               type: "doc",
               id: "sdk/backend/registry",
+              label: "Registry",
             },
             {
               type: "doc",
               id: "sdk/backend/lazy-wallet-registry",
+              label: "Lazy wallet registry",
             },
             {
               type: "doc",
               id: "sdk/backend/payments",
+              label: "Payments",
             },
             {
               type: "doc",
               id: "sdk/backend/protocol-admin",
+              label: "Protocol admin",
             },
             {
               type: "doc",
               id: "sdk/backend/calls",
+              label: "Calls",
             },
             {
               type: "doc",
               id: "sdk/backend/utils",
+              label: "Utils",
             },
           ],
         },
