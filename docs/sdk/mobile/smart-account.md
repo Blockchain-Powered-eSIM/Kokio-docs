@@ -85,7 +85,7 @@ const valid = await kokio.P256Verifier!.verifySignature(message, true, webAuthnS
 | Name | Type | Description |
 | :--- | :--- | :--- |
 | message | `Hex` | The signed message |
-| requireMessageVerification | `boolean` | Require the assertion to match the message |
+| requireMessageVerification | `boolean` | Passed to the contract's `requireUserVerification`. `true` demands the authenticator's user verification flag |
 | webAuthnSignature | `WebAuthnSignature` | `{ authenticatorData, clientDataJSON, challengeIndex, typeIndex, r, s }` |
 | x | `bigint` | The P-256 public key's x coordinate |
 | y | `bigint` | The P-256 public key's y coordinate |
