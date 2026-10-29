@@ -22,15 +22,19 @@ Two roles sit on this contract and they are not the same:
 | Role | Who | Can |
 |---|---|---|
 | **Admin** | The backend key | Pause, record purchases, assign identifiers |
-| **Owner** | The [ProtocolAdmin](./protocol-admin.md) timelock | Unpause, upgrade, hand over ownership |
+| **Owner** | The [ProtocolAdmin](./protocol-admin.md) timelock | Pause and unpause, nominate, suspend and restore the admin, change the vault, the default price cap and the lazy wallet registry address, upgrade, hand over ownership |
 
 Anything named `*Call` below builds a payload for the owner and sends nothing itself.
+
+:::warning
+The methods marked owner only send a direct transaction. On the live deployment the owner is the ProtocolAdmin timelock, so sending one from the admin key reverts. Schedule the call through [`admin.protocolAdmin.proposer.schedule`](./protocol-admin.md#proposer-schedule) instead.
+:::
 
 The read-only half of this contract, reachable from a phone, is on [`kokio.registry`](../mobile/registry.md).
 
 ## addOrUpdateLazyWalletRegistryAddress {#addorupdatelazywalletregistryaddress}
 
-Wires the lazy wallet registry address into the registry. Run once during setup, or again if the [lazy wallet registry](./lazy-wallet-registry.md) is redeployed.
+Owner only. Wires the lazy wallet registry address into the registry. Run once during setup, or again if the [lazy wallet registry](./lazy-wallet-registry.md) is redeployed.
 
 ```ts
 const hash = await admin.registry.addOrUpdateLazyWalletRegistryAddress(lazyWalletRegistryAddress);
@@ -40,7 +44,7 @@ Returns `Promise<Hash>`.
 
 ## updateVaultAddress {#updatevaultaddress}
 
-Changes the vault address that receives eSIM payments.
+Owner only. Changes the vault address that receives eSIM payments.
 
 ```ts
 const hash = await admin.registry.updateVaultAddress(newVaultAddress);
@@ -50,13 +54,13 @@ Returns `Promise<Hash>`.
 
 ## requestAdminUpdate {#requestadminupdate}
 
-Starts the two-step handover of the admin role to a new address. Use it to rotate the backend's signing key.
+Owner only. Starts the two-step handover of the admin role to a new address. Use it to rotate the backend's signing key.
 
 :::warning
 This takes the role off the current admin right away. Every admin-gated call reverts until the new address accepts with `acceptAdminUpdate`, so send the two steps close together or user-facing calls that need the admin will fail in between.
 :::
 
-Naming the current admin instead cancels a pending nomination.
+Naming the current admin instead withdraws a pending nomination and lifts a suspension.
 
 ```ts
 const hash = await admin.registry.requestAdminUpdate(newAdminAddress);
@@ -76,7 +80,7 @@ Returns `Promise<Hash>`.
 
 ## disableAdmin {#disableadmin}
 
-Suspends the admin's powers across the whole protocol. Use it if the backend's admin key is compromised, as a way to freeze admin actions without losing the address itself.
+Owner only. Suspends the admin's powers across the whole protocol. Use it if the backend's admin key is compromised, as a way to freeze admin actions without losing the address itself. A guardian can do the same without the delay, with [`guardian.disableAdminInstantly`](./protocol-admin.md#guardian-disableadmininstantly).
 
 The address stays on record, so turning the admin back on does not need it supplied again. Reverts if the admin is already suspended.
 
@@ -88,7 +92,7 @@ Returns `Promise<Hash>`.
 
 ## enableAdmin {#enableadmin}
 
-Lifts a suspension started by `disableAdmin`.
+Owner only. Lifts a suspension started by `disableAdmin`. There is no instant guardian route for this.
 
 ```ts
 const hash = await admin.registry.enableAdmin();
@@ -228,7 +232,7 @@ Returns `Promise<Hash>`.
 
 ## setDefaultPriceCapUSDCents {#setdefaultpricecapusdcents}
 
-Sets the fallback price ceiling, in US cents, every eSIM wallet uses when it has no cap of its own.
+Owner only. Sets the fallback price ceiling, in US cents, every eSIM wallet uses when it has no cap of its own. The scheduled form is [`protocolAdmin.setDefaultPriceCapUSDCentsCall`](./protocol-admin.md#setdefaultpricecapusdcentscall).
 
 :::warning
 Zero reverts. A zero cap would read as "no limit" for every wallet without one of its own, so the contract refuses it outright.

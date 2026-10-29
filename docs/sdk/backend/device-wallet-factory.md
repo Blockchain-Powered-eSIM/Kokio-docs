@@ -34,7 +34,7 @@ const hash = await admin.deviceWalletFactory.createAccount(deviceUniqueIdentifie
 | deviceUniqueIdentifier | `string` | The id for this device |
 | ownerKey | `P256Key` | The passkey's P-256 public key, as `[x, y]` hex |
 | salt | `bigint` | Makes the address unique per user |
-| depositAmount | `bigint` | ETH sent as the wallet's starting gas deposit, in wei |
+| depositAmount | `bigint` | ETH forwarded to the new device wallet's balance, in wei |
 
 Returns `Promise<Hash>`.
 
@@ -57,7 +57,7 @@ const hash = await admin.deviceWalletFactory.deployDeviceWalletForUsers(
 | deviceUniqueIdentifiers | `string[]` | One id per wallet |
 | ownerKeys | `P256Key[]` | One owner key per wallet |
 | salts | `bigint[]` | One salt per wallet |
-| depositAmounts | `bigint[]` | Each wallet's starting gas deposit, in wei |
+| depositAmounts | `bigint[]` | ETH forwarded to each new device wallet's balance, in wei |
 | value | `bigint` | The total ETH sent for the whole batch, the sum of `depositAmounts` or more. Any leftover is refunded onchain |
 
 Returns `Promise<Hash>`.
@@ -85,7 +85,7 @@ Returns `Promise<Hash>`.
 
 ## addRegistryAddress {#addregistryaddress}
 
-One-time setup call that wires the registry address into the factory. Run once, as part of initial deployment.
+Owner only. One-time setup call that wires the registry address into the factory. Run once, as part of initial deployment.
 
 ```ts
 const hash = await admin.deviceWalletFactory.addRegistryAddress(registryAddress);
@@ -95,7 +95,7 @@ Returns `Promise<Hash>`.
 
 ## updateDeviceWalletImplementation {#updatedevicewalletimplementation}
 
-Points the device wallet beacon at a new implementation contract.
+Owner only. Points the device wallet beacon at a new implementation contract. On the live deployment the owner is the [ProtocolAdmin](./protocol-admin.md) timelock, so a direct call from the admin key reverts.
 
 :::warning
 This moves every deployed device wallet to the new code at once, because they all read their implementation from the same beacon.

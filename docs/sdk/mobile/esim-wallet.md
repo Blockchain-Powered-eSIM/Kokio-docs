@@ -169,7 +169,7 @@ Returns `Promise<Hash>`.
 Reads the price ceiling that actually applies to this wallet's next purchase, in US cents. Check this before naming a price on `buyDataBundleWithToken`.
 
 :::note
-A wallet with no cap of its own falls back to the registry's default. If neither is set it returns the maximum `uint64` rather than zero, so a missing cap never reads as "no purchases allowed".
+A wallet with no cap of its own falls back to the registry's default. If neither is set it returns `maxUint256` rather than zero, so a missing cap never reads as "no purchases allowed". That case cannot happen on a live deployment, because the registry refuses a zero default.
 :::
 
 ```ts

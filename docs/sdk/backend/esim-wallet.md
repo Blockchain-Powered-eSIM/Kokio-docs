@@ -33,7 +33,7 @@ Prices are whole US cents as a `bigint` and a currency is named by a `bytes32`. 
 
 ## buyDataBundleWithToken {#buydatabundlewithtoken}
 
-Buys a data bundle for this eSIM as the admin, rather than as the eSIM's own device wallet. Use it when the backend is triggering a purchase on the user's behalf and the device wallet's own token balance pays for it.
+Buys a data bundle for this eSIM as the admin, rather than as the eSIM's own device wallet. Use it when the backend is triggering a purchase on the user's behalf and tokens pay for it. The eSIM wallet's own balance is spent first, and a shortfall is pulled from the device wallet if it has granted this eSIM wallet access to its funds.
 
 :::note
 For a purchase that was paid for outside the protocol, on a card or through another wallet, use [`registry.recordSettledPurchase`](./registry.md) instead. This call moves tokens and only makes sense when tokens are what paid.
@@ -163,7 +163,7 @@ Deploying an eSIM wallet is not exposed here. That call is restricted to the reg
 
 ### addRegistryAddress {#addregistryaddress}
 
-One-time setup call that wires the registry address into the eSIM wallet factory. Run once, as part of initial deployment.
+Owner only. One-time setup call that wires the registry address into the eSIM wallet factory. Run once, as part of initial deployment.
 
 ```ts
 const hash = await admin.eSIMWalletFactory.addRegistryAddress(registryAddress);
@@ -173,7 +173,7 @@ Returns `Promise<Hash>`.
 
 ### updateESIMWalletImplementation {#updateesimwalletimplementation}
 
-Points the eSIM wallet beacon at a new implementation contract.
+Owner only. Points the eSIM wallet beacon at a new implementation contract. On the live deployment the owner is the [ProtocolAdmin](./protocol-admin.md) timelock, so a direct call from the admin key reverts.
 
 :::warning
 This moves every deployed eSIM wallet to the new code at once.

@@ -77,7 +77,7 @@ const deployment = await admin.lazyWalletRegistry.deployLazyWalletAndSetESIMIden
 | deviceOwnerPublicKey | `P256Key` | The passkey's P-256 public key, as `[x, y]` hex |
 | deviceUniqueIdentifier | `string` | The device id the history was recorded under |
 | salt | `bigint` | Makes the address unique per user |
-| depositAmount | `bigint` | ETH sent as the wallet's starting gas deposit, in wei. `0n` when resuming |
+| depositAmount | `bigint` | ETH forwarded to the new device wallet's balance, in wei. `0n` when resuming |
 | maxWallets | `bigint`, optional | How many eSIM wallets to deploy per transaction |
 
 :::tip
