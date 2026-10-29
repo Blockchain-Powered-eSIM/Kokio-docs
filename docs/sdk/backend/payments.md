@@ -88,6 +88,17 @@ const scheduled = await admin.protocolAdmin.proposer.schedule(call);
 
 Returns `Promise<OwnerCall>`.
 
+## recoverTokensCall {#recovertokenscall}
+
+Builds the call payload to send back tokens someone sent to the adapter by mistake. Purchases never leave tokens in the adapter, so anything it holds arrived that way. The contract emits `TokensRecovered(token, to, amount)` and rejects a zero token, recipient or amount.
+
+```ts
+const call = await admin.paymentAdapter.recoverTokensCall(token, recipient, amount);
+const scheduled = await admin.protocolAdmin.proposer.schedule(call);
+```
+
+Returns `Promise<OwnerCall>`.
+
 ## transferOwnershipCall {#transferownershipcall}
 
 Builds the call payload to hand ownership of this contract to a new address. On the live deployment the owner is the ProtocolAdmin timelock, so hand the result to `protocolAdmin.proposer.schedule` rather than sending it directly.
