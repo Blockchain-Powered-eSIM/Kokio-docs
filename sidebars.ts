@@ -217,6 +217,10 @@ const sidebars: SidebarsConfig = {
               type: "doc",
               id: "sdk/backend/calls",
             },
+            {
+              type: "doc",
+              id: "sdk/backend/utils",
+            },
           ],
         },
       ],

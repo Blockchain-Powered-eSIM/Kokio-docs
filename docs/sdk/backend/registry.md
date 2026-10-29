@@ -95,27 +95,79 @@ Returns `Promise<Hash>`.
 
 ## recordSettledPurchase {#recordsettledpurchase}
 
-Records a data bundle paid for outside the protocol, by card or an external wallet. Use it once the backend has confirmed a payment through whatever rail took it.
+Records a data bundle paid for outside the protocol, by card, an external wallet or a coupon. Use it once the backend has confirmed a payment through whatever rail took it.
 
-No money moves through this call, so `settlement` on the bundle details has to be `1` for an external wallet or `2` for fiat, never `0`. The contract reverts with `SettlementNotAsserted` on `0`, because nothing here proves the device wallet actually paid. `tokenAmount` is recorded for offchain matching and never checked against `priceUSDCents`. `paymentReference` is spendable once per eSIM wallet.
+No money moves through this call, so `settlement` on the bundle details has to be `1` for an external wallet or `2` for fiat, never `0`. The contract reverts with `SettlementNotAsserted` on `0`, because nothing here proves the device wallet actually paid. `tokenAmount` is in the asset's smallest unit (`400n` is \$4.00 in `USD`, `4_000_000n` in `USDC`), recorded for offchain matching and never checked against `priceUSDCents`. `paymentReference` is spendable once per eSIM wallet. The wallet's price cap applies, and its admin allowance does not, because nothing is charged.
 
 This is the call that writes into a user's history on the backend's word alone. Confirm the payment first.
 
 ```ts
+import { stringToHex } from "viem";
+
 const hash = await admin.registry.recordSettledPurchase(
   eSIMWalletAddress,
   { id: bundleId, priceUSDCents: 500n, settlement: 2 }, // 2 = Fiat
-  asset,
-  tokenAmount,
+  stringToHex("USD", { size: 32 }),
+  500n,
   paymentReference,
 );
 ```
 
+A coupon is recorded as `Fiat` in `USD`, with its cents as `tokenAmount` and a reference tagged `Coupon` with [`utils.tagPaymentReference`](./utils.md#tagpaymentreference) when it covers the whole price.
+
 Returns `Promise<Hash>`.
+
+### Split between a coupon and another payment {#coupon-split}
+
+When a coupon covers part of the price and the user pays the rest by card or an external wallet, pass both of the order's references and the coupon's cents. The bundle details carry the full price and how the user paid the rest. `asset` and `tokenAmount` are what the user paid.
+
+```ts
+import { stringToHex } from "viem";
+import { PaymentReferenceKind } from "kokio-sdk/admin";
+
+const refs = [
+  admin.utils.tagPaymentReference(orderRef, PaymentReferenceKind.CouponPart),
+  admin.utils.tagPaymentReference(orderRef, PaymentReferenceKind.Remainder),
+] as const;
+
+// A \$10.00 bundle: \$6.00 by coupon, \$4.00 in USDC from an external wallet.
+const hash = await admin.registry.recordSettledPurchase(
+  eSIMWalletAddress,
+  { id: bundleId, priceUSDCents: 1000n, settlement: 1 }, // 1 = ExternalWallet
+  stringToHex("USDC", { size: 32 }),
+  4_000_000n,
+  refs,
+  600n, // the coupon's cents
+);
+```
+
+The registry has no call that records two purchases at once, so this sends two transactions:
+
+| Line | `priceUSDCents` | `settlement` | asset | `tokenAmount` | Reference |
+|---|---|---|---|---|---|
+| The user's share | `400n` | as passed | as passed | as passed | `Remainder` |
+| The coupon's share | `600n` | `2` (`Fiat`) | `USD` | `600n` | `CouponPart` |
+
+The user's share goes first, and the coupon's share is sent once it is mined. Before sending, each line is checked against `usedPaymentReferences` and skipped if already recorded, so a retry after a partial failure sends only what is missing. With both already recorded, the user's share is sent anyway and the contract refuses it with `PaymentReferenceAlreadyUsed`, the same error a retried single reference gets.
+
+This form is not for a device wallet split. There the user's own purchase records their share, and the coupon's share is recorded with the single form, `priceUSDCents` and `tokenAmount` set to the coupon's cents and a `CouponPart` reference.
+
+Errors before anything is sent:
+
+- `InvalidPaymentReferenceError`: the references are not one order's `CouponPart` and `Remainder`, in that order, or one of them cannot be read.
+- `CouponSplitOutOfRangeError`: the coupon's cents are missing, `0n` or less, or not below the full price. A coupon that covers the whole price is a full-coupon order and takes a single `Coupon` reference.
+- `ContractRevertError`: the contract would refuse the first line, for example `SettlementNotAsserted` when `settlement` is `0`.
+
+After the first transaction is sent:
+
+- `TransactionRevertedError`: the user's share reverted once mined. The coupon's share is not sent.
+- `ContractRevertError`: the contract would refuse the coupon's share. The user's share is already recorded, so a retry sends only the coupon's share.
+
+Returns `Promise<Hash>`, the hash of the last transaction sent. Any earlier one is already mined.
 
 ## pause {#pause}
 
-Stops the purchase and token pull paths on every device wallet and eSIM wallet, protocol-wide. This is the one emergency lever the admin key can pull on its own: it can pause, but only the owner can unpause. Use it if something looks wrong and needs an immediate stop.
+Stops the purchase and token pull paths on every device wallet and eSIM wallet, protocol-wide. This is the one emergency lever the admin key can pull on its own: it can pause, but only the owner can unpause. Use it if something looks wrong and needs an immediate stop. The owner can pause too, which is how a guardian pauses with [`protocolAdmin.guardian.pauseInstantly`](./protocol-admin.md#guardian-pauseinstantly) while the admin key is suspended.
 
 ```ts
 const hash = await admin.registry.pause();
@@ -336,6 +388,16 @@ Reads the fallback price ceiling, in US cents, for a wallet with no cap of its o
 
 ```ts
 const cap = await admin.registry.defaultPriceCapUSDCents();
+```
+
+Returns `Promise<bigint>`.
+
+## defaultAdminAllowanceUSDCents {#defaultadminallowanceusdcents}
+
+Reads what the admin key may charge a newly created eSIM wallet in total, in US cents. Changing it is an owner action, see [`protocolAdmin.setDefaultAdminAllowanceUSDCentsCall`](./protocol-admin.md#setdefaultadminallowanceusdcentscall).
+
+```ts
+const allowance = await admin.registry.defaultAdminAllowanceUSDCents();
 ```
 
 Returns `Promise<bigint>`.
