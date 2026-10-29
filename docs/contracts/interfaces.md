@@ -5,9 +5,13 @@ description: The four narrow interfaces in the Kokio suite, why each one leaves 
 
 # Interfaces {#interfaces}
 
+The four narrow interfaces between Kokio contracts, and why what they leave out matters.
+
+---
+
 Four small interfaces sit between the contracts in the Kokio [suite](./overview.md). Each is a deliberately narrow view of a larger contract, declared so the compiler checks a signature that gets called across a boundary.
 
-They are worth reading for what they leave out. Each of these is a list of the only things one contract is allowed to say to another, and in `IRegistryAdmin` the omission is the security property.
+Each one lists the only things one contract is allowed to say to another. Read them for what they leave out: in `IRegistryAdmin`, the omission is the security property.
 
 | Interface | Whose view it is | What it holds |
 |---|---|---|
@@ -20,7 +24,13 @@ They are worth reading for what they leave out. Each of these is a list of the o
 
 `IPausable` holds both `pause()` and `unpause()`, because a guardian does both without waiting. Raising a pause through the timelock matters when the admin key, which can also raise one, is suspended or being replaced.
 
-`IRegistryAdmin` holds `disableAdmin` and `requestAdminUpdate`, and leaves out `enableAdmin`. The owner reaches it as an ordinary scheduled payload, which waits out the delay. Putting it in this interface would invite a named function beside the guardian's, which is the one place a fast path could be added by accident. Suspending is instant and restoring waits, and that split is what stops a compromised key from undoing its own suspension. `adminOfRecord` is there so `disableAndNominate` can refuse to nominate the admin it is meant to replace.
+`IRegistryAdmin` holds `disableAdmin` and `requestAdminUpdate`, and leaves out `enableAdmin`. The owner reaches it as an ordinary scheduled payload, which waits out the delay. Putting it in this interface would invite a named function beside the guardian's, which is the one place a fast path could be added by accident.
+
+:::note
+Suspending is instant and restoring waits. That split is what stops a compromised key from undoing its own suspension.
+:::
+
+`adminOfRecord` is there so `disableAndNominate` can refuse to nominate the admin it is meant to replace.
 
 `IPausable` and `IRegistryAdmin` exist at all because a guardian acts with no delay. A drift between what `ProtocolAdmin` calls and what `Registry` offers would only show up as a revert during an incident, which is the worst possible time to find out. Declaring the two signatures makes the compiler check them instead.
 

@@ -5,9 +5,16 @@ description: The Kokio library that checks a WebAuthn assertion onchain, trying 
 
 # WebAuthn library {#webauthn-library}
 
+How a passkey assertion is checked onchain, and which parts of WebAuthn it does not check.
+
+---
+
 `WebAuthn` is the library that checks a passkey assertion onchain, and it is what makes a Kokio wallet controllable by a fingerprint instead of a seed phrase. It is built on Daimo's work, and it is reached through the [P256 verifier](./p256-verifier.md) rather than linked into each wallet, so every [device wallet](./device-wallet.md) in the [suite](./overview.md) verifies through one address.
 
-Two functions. `tryDecodeSignature` turns calldata into a `WebAuthnSignature` struct, and `verifySignature` decides whether that assertion is valid for a given P-256 key.
+It has two functions:
+
+- `tryDecodeSignature` turns calldata into a `WebAuthnSignature` struct.
+- `verifySignature` decides whether that assertion is valid for a given P-256 key.
 
 ## Two ways to verify, one answer {#two-ways-to-verify}
 
@@ -19,13 +26,20 @@ If the precompile is absent, or if it rejects the call, the library falls back t
 
 Both functions return rather than revert, and that is a deliberate hardening rather than a style choice.
 
-The decoder Solidity generates for a struct reverts when the bytes are not a well-formed encoding. A revert is not a rejection anywhere this gets called from: inside ERC-4337 validation it fails the whole bundle instead of the one operation, and behind `isValidSignature` it reaches an integrating contract as an error instead of as an invalid signature. So `tryDecodeSignature` does the bounds checking itself and returns a zeroed struct on anything malformed. A zeroed struct then fails verification, because an empty `clientDataJSON` cannot contain the index it is handed.
+The decoder Solidity generates for a struct reverts when the bytes are not a well-formed encoding. A revert is not a rejection anywhere this gets called from:
 
+- Inside ERC-4337 validation, it fails the whole bundle instead of the one operation.
+- Behind `isValidSignature`, it reaches an integrating contract as an error instead of as an invalid signature.
+
+So `tryDecodeSignature` does the bounds checking itself and returns a zeroed struct on anything malformed. A zeroed struct then fails verification, because an empty `clientDataJSON` cannot contain the index it is handed.
+
+:::note
 One exception, inherited from solady's decoding: the length checks use wrapping arithmetic, so a crafted length near 2^256 can pass them and run the caller out of gas. That is a revert, never an accepted signature.
+:::
 
 ## What it checks, and what it does not {#what-it-checks}
 
-Worth reading before relying on it, because it verifies the parts of the WebAuthn specification that matter in Kokio's setting and skips the rest.
+It verifies the parts of the WebAuthn specification that matter in Kokio's setting and skips the rest. Read this before relying on it.
 
 It does verify:
 
@@ -34,7 +48,11 @@ It does verify:
 - The client JSON contains the challenge that was asked for.
 - The signature is valid over both the authenticator data and the client JSON, for the given public key.
 
-It does not verify the origin, the top origin, the relying party id hash, the credential backup state, client extension outputs, the signature counter or the attestation object. Origin and relying party id are trusted to the authenticator's own cross-origin policy. The practical consequence is the one Daimo names: sign messages with an expiry, so that removing a linked relying party id later has a bounded window of exposure. Kokio's [`isValidSignature`](./account-4337.md) does exactly that, with a `validUntil` packed into every signature.
+It does not verify the origin, the top origin, the relying party id hash, the credential backup state, client extension outputs, the signature counter or the attestation object. Origin and relying party id are trusted to the authenticator's own cross-origin policy.
+
+:::warning
+Sign messages with an expiry, as Daimo advises, so that removing a linked relying party id later has a bounded window of exposure. Kokio's [`isValidSignature`](./account-4337.md) does this, with a `validUntil` packed into every signature.
+:::
 
 <!-- docgen:start source=smart-contract-suite/docs/WebAuthn.md -->
 ## WebAuthn {#webauthn}
