@@ -7,20 +7,20 @@ description: The four narrow interfaces in the Kokio suite, why each one leaves 
 
 Four small interfaces sit between the contracts in the Kokio [suite](./overview.md). Each is a deliberately narrow view of a larger contract, declared so the compiler checks a signature that gets called across a boundary.
 
-They are worth reading for what they leave out. Each of these is a list of the only things one contract is allowed to say to another, and in three of the four cases the omission is the security property.
+They are worth reading for what they leave out. Each of these is a list of the only things one contract is allowed to say to another, and in `IRegistryAdmin` the omission is the security property.
 
 | Interface | Whose view it is | What it holds |
 |---|---|---|
-| `IPausable` | What [`ProtocolAdmin`](./protocol-admin.md) may do to the pause | `unpause()` alone |
-| `IRegistryAdmin` | What `ProtocolAdmin` may do to the admin role | `disableAdmin()` and `requestAdminUpdate()` |
+| `IPausable` | What a [`ProtocolAdmin`](./protocol-admin.md) guardian may do to the pause | `pause()` and `unpause()` |
+| `IRegistryAdmin` | What `ProtocolAdmin` may do to the admin role | `disableAdmin()`, `requestAdminUpdate()` and `adminOfRecord()` |
 | `IPaymentRegistry` | What the [payment adapter](./payment-adapter.md) reads from the [Registry](./registry.md) | `vault()` and `isESIMWalletValid()` |
 | `IOwnable2Step` | What an incoming owner needs to accept a handover | `acceptOwnership()` and `pendingOwner()` |
 
 ## Why the omissions matter {#why-the-omissions-matter}
 
-`IPausable` holds `unpause()` and not `pause()`. Raising a pause is the hot admin key's lever and releasing one is the timelock's, so the two are deliberately not offered through the same interface.
+`IPausable` holds both `pause()` and `unpause()`, because a guardian does both without waiting. Raising a pause through the timelock matters when the admin key, which can also raise one, is suspended or being replaced.
 
-`IRegistryAdmin` holds `disableAdmin` and `requestAdminUpdate`, and leaves out `enableAdmin` for the mirror-image reason. The owner reaches it as an ordinary scheduled payload, which waits out the delay. Putting it in this interface would invite a named function beside the guardian's, which is the one place a fast path could be added by accident. Suspending is instant and restoring waits, and that split is what stops a compromised key from undoing its own suspension.
+`IRegistryAdmin` holds `disableAdmin` and `requestAdminUpdate`, and leaves out `enableAdmin`. The owner reaches it as an ordinary scheduled payload, which waits out the delay. Putting it in this interface would invite a named function beside the guardian's, which is the one place a fast path could be added by accident. Suspending is instant and restoring waits, and that split is what stops a compromised key from undoing its own suspension. `adminOfRecord` is there so `disableAndNominate` can refuse to nominate the admin it is meant to replace.
 
 `IPausable` and `IRegistryAdmin` exist at all because a guardian acts with no delay. A drift between what `ProtocolAdmin` calls and what `Registry` offers would only show up as a revert during an incident, which is the worst possible time to find out. Declaring the two signatures makes the compiler check them instead.
 

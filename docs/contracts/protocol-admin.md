@@ -1,11 +1,11 @@
 ---
 title: ProtocolAdmin
-description: The timelock that owns Kokio's upgradeable contracts, the two day delay on every change, and the three things a guardian can do without waiting.
+description: The timelock that owns Kokio's upgradeable contracts, the two day delay on every change, and the four things a guardian can do without waiting.
 ---
 
 # Protocol admin {#protocol-admin}
 
-`ProtocolAdmin` is the timelock that owns the four upgradeable contracts in the [Kokio suite](./overview.md): the [Registry](./registry.md), the [lazy wallet registry](./lazy-wallet-registry.md), the [device wallet factory](./device-wallet-factory.md) and the [eSIM wallet factory](./esim-wallet-factory.md). Both wallet beacons sit under the two factories, so owning the factories reaches every [device wallet](./device-wallet.md) and every [eSIM wallet](./esim-wallet.md) in the protocol.
+`ProtocolAdmin` is the timelock that owns the five upgradeable contracts in the [Kokio suite](./overview.md): the [Registry](./registry.md), the [lazy wallet registry](./lazy-wallet-registry.md), the [device wallet factory](./device-wallet-factory.md), the [eSIM wallet factory](./esim-wallet-factory.md) and the [payment adapter](./payment-adapter.md). Both wallet beacons sit under the two factories, so owning the factories reaches every [device wallet](./device-wallet.md) and every [eSIM wallet](./esim-wallet.md) in the protocol.
 
 It replaces the single account that would otherwise own all of that. Nobody holds a key that can upgrade a Kokio contract on the spot.
 
@@ -19,26 +19,31 @@ Execution being open is deliberate. The announcement is what the delay buys, and
 
 ## What a guardian can do {#what-a-guardian-can-do}
 
-A guardian has no general fast path. It can say exactly three things, and each is written as its own function rather than as a payload, so no fourth sentence is expressible however the role is held:
+A guardian has no general fast path. It can say exactly four things, and each is written as its own function rather than as a payload, so no fifth sentence is expressible however the role is held:
 
-1. **Release a pause**, with `unpauseInstantly`. An upgrade that waits is reviewable. An outage that waits is just an outage.
-2. **Take `CANCELLER_ROLE` away from an account**, with `revokeCancellersInstantly`.
-3. **Suspend the protocol's admin key**, with `disableAdminInstantly` or `disableAndNominate`.
+1. **Raise a pause**, with `pauseInstantly`. The admin key can already do this, but not while it is suspended or being replaced, and that is when a pause is most likely to be needed.
+2. **Release a pause**, with `unpauseInstantly`. An upgrade that waits is reviewable. An outage that waits is just an outage.
+3. **Take `CANCELLER_ROLE` away from an account**, with `revokeCancellersInstantly`.
+4. **Suspend the protocol's admin key**, with `disableAdminInstantly`.
 
-All three take something away and none of them grants anything, which is what keeps the role away from user funds. Releasing a pause cannot move ETH. Stripping a canceller cannot. A suspended admin is an admin that has stopped being able to spend, not one the guardian chose.
+None of the four grants anything, which is what keeps the role away from user funds. A pause stops purchases and fund pulls but never a wallet owner's own `execute`, so users can still spend their ETH. Stripping a canceller cannot move money. A suspended admin is an admin that has stopped being able to spend, not one the guardian chose.
 
-Restoring any of the three is an owner action and waits out the delay, so the side taking power away always wins the race against the side handing it back.
+Restoring a canceller or an admin is an owner action and waits out the delay, so the side taking power away always wins the race against the side handing it back.
+
+Replacing the admin is not a guardian power. `disableAndNominate` suspends the current admin and nominates a new one in one scheduled operation, so it waits like any other change. It refuses to nominate the current admin (`NomineeIsTheIncumbent`), because the registry would read that as withdrawing the nomination and lift the suspension.
 
 ## Why a guardian can evict a canceller {#why-a-guardian-can-evict-a-canceller}
 
-The second power looks out of place beside the other two. Without it, a compromised canceller is permanent. Evicting any role holder means scheduling `revokeRole`; a scheduled operation can be cancelled by any canceller; so a compromised canceller cancels its own eviction forever. Nothing else breaks that loop, because every other route waits on the delay.
+The third power looks out of place beside the others. Without it, a compromised canceller is permanent. Evicting any role holder means scheduling `revokeRole`; a scheduled operation can be cancelled by any canceller; so a compromised canceller cancels its own eviction forever. Nothing else breaks that loop, because every other route waits on the delay.
 
 Two limits carry the recovery argument, and both are enforced in code rather than written down as policy:
 
 - A guardian may not hold `CANCELLER_ROLE` itself. Otherwise it could revoke every other canceller, become the only one, and cancel its own eviction.
-- A guardian may not touch `PROPOSER_ROLE`. Reaching zero proposers is unrecoverable: re-granting any role needs a scheduled operation, scheduling needs a proposer, and `Registry.unpause` is owner-only, so a bricked admin plus a pause would be a pause nobody could ever release.
+- A guardian may not touch `PROPOSER_ROLE`. Reaching zero proposers is unrecoverable: re-granting any role needs a scheduled operation, and scheduling needs a proposer, so nothing could be upgraded or reconfigured again. A guardian could still raise and release a pause, and nothing more.
 
 Reaching zero cancellers is survivable by comparison. It costs the veto, and a proposer can schedule the role back.
+
+One limit is not enforced in code. A rogue guardian and a rogue proposer together can strip every canceller and then schedule changes nobody can veto. The strip power stays because it is the only way out of a compromised canceller. Keep the guardian's and the proposers' Safes on different signers, and alert on every `CancellerRevoked` event.
 
 ## Not upgradeable {#not-upgradeable}
 
