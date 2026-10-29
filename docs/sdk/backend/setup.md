@@ -39,11 +39,13 @@ const admin = new KokioAdmin(walletClient);
 
 Give `http()` a real RPC URL. The SDK reads it to build the public client it uses for reads.
 
+The example targets Base Sepolia. For Base mainnet, import `base` from `viem/chains` and point `RPC_URL` at a mainnet node. The SDK picks the contract addresses from the chain id, so nothing else changes.
+
 Writes sign locally with the key and go out as raw transactions, so any hosted RPC works and never sees the key. A connected wallet account works too.
 
 ## Which surfaces are ready when {#surfaces}
 
-`deviceWalletFactory`, `eSIMWalletFactory`, `registry`, `lazyWalletRegistry`, `paymentAdapter` and `protocolAdmin` work as soon as the instance exists, because they are chain-wide. The two instance-scoped surfaces, `deviceWallet` and `eSIMWallet`, stay `undefined` until bound to an address.
+`deviceWalletFactory`, `eSIMWalletFactory`, `registry`, `lazyWalletRegistry`, `paymentAdapter` and `protocolAdmin` work as soon as the instance exists, because they are chain-wide. So do [`calls`](./calls.md) and [`utils`](./utils.md), which take every address as an argument. The two instance-scoped surfaces, `deviceWallet` and `eSIMWallet`, stay `undefined` until bound to an address.
 
 ```ts
 admin.setDeviceWalletAddress(deviceWalletAddress);

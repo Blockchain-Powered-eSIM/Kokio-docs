@@ -7,20 +7,20 @@ description: The four narrow interfaces in the Kokio suite, why each one leaves 
 
 Four small interfaces sit between the contracts in the Kokio [suite](./overview.md). Each is a deliberately narrow view of a larger contract, declared so the compiler checks a signature that gets called across a boundary.
 
-They are worth reading for what they leave out. Each of these is a list of the only things one contract is allowed to say to another, and in three of the four cases the omission is the security property.
+They are worth reading for what they leave out. Each of these is a list of the only things one contract is allowed to say to another, and in `IRegistryAdmin` the omission is the security property.
 
 | Interface | Whose view it is | What it holds |
 |---|---|---|
-| `IPausable` | What [`ProtocolAdmin`](./protocol-admin.md) may do to the pause | `unpause()` alone |
-| `IRegistryAdmin` | What `ProtocolAdmin` may do to the admin role | `disableAdmin()` and `requestAdminUpdate()` |
+| `IPausable` | What a [`ProtocolAdmin`](./protocol-admin.md) guardian may do to the pause | `pause()` and `unpause()` |
+| `IRegistryAdmin` | What `ProtocolAdmin` may do to the admin role | `disableAdmin()`, `requestAdminUpdate()` and `adminOfRecord()` |
 | `IPaymentRegistry` | What the [payment adapter](./payment-adapter.md) reads from the [Registry](./registry.md) | `vault()` and `isESIMWalletValid()` |
 | `IOwnable2Step` | What an incoming owner needs to accept a handover | `acceptOwnership()` and `pendingOwner()` |
 
 ## Why the omissions matter {#why-the-omissions-matter}
 
-`IPausable` holds `unpause()` and not `pause()`. Raising a pause is the hot admin key's lever and releasing one is the timelock's, so the two are deliberately not offered through the same interface.
+`IPausable` holds both `pause()` and `unpause()`, because a guardian does both without waiting. Raising a pause through the timelock matters when the admin key, which can also raise one, is suspended or being replaced.
 
-`IRegistryAdmin` holds `disableAdmin` and `requestAdminUpdate`, and leaves out `enableAdmin` for the mirror-image reason. The owner reaches it as an ordinary scheduled payload, which waits out the delay. Putting it in this interface would invite a named function beside the guardian's, which is the one place a fast path could be added by accident. Suspending is instant and restoring waits, and that split is what stops a compromised key from undoing its own suspension.
+`IRegistryAdmin` holds `disableAdmin` and `requestAdminUpdate`, and leaves out `enableAdmin`. The owner reaches it as an ordinary scheduled payload, which waits out the delay. Putting it in this interface would invite a named function beside the guardian's, which is the one place a fast path could be added by accident. Suspending is instant and restoring waits, and that split is what stops a compromised key from undoing its own suspension. `adminOfRecord` is there so `disableAndNominate` can refuse to nominate the admin it is meant to replace.
 
 `IPausable` and `IRegistryAdmin` exist at all because a guardian acts with no delay. A drift between what `ProtocolAdmin` calls and what `Registry` offers would only show up as a revert during an incident, which is the worst possible time to find out. Declaring the two signatures makes the compiler check them instead.
 
@@ -31,9 +31,17 @@ They are worth reading for what they leave out. Each of these is a list of the o
 <!-- docgen:start source=smart-contract-suite/docs/interfaces/IPausable.md -->
 ## IPausable {#ipausable}
 
-Minimal view of the pause a guardian is allowed to release
+Minimal view of the pause a guardian is allowed to raise and release
 
-Only `unpause()` is here. Raising a pause is the hot admin key's lever and releasing one is the timelock's, so the two are deliberately not offered through the same interface.
+Both, because a guardian does both without waiting, even while the admin key is suspended.
+
+### pause {#ipausable-pause}
+
+```solidity
+function pause() external
+```
+
+Stops the protocol's guarded purchase and pull paths
 
 ### unpause {#ipausable-unpause}
 
@@ -49,7 +57,7 @@ Clears the pause
 
 Minimal view of the admin role the protocol owner controls
 
-Holds only the two calls `ProtocolAdmin` makes. `enableAdmin` is deliberately absent: the owner reaches it as an ordinary scheduled payload, and putting it here would invite a named function beside the guardian's, which is the one place a fast path could be added by accident. Suspending is instant and restoring waits, and the split is what stops a compromised key from undoing its own suspension.
+Holds only what `ProtocolAdmin` calls. `enableAdmin` is left out (the owner reaches it as a scheduled payload) so no instant restore is added by accident: suspending is instant and restoring waits, which stops a compromised key undoing its own suspension.
 
 ### disableAdmin {#iregistryadmin-disableadmin}
 
@@ -72,6 +80,14 @@ Nominates a new admin, which strips the incumbent until the nominee accepts
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | _newAdmin | address | Address of the recipient to receive the admin role |
+
+### adminOfRecord {#iregistryadmin-adminofrecord}
+
+```solidity
+function adminOfRecord() external view returns (address)
+```
+
+The admin address on the books, whether or not its powers are live
 <!-- docgen:end -->
 
 <!-- docgen:start source=smart-contract-suite/docs/interfaces/IPaymentRegistry.md -->
@@ -121,7 +137,7 @@ The device wallet an eSIM wallet belongs to, or zero if the registry has no reco
 
 Minimal view of the two-step ownership handover the protocol contracts use
 
-Matches the part of OpenZeppelin's `Ownable2Step` an incoming owner needs. The offer is made by the current owner and completed by the nominee, so a contract taking ownership only ever calls these two.
+The part of OpenZeppelin's `Ownable2Step` a contract taking ownership calls.
 
 ### acceptOwnership {#iownable2step-acceptownership}
 

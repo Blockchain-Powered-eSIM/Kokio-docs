@@ -5,16 +5,19 @@
       "maxDuration": 20
     }
   },
-  "headers": [
+  "redirects": [
     {
-      "source": "/.well-known/apple-app-site-association",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/json"
-        }
-      ]
+      "source": "/docs/contracts/deployments",
+      "destination": "/docs/deployments/base",
+      "permanent": true
     },
+    {
+      "source": "/md/contracts/deployments.md",
+      "destination": "/md/deployments/base.md",
+      "permanent": true
+    }
+  ],
+  "headers": [
     {
       "source": "/md/(.*)",
       "headers": [

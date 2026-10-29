@@ -119,9 +119,19 @@ const sidebars: SidebarsConfig = {
           type: "doc",
           id: "contracts/types",
         },
+      ],
+    },
+    {
+      type: "category",
+      label: "Deployed addresses",
+      items: [
         {
           type: "doc",
-          id: "contracts/deployments",
+          id: "deployments/base",
+        },
+        {
+          type: "doc",
+          id: "deployments/base-sepolia",
         },
       ],
     },
@@ -202,6 +212,14 @@ const sidebars: SidebarsConfig = {
             {
               type: "doc",
               id: "sdk/backend/protocol-admin",
+            },
+            {
+              type: "doc",
+              id: "sdk/backend/calls",
+            },
+            {
+              type: "doc",
+              id: "sdk/backend/utils",
             },
           ],
         },

@@ -29,7 +29,7 @@ const usdcSymbol = stringToHex("USDC", { size: 32 });
 // 0x5553444300000000000000000000000000000000000000000000000000000000
 ```
 
-`USDC` on the current deployment is Circle's Base Sepolia USDC. `USD` has no token and stands for a card or bank payment. Read any asset's token address with [`resolveAsset`](#resolveasset) rather than hardcoding it.
+`USDC` is Circle's USDC on each network, and Base mainnet also accepts `USDT` and `DAI`. The token addresses are on the [Base mainnet](../../deployments/base.md#currencies) and [Base Sepolia](../../deployments/base-sepolia.md#currencies) pages. `USD` has no token and stands for a card or bank payment. Read any asset's token address with [`resolveAsset`](#resolveasset) rather than hardcoding it.
 
 ## registerAsset {#registerasset}
 
@@ -83,6 +83,17 @@ Builds the call payload to change a currency already in the table.
 
 ```ts
 const call = await admin.paymentAdapter.updateAssetCall(symbol, asset);
+const scheduled = await admin.protocolAdmin.proposer.schedule(call);
+```
+
+Returns `Promise<OwnerCall>`.
+
+## recoverTokensCall {#recovertokenscall}
+
+Builds the call payload to send back tokens someone sent to the adapter by mistake. Purchases never leave tokens in the adapter, so anything it holds arrived that way. The contract emits `TokensRecovered(token, to, amount)` and rejects a zero token, recipient or amount.
+
+```ts
+const call = await admin.paymentAdapter.recoverTokensCall(token, recipient, amount);
 const scheduled = await admin.protocolAdmin.proposer.schedule(call);
 ```
 

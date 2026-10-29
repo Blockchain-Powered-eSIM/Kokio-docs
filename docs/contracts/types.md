@@ -41,14 +41,14 @@ It is decoded from calldata by [`WebAuthn.tryDecodeSignature`](./webauthn.md), w
 
 `Asset` is 23 bytes and fits one slot with nine to spare. Anything new has to stay inside those nine bytes, because a second slot moves every entry in a live mapping and a live table cannot be moved.
 
-`DataBundleDetails` has the same constraint for the same reason, and `priceCapUSDCents` on the eSIM wallet is declared where it is so it shares a slot with `newRequestedOwner`. Solidity packs in declaration order, so moving that line costs the slot.
+`DataBundleDetails` has the same constraint for the same reason, and `priceCapUSDCents` on the eSIM wallet is declared where it is so it shares a slot with `newRequestedOwner`. Solidity packs in declaration order, so moving that line costs the slot. `adminAllowanceUSDCents` comes next and starts a slot of its own, because 20 bytes of address plus two 8-byte figures do not fit in 32. That slot has 24 bytes free.
 
 <!-- docgen:start source=smart-contract-suite/docs/CustomStructs.md -->
 ## Settlement {#settlement}
 
 Which contract, if any, saw the money for a data bundle move
 
-Only `DeviceWallet` can be proven onchain. The other two are the admin's word, so the price cap is the only check on them.
+`DeviceWallet` means the money moved through the purchase path, not that the price matches an order. The other two are the admin's word, bounded only by the price cap.
 
 ```solidity
 enum Settlement {
@@ -62,7 +62,7 @@ enum Settlement {
 
 Data Bundle related details stored in the eSIM wallet
 
-Two slots: `id`, then `priceUSDCents` and `settlement` packed together. `id` is `bytes32` because the provider's ids fit in 32 bytes and a `string` would cost an extra slot on every entry. No timestamp field: the event log already has one.
+Two slots. `id` is `bytes32` since provider ids fit and a `string` costs an extra slot per entry. No timestamp: the event log already has one.
 
 ```solidity
 struct DataBundleDetails {

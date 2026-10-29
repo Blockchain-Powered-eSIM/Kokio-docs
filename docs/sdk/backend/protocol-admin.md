@@ -9,7 +9,7 @@ description: admin.protocolAdmin drives the Kokio timelock that owns the registr
 
 The Kokio timelock that owns the [registry](./registry.md), the [lazy wallet registry](./lazy-wallet-registry.md), both wallet factories and the [payment adapter](./payments.md). Any change to those contracts that needs `onlyOwner` goes through here: a proposer announces it, a delay passes, and anyone can then run it. This is what stands between one compromised key and an instant change to five contracts.
 
-On the live deployment the delay is two days and the floor below which it cannot go is one hour. The current values, along with who holds which role, are on the [deployed addresses](../../contracts/deployments.md) page. `getMinDelay()` reads the real one.
+On both Base networks the delay is two days and the floor below which it cannot go is one day, listed on the [Base mainnet](../../deployments/base.md#limits) and [Base Sepolia](../../deployments/base-sepolia.md#limits) pages. `getMinDelay()` reads the real one.
 
 Four role-scoped surfaces do the work.
 
@@ -18,7 +18,7 @@ Four role-scoped surfaces do the work.
 | `proposer` | schedules a call | `PROPOSER_ROLE` |
 | `executor` | runs a call once its delay has passed | none, anyone can execute a ready operation |
 | `canceller` | cancels a call before it runs | `CANCELLER_ROLE`, which every proposer also holds |
-| `guardian` | bypasses the delay for three emergency actions | `GUARDIAN_ROLE` |
+| `guardian` | bypasses the delay for four emergency actions | `GUARDIAN_ROLE` |
 
 ```ts
 const op = await admin.protocolAdmin.proposer.schedule({
@@ -103,6 +103,16 @@ Drops a scheduled operation before it runs. Needs `CANCELLER_ROLE`, which every 
 
 ```ts
 const hash = await admin.protocolAdmin.canceller.cancel(operationId);
+```
+
+Returns `Promise<Hash>`.
+
+## guardian.pauseInstantly {#guardian-pauseinstantly}
+
+Pauses a protocol contract immediately, with no delay. Needs `GUARDIAN_ROLE`. It can only stop the contract, which the admin key can already do, but this route still works while the admin key is suspended or being replaced. `guardian.unpauseInstantly` releases it. The contract emits `PauseRaised(target, guardian)`.
+
+```ts
+const hash = await admin.protocolAdmin.guardian.pauseInstantly(registryAddress);
 ```
 
 Returns `Promise<Hash>`.
@@ -254,6 +264,19 @@ Builds the call payload to set the registry's fallback price cap, in US cents. A
 
 ```ts
 const call = await admin.protocolAdmin.setDefaultPriceCapUSDCentsCall(cap);
+const scheduled = await admin.protocolAdmin.proposer.schedule(call);
+```
+
+Returns `Promise<OwnerCall>`.
+
+## setDefaultAdminAllowanceUSDCentsCall {#setdefaultadminallowanceusdcentscall}
+
+Builds the call payload to set what the admin key may charge each newly created eSIM wallet in total, in US cents. Wallets that already exist keep their own figure.
+
+`target` defaults to the registry.
+
+```ts
+const call = await admin.protocolAdmin.setDefaultAdminAllowanceUSDCentsCall(allowance);
 const scheduled = await admin.protocolAdmin.proposer.schedule(call);
 ```
 

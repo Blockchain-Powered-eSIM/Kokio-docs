@@ -137,6 +137,16 @@ const cap = await kokio.registry!.defaultPriceCapUSDCents();
 
 Returns `Promise<bigint>`.
 
+## defaultAdminAllowanceUSDCents {#defaultadminallowanceusdcents}
+
+Reads what the admin key may charge a newly created eSIM wallet in total, in US cents. It is 2500 (\$25.00) on Base mainnet and 10000 (\$100.00) on Base Sepolia. Existing wallets keep their own figure when this changes.
+
+```ts
+const allowance = await kokio.registry!.defaultAdminAllowanceUSDCents();
+```
+
+Returns `Promise<bigint>`.
+
 ## paymentAdapter {#paymentadapter}
 
 Reads the payment adapter this registry currently points at. Read this before going to [`kokio.paymentAdapter`](./payments.md), which targets whatever address you pass it rather than resolving the current one itself.

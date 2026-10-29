@@ -7,7 +7,7 @@ description: The one contract every Kokio wallet checks passkey signatures throu
 
 `P256Verifier` is the contract every Kokio wallet checks a passkey signature through. Kokio wallets are ERC-4337 smart accounts owned by a WebAuthn passkey rather than by a seed phrase, so before any wallet acts on an instruction it has to be satisfied that the phone's passkey really produced it. This contract is where that question gets answered.
 
-It holds no state and owns nothing. It is a thin wrapper around the [WebAuthn library](./webauthn.md), and it exists as a separate contract so that each account stores one immutable address to verify through, rather than carrying a copy of the verification code in its own bytecode. Its deployed address is on the [deployed addresses](./deployments.md) page.
+It holds no state and owns nothing. It is a thin wrapper around the [WebAuthn library](./webauthn.md), and it exists as a separate contract so that each account stores one immutable address to verify through, rather than carrying a copy of the verification code in its own bytecode. Its address is on the [Base mainnet](../deployments/base.md) and [Base Sepolia](../deployments/base-sepolia.md) pages.
 
 ## Where a signature comes from {#where-a-signature-comes-from}
 
@@ -27,7 +27,7 @@ Underneath, the library tries the RIP-7212 precompile first, a native P-256 veri
 
 Thin contract wrapper around the WebAuthn verification library
 
-Adapted from Daimo's DaimoVerifier: https://github.com/daimo-eth/daimo/blob/master/packages/contract/src/DaimoVerifier.sol It exists as a contract so accounts hold one immutable address to verify through, rather than linking the library into every implementation.
+Adapted from Daimo's DaimoVerifier: https://github.com/daimo-eth/daimo/blob/master/packages/contract/src/DaimoVerifier.sol A contract so accounts verify through one immutable address rather than compiling the library into every implementation.
 
 ### verifySignature {#p256verifier-verifysignature}
 
