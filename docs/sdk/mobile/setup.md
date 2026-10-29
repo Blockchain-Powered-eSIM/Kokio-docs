@@ -40,9 +40,11 @@ const kokio = new Kokio(
 );
 ```
 
+The example targets Base Sepolia. For Base mainnet, import `base` from `viem/chains` and use a mainnet RPC URL. The SDK picks the contract addresses from the chain id, so nothing else changes.
+
 The wallet client needs no `account`. The passkey signs everything. The one call that needs an account on it is `deviceWalletFactory.createAccountWithEOA`, which a normal app never uses.
 
-**Give `http()` a real RPC URL.** This is easy to get wrong, and it fails later, far from the line that caused it. The SDK reads `client.transport.url` to build the public client it uses for contract reads and nonce lookups. Calling `http()` with no argument leaves that undefined, the reads fall back to Base Sepolia's public endpoint, and its rate limit makes wallet derivation fail intermittently.
+**Give `http()` a real RPC URL.** This is easy to get wrong, and it fails later, far from the line that caused it. The SDK reads `client.transport.url` to build the public client it uses for contract reads and nonce lookups. Calling `http()` with no argument leaves that undefined, the reads fall back to the chain's public endpoint, and its rate limit makes wallet derivation fail intermittently.
 
 ## The second construction {#the-second-construction}
 

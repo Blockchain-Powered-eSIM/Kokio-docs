@@ -18,7 +18,7 @@ React Native, and the only part a user ever sees.
 
 ## Smart contract suite {#smart-contract-suite}
 
-Eighteen Solidity units, deployed on Base Sepolia. [The wallet suite overview](../contracts/overview.md) covers all of them. The shape is:
+Eighteen Solidity units, live on [Base mainnet](../deployments/base.md) with a testnet copy on [Base Sepolia](../deployments/base-sepolia.md). [The wallet suite overview](../contracts/overview.md) covers all of them. The shape is:
 
 - **A wallet per device and a wallet per eSIM.** Both are ERC-4337 smart accounts, deployed by factories at addresses that can be computed before the wallets exist. An eSIM can move between devices without moving anything else.
 - **[A registry](../contracts/registry.md)** mapping a user's device and eSIM identifiers to those wallets, and holding the purchase history.
