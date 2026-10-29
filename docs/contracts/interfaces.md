@@ -31,9 +31,17 @@ They are worth reading for what they leave out. Each of these is a list of the o
 <!-- docgen:start source=smart-contract-suite/docs/interfaces/IPausable.md -->
 ## IPausable {#ipausable}
 
-Minimal view of the pause a guardian is allowed to release
+Minimal view of the pause a guardian is allowed to raise and release
 
-Only `unpause()` is here. Raising a pause is the hot admin key's lever and releasing one is the timelock's, so the two are deliberately not offered through the same interface.
+Both, because a guardian does both without waiting, even while the admin key is suspended.
+
+### pause {#ipausable-pause}
+
+```solidity
+function pause() external
+```
+
+Stops the protocol's guarded purchase and pull paths
 
 ### unpause {#ipausable-unpause}
 
@@ -49,7 +57,7 @@ Clears the pause
 
 Minimal view of the admin role the protocol owner controls
 
-Holds only the two calls `ProtocolAdmin` makes. `enableAdmin` is deliberately absent: the owner reaches it as an ordinary scheduled payload, and putting it here would invite a named function beside the guardian's, which is the one place a fast path could be added by accident. Suspending is instant and restoring waits, and the split is what stops a compromised key from undoing its own suspension.
+Holds only what `ProtocolAdmin` calls. `enableAdmin` is left out (the owner reaches it as a scheduled payload) so no instant restore is added by accident: suspending is instant and restoring waits, which stops a compromised key undoing its own suspension.
 
 ### disableAdmin {#iregistryadmin-disableadmin}
 
@@ -72,6 +80,14 @@ Nominates a new admin, which strips the incumbent until the nominee accepts
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | _newAdmin | address | Address of the recipient to receive the admin role |
+
+### adminOfRecord {#iregistryadmin-adminofrecord}
+
+```solidity
+function adminOfRecord() external view returns (address)
+```
+
+The admin address on the books, whether or not its powers are live
 <!-- docgen:end -->
 
 <!-- docgen:start source=smart-contract-suite/docs/interfaces/IPaymentRegistry.md -->
@@ -121,7 +137,7 @@ The device wallet an eSIM wallet belongs to, or zero if the registry has no reco
 
 Minimal view of the two-step ownership handover the protocol contracts use
 
-Matches the part of OpenZeppelin's `Ownable2Step` an incoming owner needs. The offer is made by the current owner and completed by the nominee, so a contract taking ownership only ever calls these two.
+The part of OpenZeppelin's `Ownable2Step` a contract taking ownership calls.
 
 ### acceptOwnership {#iownable2step-acceptownership}
 

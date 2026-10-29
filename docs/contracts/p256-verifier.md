@@ -27,7 +27,7 @@ Underneath, the library tries the RIP-7212 precompile first, a native P-256 veri
 
 Thin contract wrapper around the WebAuthn verification library
 
-Adapted from Daimo's DaimoVerifier: https://github.com/daimo-eth/daimo/blob/master/packages/contract/src/DaimoVerifier.sol It exists as a contract so accounts hold one immutable address to verify through, rather than linking the library into every implementation.
+Adapted from Daimo's DaimoVerifier: https://github.com/daimo-eth/daimo/blob/master/packages/contract/src/DaimoVerifier.sol A contract so accounts verify through one immutable address rather than compiling the library into every implementation.
 
 ### verifySignature {#p256verifier-verifysignature}
 

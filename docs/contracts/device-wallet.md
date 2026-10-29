@@ -32,7 +32,7 @@ The practical consequence for anyone reading storage: the layout of this contrac
 
 A user's device: an ERC-4337 account that owns the eSIM wallets bought for that device
 
-A beacon proxy deployed by `DeviceWalletFactory`, owned by a P256 key the user holds. It funds its eSIM wallets, decides which of them may spend its money, and is the only party that can move one to another device. Its own owner key rotates through `transferOwnership`, which also tells the registry so the two records cannot drift apart.
+Beacon proxy owned by the user's P256 key. Key rotation also updates the registry, so the two records cannot drift apart.
 
 ### registry {#devicewallet-registry}
 
@@ -74,7 +74,7 @@ mapping(address => bool) canPullFunds
 
 Tracks if an associated eSIM wallet may pull this wallet's tokens
 
-A wallet trusted with the funds can already drain the owner, so a second flag per asset would cost another signature and limit nothing.
+One flag for all tokens: a wallet trusted with funds can drain them anyway, so per-token flags would cost signatures and limit nothing.
 
 ### FundsAccessUpdated {#devicewallet-fundsaccessupdated}
 
@@ -90,9 +90,7 @@ Emitted when owner updates an eSIM wallet's access to this wallet's money
 event TokenSent(address _token, address _eSIMWalletAddress, uint256 _amount)
 ```
 
-Emitted when an ERC-20 leaves this contract
-
-mostly when an eSIM wallet pulls tokens to pay for a data bundle
+Emitted when an associated eSIM wallet pulls an ERC-20 from this wallet
 
 ### ESIMWalletAdded {#devicewallet-esimwalletadded}
 
@@ -183,7 +181,7 @@ function init(address _registry, bytes32[2] _deviceWalletOwnerKey, string _devic
 
 Wires the wallet to the registry and the factory, and sets its owner key
 
-Called as the beacon proxy's constructor argument, so it always runs in the same transaction as the deployment. `Account4337.initialize` is internal, and this is the only path to it.
+Runs from the beacon proxy's constructor, in the deployment transaction. It is the only path to the internal `Account4337.initialize`.
 
 **Parameters**
 
@@ -202,11 +200,7 @@ function deployESIMWallet(bool _hasAccessToFunds, uint256 _salt) external return
 
 Deploys an eSIM wallet for this device and binds it
 
-The new wallet has no eSIM identifier yet. That arrives through `setESIMUniqueIdentifierForAnESIMWallet` once the eSIM itself has been created.
-
-Access to this wallet's money is granted only afterwards, by the owner, with `toggleAccessToFunds`.
-
-The admin gate here is a workflow convenience, not a security boundary against this wallet's own owner: `ESIMWalletFactory.deployESIMWallet` also accepts a call from any device wallet the registry knows, so the owner can reach the same outcome directly through `execute` with no admin involved. Closing that would need the deployment triggered by the admin rather than by this wallet, since nothing downstream of a device wallet's own call can tell one caller's signed intent from another's.
+Fund access is granted later by the owner with `toggleAccessToFunds`. The admin gate is a convenience, not a boundary: the owner can call the factory directly via `execute`.
 
 **Parameters**
 
@@ -229,7 +223,7 @@ function pullToken(address _token, uint256 _amount) external returns (uint256)
 
 Allow an associated eSIM wallet to pull an ERC-20 (for data bundles)
 
-Refused while the protocol is paused, and refused for a wallet whose access the owner has revoked. It exists so the admin can charge this wallet without an owner signature in that transaction; an owner buying for themselves can batch the transfer and the purchase through `executeBatch` instead.
+Lets the admin charge this wallet without an owner signature. An owner buying for themselves can batch the transfer and purchase in `executeBatch` instead.
 
 **Parameters**
 
@@ -244,29 +238,22 @@ Refused while the protocol is paused, and refused for a wallet whose access the 
 | ---- | ---- | ----------- |
 | [0] | uint256 | The amount pulled |
 
-### transferOwnership {#devicewallet-transferownership}
+### _transferOwnership {#devicewallet-_transferownership}
 
 ```solidity
-function transferOwnership(bytes32[2] newOwner) public returns (bytes32[2])
+function _transferOwnership(bytes32[2] newOwner, bytes newOwnerSignature) internal
 ```
 
-Replaces the P256 key that owns this account
+Moves ownership to a new key once that key has proved it can sign
 
-The registry holds its own record of which key owns this wallet, and the deploy paths keep one key to one wallet. Rotating without telling it leaves the retired key named as the owner and leaves the key taking over unregistered, free for a second wallet to claim. `super` runs after the key check because it carries the `onlySelf` guard and because the registry call is an external one, so the local write has to land before it.
-
-A key that cannot verify a signature bricks the wallet for good: this function is reachable only through `execute`, which needs a signature, so there is no rotating back and no reaching the balance. The deploy paths reject such a key and this path writes the same storage, so it has to reject it too.
+The registry keeps one key to one wallet, so it must follow every rotation. It is told after the local write because it reads the key back from this wallet.
 
 **Parameters**
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | newOwner | bytes32[2] | X,Y co-ordinates of the P256 key taking over |
-
-**Return Values**
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| [0] | bytes32[2] | The owner key now in force |
+| newOwnerSignature | bytes | ABI-encoded WebAuthn assertion by the new key over the challenge |
 
 ### toggleAccessToFunds {#devicewallet-toggleaccesstofunds}
 
@@ -291,7 +278,7 @@ The only way that access is ever granted. Binding a wallet never carries it, so 
 function addESIMWallet(address _eSIMWalletAddress, bool _hasAccessToFunds) public
 ```
 
-Allow the device wallet factory or the wallet owner to add new eSIM wallet to this device wallet
+Binds an eSIM wallet; callable by the registry, the device wallet factory, this wallet, or a factory-deployed eSIM wallet adding itself
 
 **Parameters**
 
@@ -306,14 +293,14 @@ Allow the device wallet factory or the wallet owner to add new eSIM wallet to th
 function removeESIMWallet(address _eSIMWalletAddress, bool _callBackETH) public
 ```
 
-Allow the device wallet owner or the eSIM wallet to remove any eSIM wallet bound with this device wallet
+Unbinds an eSIM wallet; callable by this wallet or by that eSIM wallet itself
 
 **Parameters**
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | _eSIMWalletAddress | address | Address of the eSIM wallet to be removed |
-| _callBackETH | bool | `true` if any remaining ETH needs to be called back from the ESIM wallet to this device wallet, `false` otherwise |
+| _callBackETH | bool | Whether to pull the eSIM wallet's ETH back to this wallet |
 
 ### _addESIMWallet {#devicewallet-_addesimwallet}
 
@@ -323,9 +310,7 @@ function _addESIMWallet(address _eSIMWalletAddress, bool _hasAccessToFunds) inte
 
 Binds an eSIM wallet to this device wallet and records it with the registry
 
-Refuses a wallet this device wallet does not already own, so binding cannot run ahead of the ownership handover.
-
-A bind never carries access to this wallet's money. `toggleAccessToFunds` is `onlySelf` and the only writer of a `true`, so no bind can undo the owner's revocation. Asking for access here reverts rather than being downgraded in silence.
+Refuses a wallet not yet owned by this one, so binding cannot run ahead of a handover. Never grants fund access, so no bind can undo an owner's revocation. Asking for access reverts rather than being silently dropped.
 
 **Parameters**
 
@@ -342,7 +327,7 @@ function getVaultAddress() public view returns (address)
 
 Fetches the vault address that receives payment for data bundles
 
-Read through to the registry rather than cached, so a vault change reaches every wallet at once. The associated eSIM wallets call this before paying.
+Not cached, so a vault change in the registry reaches every wallet at once.
 
 **Return Values**
 
