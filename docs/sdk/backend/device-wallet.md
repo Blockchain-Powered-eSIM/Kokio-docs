@@ -5,11 +5,19 @@ description: admin.deviceWallet is the EOA-signed view of one Kokio device walle
 
 # Device wallet (backend) {#device-wallet-backend}
 
+Reference for `admin.deviceWallet`: deploy eSIM wallets under a device wallet and read its state, from the admin key.
+
+---
+
 `admin.deviceWallet`
 
 The EOA-signed view of one Kokio device wallet, the ERC-4337 smart account a user's passkey owns. The contract behind this surface is documented at [device wallet](../../contracts/device-wallet.md).
 
-Only present once bound with `admin.setDeviceWalletAddress(address)`. Writes here send an ordinary transaction from the admin EOA, no bundler or passkey involved. See [backend setup](./setup.md).
+:::note
+Only present once bound with `admin.setDeviceWalletAddress(address)`.
+:::
+
+Writes here send an ordinary transaction from the admin EOA, no bundler or passkey involved. See [backend setup](./setup.md).
 
 ```ts
 admin.setDeviceWalletAddress(deviceWalletAddress);
@@ -22,7 +30,9 @@ The user-facing half of the same contract is on [`kokio.deviceWallet`](../mobile
 
 Deploys a new eSIM wallet under this device wallet. This is the backend's normal onboarding flow: deploy the device wallet, then deploy its first eSIM wallet.
 
-It is the only path to `DeviceWallet.deployESIMWallet`. It needs the admin EOA and cannot be reached from a device wallet user operation.
+:::note
+This is the only path to `DeviceWallet.deployESIMWallet`. It needs the admin EOA and cannot be reached from a device wallet user operation.
+:::
 
 ```ts
 const hash = await admin.deviceWallet!.deployESIMWallet(salt);
@@ -107,6 +117,11 @@ Checks a signature over an arbitrary message, following ERC-1271.
 ```ts
 const result = await admin.deviceWallet!.isValidSignature(messageHash, signature);
 ```
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| messageHash | `Hex` | The hash of the message that was signed |
+| signature | `Hex` | One version byte, six bytes of `validUntil`, then the ABI-encoded WebAuthn assertion. See [the ERC-1271 side](../../contracts/account-4337.md#the-erc-1271-side) |
 
 Returns `Promise<Hex>`, `0x1626ba7e` when the signature is valid and has not expired, `0xffffffff` otherwise.
 
