@@ -5,7 +5,11 @@ description: "The three pieces Kokio runs on: a React Native app signing with pa
 
 # Tech stack {#tech-stack}
 
-Kokio is three pieces: an app on the phone, a suite of contracts on Base, and a backend sitting between them and the eSIM providers. This page says what each one is and where the boundaries between them are. [The mobile app flow](./mobile-app.md) walks the same system in the order a purchase moves through it.
+The app, the contracts and the backend Kokio runs on, and where the lines between them fall.
+
+---
+
+Kokio is three pieces: an app on the phone, a suite of contracts on Base, and a backend sitting between them and the eSIM providers. [The mobile app flow](./mobile-app.md) walks the same system in the order a purchase moves through it.
 
 ## Mobile application {#mobile-application}
 
@@ -34,6 +38,16 @@ Node.js, doing the work that can happen neither on the phone nor onchain.
 
 - **Aggregates providers.** Kokio does not run a mobile network. The backend integrates the supplier and aggregator APIs that issue eSIM profiles, and presents them to the app as one catalogue of plans.
 - **Provisions the eSIM.** Once a purchase settles it orders the profile from the provider and returns the QR code or install details the app shows the user.
-- **Records what the chain cannot see.** A card payment leaves no onchain proof, so the backend writes it in through [the SDK's admin entry point](../sdk/backend/setup.md). That key deploys wallets for users and records settled purchases, which is why it belongs on a server you control and never in an app bundle.
+- **Records what the chain cannot see.** A card payment leaves no onchain proof, so the backend writes it in through [the SDK's admin entry point](../sdk/backend/setup.md). That key deploys wallets for users and records settled purchases.
 
-The backend can write history and deploy wallets. It cannot take a user's eSIM, spend from their wallet or upgrade a contract: those need either the user's passkey or the [timelock](../contracts/protocol-admin.md).
+:::warning
+The admin key belongs on a server you control, never in an app bundle.
+:::
+
+| The backend can | The backend cannot |
+|---|---|
+| Write purchase history | Take a user's eSIM |
+| Deploy wallets for users | Spend from a user's wallet |
+| | Upgrade a contract |
+
+Anything in the second column needs either the user's passkey or the [timelock](../contracts/protocol-admin.md).

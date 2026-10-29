@@ -5,7 +5,11 @@ description: "Why Kokio was built the way it was, what it commits to as an open 
 
 # Principles and motivation {#principles-and-motivation}
 
-Kokio is a travel eSIM app whose purchase records live onchain and whose wallets are controlled by a passkey on the user's phone. This page is about why it was built that way. For what it does rather than why, read [what is Kokio](./kokio/landing-intro.md).
+Why Kokio was built the way it was, and who it is for.
+
+---
+
+Kokio is a travel eSIM app whose purchase records live onchain and whose wallets are controlled by a passkey on the user's phone. For what it does rather than why, read [what is Kokio](./kokio/landing-intro.md).
 
 ## What the project commits to {#what-the-project-commits-to}
 

@@ -5,7 +5,17 @@ description: Kokio is an open source travel eSIM app built on passkeys and smart
 
 # Kokio and the eSIM stack {#kokio-and-the-esim-stack}
 
-Kokio is a travel eSIM app. You buy a data plan for wherever you are going, it installs on your phone as an eSIM, and the record of what you bought is written to a public blockchain instead of a provider's database. There is no account and no password, and nothing asks for a name or a document scan. The wallet holding that record is controlled by a passkey on your phone, so it belongs to you and Kokio cannot spend from it.
+What Kokio is, and where it sits in the stack every eSIM runs on.
+
+---
+
+Kokio is a travel eSIM app. You buy a data plan for wherever you are going, it installs on your phone as an eSIM, and the record of what you bought is written to a public blockchain instead of a provider's database.
+
+There is no account and no password, and nothing asks for a name or a document scan.
+
+:::note
+The wallet holding your purchase record is controlled by a passkey on your phone. It belongs to you, and Kokio cannot spend from it.
+:::
 
 The project is open source, and it sits where mobile telecoms and blockchain overlap. It takes three things from those two worlds:
 
@@ -26,3 +36,9 @@ Every eSIM runs on the same three pieces, Kokio's included.
 [How eSIM provisioning works](./esim/working.md) walks the same three layers in the order a purchase moves through them.
 
 Kokio is the app on top. It is the entry point a user buys through, and it adds a fourth piece the standard stack does not have: a suite of [smart contracts](./contracts/overview.md) holding the ownership record.
+
+## Next steps {#next-steps}
+
+- See [how eSIM provisioning works](./esim/working.md), layer by layer.
+- Read the [smart contracts overview](./contracts/overview.md).
+- Build against the protocol with the [Kokio SDK](./sdk/overview.md).

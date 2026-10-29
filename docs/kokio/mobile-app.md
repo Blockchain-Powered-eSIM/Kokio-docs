@@ -5,7 +5,11 @@ description: "What happens in the Kokio app from installing it to using the eSIM
 
 # Mobile app flow {#mobile-app-flow}
 
-The Kokio app is where a user does everything: registers a passkey, gets a wallet, buys a data bundle and installs the eSIM. This page follows that path in order. The pieces behind it are described in [the tech stack](./tech-stack.md), and the contracts each step touches are under [smart contracts](../contracts/overview.md).
+What happens in the Kokio app, from installing it to using the eSIM.
+
+---
+
+The Kokio app is where a user does everything: registers a passkey, gets a wallet, buys a data bundle and installs the eSIM. The pieces behind it are described in [the tech stack](./tech-stack.md), and the contracts each step touches are under [smart contracts](../contracts/overview.md).
 
 ## Checkout {#checkout}
 
@@ -24,7 +28,11 @@ Buying a plan runs in this order:
 
 ## Step by step {#step-by-step}
 
-1. **Install the app and register a passkey.** The passkey is a P-256 key generated in the device's secure enclave. It never leaves the phone, and it is the only thing that can authorise anything that follows.
+1. **Install the app and register a passkey.** The passkey is a P-256 key generated in the device's secure enclave. It never leaves the phone.
+
+   :::note
+   The passkey is the only thing that can authorise any of the steps that follow.
+   :::
 
 2. **Deploy the wallets.** On a new device the app asks for a [device wallet](../contracts/device-wallet.md) and an [eSIM wallet](../contracts/esim-wallet.md), which are linked to each other as they are deployed. Both addresses can be computed before either exists, so the app can show them straight away.
 
