@@ -31,7 +31,7 @@ Buying a plan runs in this order:
 1. **Install the app and register a passkey.** The passkey is a P-256 key generated in the device's secure enclave. It never leaves the phone.
 
    :::note
-   The passkey is the only thing that can authorise any of the steps that follow.
+   The passkey is the only key that can sign for the user's device wallet.
    :::
 
 2. **Deploy the wallets.** On a new device the app asks for a [device wallet](../contracts/device-wallet.md) and an [eSIM wallet](../contracts/esim-wallet.md), which are linked to each other as they are deployed. Both addresses can be computed before either exists, so the app can show them straight away.

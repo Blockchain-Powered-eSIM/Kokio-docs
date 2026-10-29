@@ -5,7 +5,7 @@ description: "Kokio's answer to the problems with eSIMs: plans sourced from aggr
 
 # How Kokio solves it {#how-kokio-solves-it}
 
-Local prices, a purchase record nobody can quietly change, and keys only you hold.
+Local prices, a purchase record anyone can read, and keys only you hold.
 
 ---
 
@@ -19,14 +19,12 @@ Kokio sells eSIMs sourced from aggregators and providers who already have local 
 
 ## The record {#the-record}
 
-Every eSIM provider today keeps what you bought in a database of their own. You cannot read it, you cannot check it, and if the company is sold or shuts down your record goes with it. Kokio writes the purchase to a public blockchain instead. [The registry contract](../contracts/registry.md) holds it, anyone can read it, and nobody can quietly change it.
+Every eSIM provider today keeps what you bought in a database of their own. You cannot read it, you cannot check it, and if the company is sold or shuts down your record goes with it. Kokio writes the purchase to a public blockchain instead. Your [eSIM wallet](../contracts/esim-wallet.md) contract holds it, and anyone can read it.
 
 ## The keys {#the-keys}
 
 The wallet holding that record is an ERC-4337 smart account owned by a passkey generated in your phone's secure enclave. Authorising a purchase is a fingerprint or a face. There is no password to phish and no seed phrase to lose.
 
 :::note
-Kokio never has the key, so Kokio cannot move your eSIM, spend your balance or lock you out.
+Kokio never has the key, so it cannot sign for you or move your eSIM to another device. Kokio's admin key can only charge your eSIM wallet for data bundles, within a price cap and a spending allowance that only you can change.
 :::
-
-Self-custodial is the whole point. You buy an eSIM without needing the provider to behave well, because there is nothing left for them to behave well about.

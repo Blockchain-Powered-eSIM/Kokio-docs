@@ -14,14 +14,14 @@ Kokio is a travel eSIM app. You buy a data plan for wherever you are going, it i
 There is no account and no password, and nothing asks for a name or a document scan.
 
 :::note
-The wallet holding your purchase record is controlled by a passkey on your phone. It belongs to you, and Kokio cannot spend from it.
+The wallet holding your purchase record is controlled by a passkey on your phone. Kokio's admin key can only charge it for data bundles, within a price cap and a spending allowance that only you can change.
 :::
 
 The project is open source, and it sits where mobile telecoms and blockchain overlap. It takes three things from those two worlds:
 
 - eSIMs, so a plan can be bought and installed remotely, with no plastic card and no shop
 - a public chain, so a purchase is recorded somewhere the buyer can read and the seller cannot quietly edit
-- passkeys and P-256 cryptography, so the phone's secure enclave is the only thing that can authorise a purchase
+- passkeys and P-256 cryptography, so the phone's secure enclave holds the only key that can sign for the wallet
 
 ## The three layers of an eSIM {#the-three-layers-of-an-esim}
 

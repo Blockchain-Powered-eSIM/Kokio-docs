@@ -16,11 +16,8 @@ An [**eSIM**](https://en.wikipedia.org/wiki/ESIM) (embedded SIM) is a SIM built 
 
 ## Who an eSIM helps {#benefits-of-esims}
 
-- **Users:** Several plans on one phone, switched in settings, with no plastic cards to carry or swap.
-- **Distributors:** No physical stock to ship, and no separate SIM batch per operator or region.
-- **Operators:** No cards to make or post, and a way into devices that never had a SIM tray, such as cars and wearables.
-- **Device makers:** No tray or slot, so devices can be smaller and better sealed against water and dust.
-
-:::note
-An eSIM is as secure as a removable SIM for network access, privacy and billing, roaming included. What changes is who holds the record of it, which is [the problem Kokio answers](./problem.md).
-:::
+- **Security:** The same security as a removable SIM for network access, privacy and billing, especially when roaming.
+- **Users:** Simpler subscription management, with no need for several physical SIM cards.
+- **Distributors:** Less logistics work, and less customisation for specific operators or regions.
+- **Operators:** Lower SIM distribution costs, new subscription models, and new markets such as automotive and wearables.
+- **Device makers:** Smaller, more durable devices, since the SIM takes less space and is less exposed to its surroundings, and a simpler supply chain.
