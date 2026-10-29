@@ -9,7 +9,7 @@ How a passkey assertion is checked onchain, and which parts of WebAuthn it does 
 
 ---
 
-`WebAuthn` is the library that checks a passkey assertion onchain, and it is what makes a Kokio wallet controllable by a fingerprint instead of a seed phrase. It is built on Daimo's work, and it is reached through the [P256 verifier](./p256-verifier.md) rather than linked into each wallet, so every [device wallet](./device-wallet.md) in the [suite](./overview.md) verifies through one address.
+`WebAuthn` is the library that checks a passkey assertion onchain, and it is what makes a Kokio device wallet controllable by a fingerprint instead of a seed phrase. It is built on Daimo's work, and it is reached through the [P256 verifier](./p256-verifier.md) rather than linked into each wallet, so every [device wallet](./device-wallet.md) in the [suite](./overview.md) verifies through one address.
 
 It has two functions:
 

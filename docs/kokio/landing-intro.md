@@ -24,6 +24,10 @@ Kokio does not have a copy of your passkey. That is what stops Kokio spending yo
 
 The first time you buy, the app creates a [smart account](../contracts/device-wallet.md) owned by that passkey. It is an ERC-4337 wallet rather than a closed-off balance, so you can use it as an everyday wallet with other onchain apps, not only for eSIMs.
 
+:::note
+The app calls this your **Kokio wallet**. The rest of these docs call it the [device wallet](../contracts/device-wallet.md), which is the contract's name.
+:::
+
 ## The purchase record is yours {#the-purchase-record-is-yours}
 
 Every purchase is written onchain, to a wallet you own, instead of into a row in a provider's database. You can read it, check it and move it between your own devices without asking anyone. [The registry](../contracts/registry.md) is the contract that holds it.

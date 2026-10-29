@@ -11,6 +11,10 @@ One phone's passkey-owned smart account, and the owner of every eSIM wallet boug
 
 A **device wallet** is one phone's account in the Kokio [suite](./overview.md). It is an ERC-4337 smart account owned by a P-256 passkey held in that phone's secure enclave, and it owns every [eSIM wallet](./esim-wallet.md) bought on that device. There is no seed phrase behind it, and no copy of the key anywhere outside the phone.
 
+:::note
+The Kokio app calls this the **Kokio wallet**. It is the same thing. These docs call it the device wallet, to keep it apart from the eSIM wallet.
+:::
+
 A device wallet:
 
 - Funds its eSIM wallets

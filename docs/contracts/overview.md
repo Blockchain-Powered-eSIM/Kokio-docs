@@ -70,6 +70,7 @@ Every upgrade, and every change of the admin key itself, runs through the [Proto
 
 Kokio's product glossary is at [kokio.app/glossary](https://kokio.app/glossary). These are the terms specific to this suite:
 
+- **Kokio wallet.** The name the Kokio app and its marketing use for the [device wallet](./device-wallet.md). They are the same contract. These docs say "device wallet" throughout, so it is never confused with the [eSIM wallet](./esim-wallet.md).
 - **Beacon proxy.** Many wallets, one shared pointer to the code they run. Upgrading the beacon moves every wallet at once, and there is no per-wallet opt-out. Both wallet types work this way, which is what makes an upgrade a governance question rather than a deployment detail.
 - **UUPS proxy.** A single contract whose upgrade logic lives in the implementation rather than in the proxy. The five singletons use it, and `ProtocolAdmin` owns them all.
 - **CREATE2.** Deploying to an address computed from the deployer, a salt and the code, rather than from a transaction counter. It is why a device wallet's address is known before it exists.

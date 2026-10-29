@@ -1,15 +1,15 @@
 ---
 title: P256 verifier
-description: The one contract every Kokio wallet checks passkey signatures through, wrapping the WebAuthn library so accounts hold a single immutable address instead of linking the code themselves.
+description: The one contract every Kokio device wallet checks passkey signatures through, wrapping the WebAuthn library so accounts hold a single immutable address instead of linking the code themselves.
 ---
 
 # P256 verifier {#p256-verifier}
 
-The one address every Kokio wallet checks a passkey signature through.
+The one address every device wallet checks a passkey signature through.
 
 ---
 
-`P256Verifier` is the contract every Kokio wallet checks a passkey signature through. Kokio wallets are ERC-4337 smart accounts owned by a WebAuthn passkey rather than by a seed phrase, so before any wallet acts on an instruction it has to be satisfied that the phone's passkey really produced it. This contract answers that.
+`P256Verifier` is the contract every Kokio [device wallet](./device-wallet.md) checks a passkey signature through. Device wallets are ERC-4337 smart accounts owned by a WebAuthn passkey rather than by a seed phrase, so before any wallet acts on an instruction it has to be satisfied that the phone's passkey really produced it. This contract answers that.
 
 It holds no state and owns nothing. It is a thin wrapper around the [WebAuthn library](./webauthn.md), and it exists as a separate contract so that each account stores one immutable address to verify through, rather than carrying a copy of the verification code in its own bytecode. Its address is on the [Base mainnet](../deployments/base.md) and [Base Sepolia](../deployments/base-sepolia.md) pages.
 

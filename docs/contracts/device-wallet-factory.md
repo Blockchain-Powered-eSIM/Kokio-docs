@@ -9,7 +9,7 @@ How device wallets are deployed, how their addresses are known in advance, and w
 
 ---
 
-`DeviceWalletFactory` deploys [device wallets](./device-wallet.md) and owns the beacon they all point at. Every Kokio wallet on a phone comes from here. It is a UUPS singleton, one per chain, and it sits under the [Registry](./registry.md) in the [suite](./overview.md).
+`DeviceWalletFactory` deploys [device wallets](./device-wallet.md) and owns the beacon they all point at. Every Kokio device wallet on a phone comes from here. It is a UUPS singleton, one per chain, and it sits under the [Registry](./registry.md) in the [suite](./overview.md).
 
 Two things about it matter to anyone integrating. The address of a wallet is known before the wallet exists, and there are two routes to deploying one.
 

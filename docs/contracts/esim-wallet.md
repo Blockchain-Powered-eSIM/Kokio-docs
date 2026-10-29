@@ -1,6 +1,6 @@
 ---
 title: ESIMWallet
-description: The Kokio wallet that stands for one eSIM, holding its data bundle purchase history, its spending ceiling, and the funds moving through it.
+description: The Kokio contract that stands for one eSIM, holding its data bundle purchase history, its spending ceiling, and the funds moving through it.
 ---
 
 # eSIM wallet {#esim-wallet}
