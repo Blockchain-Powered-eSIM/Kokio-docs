@@ -85,13 +85,29 @@ Returns `Promise<Hash>`.
 
 Moves ownership of this device wallet to a new passkey. Use it when a user gets a new device or resets their passkey.
 
-This is permanent and self-signed: it needs a valid signature from the current passkey, and there is no way to transfer again if the new key turns out to be unusable. Make sure the new key can actually sign before calling.
+It takes two signatures. The new passkey signs the wallet's `rotationChallenge` for its own key, and the current passkey signs the user operation that sends it. The wallet checks the first one and reverts with `NewOwnerKeyCannotSign` if it is missing, comes from another key, was made for another wallet or chain, or lacks user verification. So a wallet can only move to a key that can sign.
+
+`newOwnerSignature` is the new passkey's WebAuthn assertion over the challenge bytes, ABI-encoded as a `WebAuthnSignature` tuple (`authenticatorData`, `clientDataJSON`, `challengeIndex`, `typeIndex`, `r`, `s`). Unlike a user operation signature it has no version or `validUntil` header, and `s` must be in the low half of the curve order.
 
 ```ts
-const hash = await kokio.deviceWallet!.transferOwnership(newOwnerKey);
+const challenge = await kokio.deviceWallet!.rotationChallenge(newOwnerKey);
+// The new passkey signs `challenge` here, and the app encodes its assertion as `newOwnerSignature`.
+const hash = await kokio.deviceWallet!.transferOwnership(newOwnerKey, newOwnerSignature);
 ```
 
 Returns `Promise<Hash>`.
+
+## rotationChallenge {#rotationchallenge}
+
+Reads the bytes a new passkey must sign before `transferOwnership` accepts it. They are bound to this wallet, this chain and `newOwnerKey`, so a challenge cannot be reused elsewhere. Do not cache it across chains.
+
+The value is `keccak256("\x19Ethereum Signed Message:\n116" ‖ chainId ‖ wallet ‖ x ‖ y)`, packed, so it can also be built offchain.
+
+```ts
+const challenge = await kokio.deviceWallet!.rotationChallenge(newOwnerKey);
+```
+
+Returns `Promise<Hex>`, 32 bytes.
 
 ## addDeposit {#adddeposit}
 

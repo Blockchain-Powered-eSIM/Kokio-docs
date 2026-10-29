@@ -59,6 +59,8 @@ const hash = await kokio.eSIMWallet!.buyDataBundleWithTransfer(
 );
 ```
 
+When the backend builds these calls with [`admin.calls.buyDataBundleWithTransfer`](../backend/calls.md), sign what it returns with `kokio.deviceWallet!.sendUserOperation(calls)` instead.
+
 Returns `Promise<Hash>`, a user operation hash.
 
 ## sendTokenToDeviceWallet {#sendtokentodevicewallet}
@@ -83,6 +85,18 @@ const hash = await kokio.eSIMWallet!.setPriceCapUSDCents(50_000n); // \$500.00
 
 Returns `Promise<Hash>`.
 
+## setAdminAllowanceUSDCents {#setadminallowanceusdcents}
+
+Sets the total the Kokio backend (the admin key) may charge this eSIM wallet, in US cents. Each admin purchase lowers it and nothing refills it, so this is how the user lets the backend keep buying for them. Purchases the user signs themselves never touch it.
+
+The new figure replaces what is left rather than adding to it. `0n` stops admin purchases entirely. A new eSIM wallet starts at the registry default, and so does a wallet that moves to another device wallet.
+
+```ts
+const hash = await kokio.eSIMWallet!.setAdminAllowanceUSDCents(5_000n); // \$50.00
+```
+
+Returns `Promise<Hash>`.
+
 ## requestTransferOwnership {#requesttransferownership}
 
 Starts moving this eSIM wallet to a new device wallet. Use it when a user is switching their eSIM to a different device. The move only completes once the new device wallet calls `acceptOwnershipTransfer`.
@@ -103,6 +117,19 @@ const hash = await kokio.eSIMWallet!.acceptOwnershipTransfer();
 
 Returns `Promise<Hash>`.
 
+## acceptAndBindESIMWallet {#acceptandbindesimwallet}
+
+Accepts the transfer and adds the eSIM wallet to this device wallet's list, in one user operation and one passkey prompt. Use it instead of `acceptOwnershipTransfer` followed by `deviceWallet.addESIMWallet`. Pass `grantAccessToFunds: true` to also let the eSIM wallet pull tokens from this device wallet.
+
+```ts
+kokio.setESIMWalletAddress(eSIMWalletAddress);
+const hash = await kokio.eSIMWallet!.acceptAndBindESIMWallet({ grantAccessToFunds: true });
+```
+
+When the backend builds these calls with [`admin.calls.acceptAndBindESIMWallet`](../backend/calls.md), sign what it returns with `kokio.deviceWallet!.sendUserOperation(calls)` instead.
+
+Returns `Promise<Hash>`, a user operation hash.
+
 ## sendETHToDeviceWallet {#sendethtodevicewallet}
 
 Sends ETH held by this eSIM wallet back to its owning device wallet. Data bundles no longer cost ETH, but the wallet still accepts plain ETH transfers, which is how a device wallet tops it up, so this stays around for moving that balance back.
@@ -121,6 +148,16 @@ If the wallet has no cap of its own it falls back to the registry's default, and
 
 ```ts
 const cap = await kokio.eSIMWallet!.priceCapUSDCents();
+```
+
+Returns `Promise<bigint>`.
+
+## adminAllowanceUSDCents {#adminallowanceusdcents}
+
+Reads what the Kokio backend (the admin key) may still charge this eSIM wallet, in US cents. When an admin purchase is refused with `AdminAllowanceExceeded`, show this figure and ask the user to raise it with `setAdminAllowanceUSDCents`.
+
+```ts
+const remaining = await kokio.eSIMWallet!.adminAllowanceUSDCents();
 ```
 
 Returns `Promise<bigint>`.

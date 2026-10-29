@@ -213,6 +213,10 @@ const sidebars: SidebarsConfig = {
               type: "doc",
               id: "sdk/backend/protocol-admin",
             },
+            {
+              type: "doc",
+              id: "sdk/backend/calls",
+            },
           ],
         },
       ],
