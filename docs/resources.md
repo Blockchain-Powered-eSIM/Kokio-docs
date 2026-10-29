@@ -5,7 +5,15 @@ description: "Where the rest of Kokio is written down: the contract and SDK repo
 
 # Resources {#resources}
 
-Kokio's documentation is split between this site and a handful of repositories and wikis. This site is the maintained surface, and the pages here are generated from or checked against the source repositories. The links below are those sources, worth opening when you want the code itself or the longer background rather than the summary.
+The repositories and wikis behind this site.
+
+---
+
+Kokio's documentation is split between this site and a handful of repositories and wikis. Open these when you want the code itself, or the longer background behind a page here.
+
+:::note
+This site is the maintained copy. Its pages are generated from, or checked against, the source repositories below.
+:::
 
 ## Source code {#source-code}
 

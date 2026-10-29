@@ -5,7 +5,15 @@ description: The Kokio contract addresses on the Base Sepolia testnet, chain 845
 
 # Base Sepolia {#base-sepolia}
 
-The Kokio testnet. Balances here are worth nothing, and anything on this page can be redeployed without notice. The live deployment is on the [Base mainnet](./base.md) page.
+Kokio contract addresses, currencies and limits on the Base Sepolia testnet.
+
+---
+
+The Kokio testnet. The live deployment is on the [Base mainnet](./base.md) page.
+
+:::note
+Balances here are worth nothing, and anything on this page can be redeployed without notice.
+:::
 
 | | |
 |---|---|
@@ -62,4 +70,6 @@ cast code 0x916b6b554119c789EF3026EDeB0E1Ba741b42A49 --rpc-url https://sepolia.b
 cast call 0x916b6b554119c789EF3026EDeB0E1Ba741b42A49 "owner()(address)" --rpc-url https://sepolia.base.org
 ```
 
+:::warning
 If `owner()` returns anything other than `0xdBC411D2fEc7758B32885DbF0B4AE957c3b918Fe`, this page is out of date.
+:::
