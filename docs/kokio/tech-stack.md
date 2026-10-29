@@ -40,14 +40,10 @@ Node.js, doing the work that can happen neither on the phone nor onchain.
 - **Provisions the eSIM.** Once a purchase settles it orders the profile from the provider and returns the QR code or install details the app shows the user.
 - **Records what the chain cannot see.** A card payment leaves no onchain proof, so the backend writes it in through [the SDK's admin entry point](../sdk/backend/setup.md). That key deploys wallets for users and records settled purchases.
 
-:::warning
-The admin key belongs on a server you control, never in an app bundle.
-:::
-
 | The backend can | The backend cannot |
 |---|---|
-| Write purchase history | Take a user's eSIM |
-| Deploy wallets for users | Spend from a user's wallet |
-| | Upgrade a contract |
+| Write purchase history | Move a user's eSIM wallet to another device |
+| Deploy wallets for users | Charge an eSIM wallet above its price cap or admin allowance |
+| Charge an eSIM wallet for a data bundle, within those limits | Change either limit, or upgrade a contract |
 
 Anything in the second column needs either the user's passkey or the [timelock](../contracts/protocol-admin.md).

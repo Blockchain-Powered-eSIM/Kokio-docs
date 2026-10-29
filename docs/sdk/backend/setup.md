@@ -19,13 +19,9 @@ Read this before wiring the key in. The admin key:
 
 - Deploys wallets on users' behalf
 - Records purchases that were paid for outside the protocol
-- Moves the price cap
+- Buys data bundles for users, within each eSIM wallet's price cap and admin allowance
 
 `recordSettledPurchase` in particular writes a purchase into a user's history on the backend's word alone, because a card payment leaves no onchain proof. Nothing in the contracts distinguishes a correct record from an invented one.
-
-:::warning
-The admin key belongs in a server you control, never in an app bundle or a browser. Every call that spends it should be traceable to an order in your own system.
-:::
 
 Ownership of the protocol contracts is separate and sits behind the [ProtocolAdmin timelock](./protocol-admin.md), which the admin key cannot bypass.
 
