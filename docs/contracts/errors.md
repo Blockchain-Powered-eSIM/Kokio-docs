@@ -5,7 +5,7 @@ description: Every custom error the Kokio contracts revert with, grouped by the 
 
 # Custom errors {#custom-errors}
 
-Every custom error in the Kokio [wallet suite](./overview.md) is declared in one place, `Errors`. It is an interface rather than a library, so each contract reaches them as `Errors.Name` without inheriting anything. Ninety-two of them, listed below and grouped by the contract that raises them.
+Every custom error in the Kokio [wallet suite](./overview.md) is declared in one place, `Errors`. It is an interface rather than a library, so each contract reaches them as `Errors.Name` without inheriting anything. Ninety-five of them, listed below and grouped by the contract that raises them.
 
 If you are here because a transaction reverted, decode the selector first, then find the name in the tables.
 
@@ -29,6 +29,7 @@ The [Kokio SDK](../sdk/overview.md) does this for you. It resolves the selector 
 |---|---|---|
 | `ProtocolPaused` | The [Registry's](./registry.md) pause flag is up, and every guarded path is stopped | Nothing you can fix. Retry once the pause is released |
 | `DataBundlePriceAboveCap` | The bundle costs more than that [eSIM wallet's](./esim-wallet.md) ceiling | The wallet owner lowers the price or raises their own cap. The admin cannot raise it for them |
+| `AdminAllowanceExceeded` | An admin purchase costs more than what is left of that eSIM wallet's admin allowance | The user raises it with `setAdminAllowanceUSDCents`. Purchases the user signs themselves do not touch it |
 | `FundsAccessRevoked` | The [device wallet](./device-wallet.md) has not granted this eSIM wallet access to its funds | The user grants access with `toggleAccessToFunds` |
 | `PaymentReferenceAlreadyUsed` | That order id was already spent on a purchase | The purchase went through. Read the result rather than retrying with the same reference |
 | `SettlementNotFunded` | The [adapter](./payment-adapter.md) was told more was sent than actually arrived | Usually a fee-on-transfer token, which the protocol does not support. Otherwise the funding call and the settle call are not in the same transaction |
@@ -62,6 +63,9 @@ Raised by the [Registry](./registry.md), which holds the admin role, the pause f
 | `NotTheAssociatedDeviceWallet(address eSIMWallet, address associatedDeviceWallet)` | The eSIM wallet belongs to a different device wallet than the caller |
 | `AdminAlreadyDisabled()` | The admin is already suspended |
 | `AdminNotDisabled()` | The call only makes sense on a suspended admin |
+| `OwnerKeyNotHeldByWallet(address deviceWallet)` | A device wallet tried to register an owner key it does not hold. The registry reads the key back from the wallet |
+| `OnlyAdmin()` | The caller is not the live eSIM wallet admin. On `pause`, the owner is also allowed |
+| `VaultUnchanged(address vault)` | The vault being set is the one already stored |
 | `ProtocolPaused()` | The protocol is paused. Also raised by `DeviceWallet` and `ESIMWallet` |
 
 These four are raised on the path for purchases paid for outside the protocol:
@@ -70,7 +74,7 @@ These four are raised on the path for purchases paid for outside the protocol:
 |---|---|
 | `PaymentAdapterNotSet()` | No [payment adapter](./payment-adapter.md) is wired up yet |
 | `PaymentAdapterUnchanged(address paymentAdapter)` | The adapter being set is the one already stored |
-| `SettlementNotAsserted()` | Only `buyDataBundle` may claim the protocol saw the money move. A recorded outside purchase cannot |
+| `SettlementNotAsserted()` | Only `buyDataBundleWithToken` may claim the protocol saw the money move. A recorded outside purchase cannot |
 | `HistoryNotFullyCopied(string eSIMIdentifier, uint256 outstanding)` | Older history is still waiting to be copied, so a new entry would land out of order |
 
 ## RegistryHelper {#registryhelper-errors}
@@ -82,7 +86,7 @@ Raised by the storage half of the Registry, which the Registry inherits, so they
 | `OnlyLazyWalletRegistry()` | Only the lazy wallet registry may call the deferred deployment paths |
 | `DeviceIdentifierAlreadyRegistered(string deviceIdentifier)` | A device wallet already exists for that identifier |
 | `OwnerKeyAlreadyRegistered(bytes32 ownerKeyHash)` | That passkey already owns a device wallet |
-| `SaltTooHigh(uint256 salt, uint256 count)` | The salt is past the number of wallets this device has |
+| `SaltTooHigh(uint256 salt, uint256 count)` | The salt is past the number of wallets this device has. Raised by the lazy wallet registry |
 | `DeviceWalletAlreadyExists(string deviceIdentifier, address deviceWallet)` | Deploying would overwrite a wallet already at that address |
 | `NotAProtocolESIMWallet(address eSIMWallet)` | The address was not deployed by the eSIM wallet factory, so the protocol does not treat it as real |
 | `DeviceIdentifierReservedForLazyWallet(string deviceIdentifier)` | The identifier belongs to a fiat user whose wallets are not deployed yet. Go through the [lazy wallet registry](./lazy-wallet-registry.md) |
@@ -116,11 +120,8 @@ Raised by the [device wallet factory](./device-wallet-factory.md).
 
 | Error | Meaning |
 |---|---|
-| `OnlyAdmin()` | The caller is not the eSIM wallet admin |
 | `OnlyAdminOrRegistry()` | The caller is neither the admin nor the registry |
-| `OnlyEntryPoint()` | Only the ERC-4337 EntryPoint may take the `createAccount` route |
-| `InvalidDeviceWalletOwnerKey()` | The P-256 key pair is not a usable owner key |
-| `VaultUnchanged(address vault)` | The vault being set is the one already stored |
+| `InvalidDeviceWalletOwnerKey()` | The P-256 key pair is not a usable owner key. Also raised by `DeviceWallet` |
 | `EmptyBatch()` | A batch deployment was handed no entries |
 | `DeviceWalletInfoAlreadyAdded(address deviceWallet)` | That wallet's registry record already exists. `postCreateAccount` runs once |
 | `DeviceWalletMismatch(address deviceWallet, address derived)` | The address given does not match the one CREATE2 derives from the inputs |
@@ -149,7 +150,7 @@ Raised by a [device wallet](./device-wallet.md).
 
 | Error | Meaning |
 |---|---|
-| `UnknownESIMWallet(address eSIMWallet)` | This device wallet has no record of that eSIM wallet |
+| `UnknownESIMWallet(address eSIMWallet)` | This device wallet has no record of that eSIM wallet. Also raised by `RegistryHelper` |
 | `FundsAccessRevoked(address eSIMWallet)` | That eSIM wallet may not pull funds from here. Grant it with `toggleAccessToFunds` |
 | `FundsAccessNotGrantableAtBind(address eSIMWallet)` | Funds access cannot be granted in the same call that binds the wallet. It is a separate, deliberate decision |
 | `ESIMWalletAlreadyAdded(address eSIMWallet)` | That eSIM wallet is already attached to this device |
@@ -169,11 +170,12 @@ Raised by an [eSIM wallet](./esim-wallet.md).
 | `OnlyRegistry()` | Only the registry may call |
 | `OnlyDeviceWalletOrESIMWalletAdmin()` | The caller is neither the owning device wallet nor the admin |
 | `DataBundlePriceAboveCap(uint64 priceUSDCents, uint64 cap)` | The bundle costs more than this wallet's ceiling. Only the owning device wallet can change the cap |
+| `AdminAllowanceExceeded(uint64 priceUSDCents, uint64 remaining)` | An admin purchase costs more than the admin may still charge this wallet. Only the owning device wallet can raise it |
 | `ESIMIdentifierAlreadySet(string eSIMUniqueIdentifier)` | The eSIM identifier is set once and not replaced |
 | `EmptyDataBundleID()` | The bundle id is empty |
 | `ZeroDataBundlePrice()` | A bundle cannot be recorded at a price of zero |
 | `ZeroDataBundlePriceCap()` | A cap of zero means "follow the registry", so it cannot be set explicitly |
-| `NotADeviceWallet(address account)` | An eSIM wallet's owner has to be a device wallet, and that address is not one |
+| `NotADeviceWallet(address account)` | An eSIM wallet's owner has to be a device wallet, and that address is not one. Also raised by `RegistryHelper` |
 | `OnlyRequestedOwner(address newRequestedOwner)` | Only the nominated owner may accept the handover |
 | `UseAcceptOwnershipTransfer()` | Ownership moves in two steps here. The one-step call is blocked |
 
@@ -184,7 +186,9 @@ Raised by the [ERC-4337 base](./account-4337.md), and so by every device wallet 
 | Error | Meaning |
 |---|---|
 | `OnlySelf()` | The account only accepts that call from itself |
+| `OnlyEntryPoint()` | Only the ERC-4337 EntryPoint may make that call |
 | `OnlyEntryPointOrSelf()` | The caller is neither the EntryPoint nor the account itself |
+| `NewOwnerKeyCannotSign()` | A key rotation came without a valid assertion from the new key over `rotationChallenge(newOwner)` |
 
 ## Moving value {#moving-value-errors}
 
@@ -194,7 +198,7 @@ Raised by both `ESIMWallet` and `DeviceWallet` when funds move.
 |---|---|
 | `FailedToTransfer()` | The transfer did not succeed |
 | `InsufficientBalance(uint256 balance, uint256 amount)` | The wallet holds less than the call asked to move |
-| `ZeroAmount()` | Nothing to move |
+| `ZeroAmount()` | Nothing to move. Also raised by `PaymentAdapter.recoverTokens` |
 | `AssetNotTransferable(bytes32 asset)` | The currency has no token address, so nothing can be transferred in it. `USD` is one of these |
 
 ## PaymentAdapter {#paymentadapter-errors}
@@ -204,13 +208,13 @@ Raised by the [payment adapter](./payment-adapter.md).
 | Error | Meaning |
 |---|---|
 | `EmptyAssetSymbol()` | The currency symbol is empty |
-| `EmptyPaymentReference()` | The payment reference is empty |
+| `EmptyPaymentReference()` | The payment reference is empty. Also raised by the Registry |
 | `AssetNotAllowed(bytes32 asset)` | The currency is registered but switched off, or never registered |
 | `AssetAlreadyRegistered(bytes32 asset)` | Use `updateAsset` to change an existing entry. `registerAsset` is for new ones, so a typo cannot overwrite a live currency |
 | `AssetNotRegistered(bytes32 asset)` | Nothing to update under that symbol |
 | `AssetDecimalsTooLow(bytes32 asset, uint8 decimals)` | `quote` divides by 100, so fewer than two decimals loses the cents |
 | `AssetDecimalsTooHigh(bytes32 asset, uint8 decimals)` | Past the ceiling `quote` overflows, and the currency could never be priced |
 | `AssetNeedsSwap(bytes32 asset)` | The currency is not denominated in dollars, and there are no price feeds to convert it. Pay in a dollar-denominated asset |
-| `PaymentReferenceAlreadyUsed(bytes32 paymentReference)` | That order id was already spent |
+| `PaymentReferenceAlreadyUsed(bytes32 paymentReference)` | That order id was already spent. Raised by the Registry, which keeps the record of spent references |
 | `SettlementAboveMax(uint256 required, uint256 maxAmountIn)` | The price costs more of the currency than the buyer was willing to spend |
 | `SettlementNotFunded(uint256 amountIn, uint256 balance)` | The caller has to send the tokens before calling `settle`, and sent less than it declared |
