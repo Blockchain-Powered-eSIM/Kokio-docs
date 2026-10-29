@@ -5,7 +5,7 @@ description: admin.calls builds the calls a user's device wallet signs as one us
 
 # Calls (backend) {#calls-backend}
 
-Reference for `admin.calls`: build on the backend the calls a user's device wallet signs in the app.
+Reference for `admin.calls`: build on the backend the calls a user's Kokio device wallet signs in the app.
 
 ---
 
