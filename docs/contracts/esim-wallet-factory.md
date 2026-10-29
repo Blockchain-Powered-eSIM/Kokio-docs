@@ -5,13 +5,27 @@ description: Deploys Kokio eSIM wallets, owns the beacon they all follow, and is
 
 # eSIM wallet factory {#esim-wallet-factory}
 
+How eSIM wallets are deployed, what makes one valid, and who upgrades them all.
+
+---
+
 `ESIMWalletFactory` deploys [eSIM wallets](./esim-wallet.md) and owns the beacon they all point at. Every eSIM Kokio sells ends up owned by a wallet this contract deployed. It is a UUPS singleton, one per chain, sitting under the [Registry](./registry.md) in the [suite](./overview.md).
 
-It is also what makes "valid" mean something. A wallet is only a real eSIM wallet if this factory deployed it, and `isESIMWalletDeployed` is the record. Anything else with the same bytecode at a different address is not in that mapping, and every guarded path in the protocol rejects it. Copying the code is not the attack this stops; claiming to be part of the suite is.
+It is also what makes "valid" mean something. A wallet is only a real eSIM wallet if this factory deployed it, and `isESIMWalletDeployed` is the record.
+
+:::note
+The same bytecode at a different address is not in that mapping, and every guarded path in the protocol rejects it. The check stops a contract claiming to be part of the suite, not someone copying the code.
+:::
 
 ## Who may deploy one {#who-may-deploy-one}
 
-Three callers, and only three: the [Registry](./registry.md), the [device wallet factory](./device-wallet-factory.md), and a device wallet deploying another eSIM wallet for itself. A user gets a new eSIM wallet by going through their own [device wallet](./device-wallet.md), which is the only route that does not need Kokio's involvement.
+Three callers, and only three:
+
+- the [Registry](./registry.md)
+- the [device wallet factory](./device-wallet-factory.md)
+- a device wallet deploying another eSIM wallet for itself
+
+A user gets a new eSIM wallet through their own [device wallet](./device-wallet.md), the only route that does not need Kokio's involvement.
 
 `getCounterFactualAddress` predicts the address the same way the device wallet factory does, so an eSIM wallet address is known before it exists.
 

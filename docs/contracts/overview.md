@@ -5,9 +5,16 @@ description: The eighteen contracts behind Kokio, what each one does, which prox
 
 # The Kokio wallet suite {#the-kokio-wallet-suite}
 
+The eighteen contracts behind Kokio, how a purchase moves through them, and the terms the reference uses.
+
+---
+
 Kokio's onchain half is a suite of eighteen Solidity units that deploy and manage eSIM data. A user buys a data bundle, the purchase is recorded onchain, and the wallet holding that record is theirs rather than the operator's. The same wallet works as an everyday hot wallet, so the eSIM and the money that pays for it live in one place.
 
-Two ideas hold the design together. Every user gets a wallet per phone and a wallet per eSIM, so an eSIM can be moved between devices without moving anything else. And the wallets are ERC-4337 smart accounts owned by a passkey in the phone's secure enclave, so there is no seed phrase to write down and nothing for Kokio to hold on the user's behalf.
+Two ideas hold the design together:
+
+- **A wallet per phone and a wallet per eSIM.** An eSIM can be moved between devices without moving anything else.
+- **Passkey-owned smart accounts.** The wallets are ERC-4337 accounts owned by a passkey in the phone's secure enclave, so there is no seed phrase to write down and nothing for Kokio to hold on the user's behalf.
 
 The suite is live on [Base mainnet](../deployments/base.md), with a testnet copy on [Base Sepolia](../deployments/base-sepolia.md).
 
@@ -40,13 +47,24 @@ The two beacons the factories own are OpenZeppelin's [`UpgradeableBeacon`](https
 3. To buy a data bundle, the eSIM wallet asks [`PaymentAdapter`](./payment-adapter.md) what the price in US cents comes to in the currency being paid, sends that amount, and the adapter pays the vault and refunds the difference.
 4. The purchase is written into the eSIM wallet's own history, so the record belongs to the user rather than to a provider's database.
 
+:::note
 A user who pays by card has no wallet at the moment of purchase. That path runs through the [LazyWalletRegistry](./lazy-wallet-registry.md) instead, which holds the history against a device identifier until wallets are deployed and the record is copied onto them.
+:::
 
 ## Smart contract wallets, and what self-custodial means here {#self-custodial}
 
 A smart contract wallet for an eSIM keeps activation, profile switching and payment under rules written in code rather than in a provider's terms of service. Transferring an eSIM, changing a plan or paying for data are all calls anyone can read and nobody can quietly reinterpret.
 
-Self-custodial means the key that authorises those calls is on the user's device and nowhere else. Kokio cannot sign for a user, cannot move their funds and cannot take an eSIM back. What Kokio's admin key can do is narrow and worth naming plainly: it can charge an eSIM wallet for a data bundle, up to a per-purchase ceiling and a running total the user sets, and it can record a purchase made outside the contracts. It cannot raise either limit, and a charge only moves money if the user has also granted that eSIM wallet access to their funds. Every upgrade and every change of the admin key itself runs through the [ProtocolAdmin](./protocol-admin.md) timelock, which means an announcement and a two day wait before anything moves.
+**Self-custodial** means the key that authorises those calls is on the user's device and nowhere else. Kokio cannot sign for a user, cannot move their funds and cannot take an eSIM back.
+
+What Kokio's admin key can do is narrow:
+
+| The admin key can | The admin key cannot |
+|---|---|
+| Charge an eSIM wallet for a data bundle, up to a per-purchase ceiling and a running total the user sets | Raise either limit |
+| Record a purchase made outside the contracts | Move money from a wallet the user has not granted access to their funds |
+
+Every upgrade, and every change of the admin key itself, runs through the [ProtocolAdmin](./protocol-admin.md) timelock: an announcement, then a two day wait before anything moves.
 
 ## Terms used in this reference {#terms}
 

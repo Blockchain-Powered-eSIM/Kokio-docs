@@ -5,6 +5,10 @@ description: Deploys Kokio device wallets at addresses you can compute before th
 
 # Device wallet factory {#device-wallet-factory}
 
+How device wallets are deployed, how their addresses are known in advance, and who upgrades them.
+
+---
+
 `DeviceWalletFactory` deploys [device wallets](./device-wallet.md) and owns the beacon they all point at. Every Kokio wallet on a phone comes from here. It is a UUPS singleton, one per chain, and it sits under the [Registry](./registry.md) in the [suite](./overview.md).
 
 Two things about it matter to anyone integrating. The address of a wallet is known before the wallet exists, and there are two routes to deploying one.
@@ -13,13 +17,21 @@ Two things about it matter to anyone integrating. The address of a wallet is kno
 
 `getCounterFactualAddress` returns the address a device wallet will have, computed with CREATE2 from the owner key and the device identifier. Nothing has to be deployed for this to work, and the answer does not change afterwards.
 
-That is what lets the app show a user their wallet address the moment they register a passkey, accept a deposit into it before it is deployed, and deploy it later out of the funds that arrived. It is also the check an integrator should make before deploying: if the predicted address already has code, the wallet is there and deploying again is not what you want. `preCreateAccountValidation` is the read that answers whether a set of inputs is still free.
+That lets the app show a user their wallet address the moment they register a passkey, accept a deposit into it before it is deployed, and deploy it later out of the funds that arrived.
+
+:::warning
+Check the predicted address before deploying. If it already has code, the wallet is there and deploying again is not what you want. `preCreateAccountValidation` answers whether a set of inputs is still free.
+:::
 
 ## Two deployment routes, one address {#two-deployment-routes}
 
 `deployDeviceWalletForUsers` is the admin route. It deploys the wallet, its first [eSIM wallet](./esim-wallet.md) and the registry records together, in one transaction. It forwards ETH into the new wallets, so like the lazy route it refuses to run while the protocol is paused.
 
-`createAccount` is the ERC-4337 route, called by the EntryPoint when a user operation carries an `initCode`. It writes no external storage at all, which is what keeps it inside the EntryPoint's validation rules. A wallet created that way is registered afterwards with `postCreateAccount`, and until that runs the [Registry](./registry.md) does not know about it.
+`createAccount` is the ERC-4337 route, called by the EntryPoint when a user operation carries an `initCode`. It writes no external storage at all, which is what keeps it inside the EntryPoint's validation rules.
+
+:::note
+A wallet created through `createAccount` is registered afterwards with `postCreateAccount`. Until that runs, the [Registry](./registry.md) does not know about it.
+:::
 
 Both routes land on the same address for the same inputs. Which one ran is not visible from the address, only from whether the registry records exist yet.
 

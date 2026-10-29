@@ -5,13 +5,30 @@ description: The central record of the Kokio wallet suite, holding the admin add
 
 # Registry contract {#registry-contract}
 
-`Registry` is the single source of truth for who is who in the Kokio [wallet suite](./overview.md), and the switchboard every wallet reads before it does anything guarded. It holds the admin address, the vault that receives payments, the pause flag and the defaults for each eSIM wallet's price ceiling and admin allowance, and it keeps the record of which [device wallets](./device-wallet.md) and [eSIM wallets](./esim-wallet.md) were deployed by the protocol rather than by someone imitating it.
+The central record of the suite: the admin, the vault, the pause switch, the default limits, and which wallets are real.
 
-One place, not several, and that is the point. Device wallets and eSIM wallets are beacon proxies tracked by mappings with no enumerable list, so there is no way to write a new value into each of them one by one. Every wallet reads this contract on its guarded paths instead, which means rotating the admin key or raising the pause reaches all of them in the same transaction.
+---
+
+`Registry` is the single source of truth for who is who in the Kokio [wallet suite](./overview.md). Every wallet reads it before it does anything guarded.
+
+It holds:
+
+- the admin address
+- the vault that receives payments
+- the pause flag
+- the defaults for each eSIM wallet's price ceiling and admin allowance
+- the record of which [device wallets](./device-wallet.md) and [eSIM wallets](./esim-wallet.md) the protocol deployed, as opposed to someone imitating it
+
+One place, not several, and that is the point. Device wallets and eSIM wallets are beacon proxies tracked by mappings with no enumerable list, so there is no way to write a new value into each of them one by one. Every wallet reads this contract on its guarded paths instead, so rotating the admin key or raising the pause reaches all of them in the same transaction.
 
 ## What it decides {#what-it-decides}
 
-- **Who the admin is.** `adminOfRecord` is the address on the books. Read `eSIMWalletAdmin()` rather than that field to find out who may currently act: a suspended admin keeps its entry so the suspension can be lifted without anyone having to remember the address.
+- **Who the admin is.** `adminOfRecord` is the address on the books. A suspended admin keeps its entry, so the suspension can be lifted without anyone having to remember the address.
+
+  :::warning
+  To find out who may act right now, read `eSIMWalletAdmin()`, not `adminOfRecord`.
+  :::
+
 - **Whether the protocol is paused.** `pause()` accepts the admin or the owner. The owner route is what lets a [guardian](./protocol-admin.md) pause through the timelock while the admin key is suspended. Releasing it is owner only, and a guardian can do that without waiting out the delay.
 - **What a purchase may cost.** `defaultPriceCapUSDCents` is the ceiling a new eSIM wallet starts with. A user can lower their own wallet's cap; nobody can raise it for them.
 - **What the admin may charge in total.** `defaultAdminAllowanceUSDCents` is the total the admin may charge a new [eSIM wallet](./esim-wallet.md#what-the-admin-can-and-cannot-do), set at `initialize` and changed by the owner. Wallets that already exist keep their own figure.
