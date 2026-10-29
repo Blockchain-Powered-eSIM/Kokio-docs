@@ -7,7 +7,7 @@ description: admin.utils checks what a mined transaction paid and how far its bl
 
 `admin.utils`
 
-Helpers that no contract exposes directly. Each one does work a backend would otherwise build itself from raw contract calls and events, so it can ask one question and get one answer.
+Helpers that no Kokio contract exposes directly. Each one does work a backend would otherwise build itself from raw contract calls and events, so it can ask one question and get one answer.
 
 Two jobs: checking what a mined transaction paid and how far its block has settled, and building and reading the tags that mark coupon purchases in a payment reference. Nothing is signed or sent. The two checks take a transaction hash or a receipt and send all their reads together, so each check is one round trip. The two reference methods make no network call at all.
 
