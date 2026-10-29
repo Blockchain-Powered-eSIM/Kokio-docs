@@ -9,7 +9,7 @@ description: admin.protocolAdmin drives the Kokio timelock that owns the registr
 
 The Kokio timelock that owns the [registry](./registry.md), the [lazy wallet registry](./lazy-wallet-registry.md), both wallet factories and the [payment adapter](./payments.md). Any change to those contracts that needs `onlyOwner` goes through here: a proposer announces it, a delay passes, and anyone can then run it. This is what stands between one compromised key and an instant change to five contracts.
 
-On the live deployment the delay is two days and the floor below which it cannot go is one hour. The current values, along with who holds which role, are on the [deployed addresses](../../contracts/deployments.md) page. `getMinDelay()` reads the real one.
+On both Base networks the delay is two days and the floor below which it cannot go is one day, listed on the [Base mainnet](../../deployments/base.md#limits) and [Base Sepolia](../../deployments/base-sepolia.md#limits) pages. `getMinDelay()` reads the real one.
 
 Four role-scoped surfaces do the work.
 

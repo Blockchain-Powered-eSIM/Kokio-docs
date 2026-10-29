@@ -138,7 +138,7 @@ Returns `Promise<Address>`, the zero address when both are free.
 
 ## beacon {#beacon}
 
-Reads the beacon every device wallet reads its implementation from. The live beacon address is on the [deployed addresses](../../contracts/deployments.md) page.
+Reads the beacon every device wallet reads its implementation from. The beacon address is on the [Base mainnet](../../deployments/base.md#contracts) and [Base Sepolia](../../deployments/base-sepolia.md#contracts) pages.
 
 ```ts
 const beacon = await admin.deviceWalletFactory.beacon();

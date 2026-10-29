@@ -11,7 +11,7 @@ It replaces the single account that would otherwise own all of that. Nobody hold
 
 ## Every change waits {#every-change-waits}
 
-A privileged change goes one way. A proposer schedules it, the delay elapses, and then anyone at all executes it. On Base Sepolia the delay is two days and the floor below which it cannot be set is one hour, both listed on the [deployed addresses](./deployments.md) page.
+A privileged change goes one way. A proposer schedules it, the delay elapses, and then anyone at all executes it. On both Base networks the delay is two days and the floor below which it cannot be set is one day, listed on the [Base mainnet](../deployments/base.md) and [Base Sepolia](../deployments/base-sepolia.md) pages.
 
 Execution being open is deliberate. The announcement is what the delay buys, and once the wait is served there is no reason for the protocol to depend on one particular key still being around to press the button.
 

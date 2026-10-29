@@ -21,7 +21,7 @@ One place, not several, and that is the point. Device wallets and eSIM wallets a
 
 The reference below is in two parts. `Registry` holds the admin, pause and payment logic. `RegistryHelper` holds the mappings and the lazy deployment paths, and `Registry` inherits it, so both sets of members live at the same address. Only the [lazy wallet registry](./lazy-wallet-registry.md) calls into the helper's functions directly; everything else goes through `Registry` itself.
 
-`Registry` is a UUPS proxy owned by [`ProtocolAdmin`](./protocol-admin.md). Its address is on the [deployed addresses](./deployments.md) page, and it does not change when the implementation behind it does.
+`Registry` is a UUPS proxy owned by [`ProtocolAdmin`](./protocol-admin.md). Its address is on the [Base mainnet](../deployments/base.md) and [Base Sepolia](../deployments/base-sepolia.md) pages, and it does not change when the implementation behind it does.
 
 <!-- docgen:start source=smart-contract-suite/docs/Registry.md -->
 ## Registry {#registry}

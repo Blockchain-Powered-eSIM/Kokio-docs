@@ -72,7 +72,7 @@ Returns `Promise<Address>`.
 
 ## beacon {#beacon}
 
-Reads the beacon every device wallet reads its implementation from. One beacon update moves every existing device wallet at once. The live beacon address is on the [deployed addresses](../../contracts/deployments.md) page.
+Reads the beacon every device wallet reads its implementation from. One beacon update moves every existing device wallet at once. The beacon address is on the [Base mainnet](../../deployments/base.md#contracts) and [Base Sepolia](../../deployments/base-sepolia.md#contracts) pages.
 
 ```ts
 const beacon = await kokio.deviceWalletFactory!.beacon();

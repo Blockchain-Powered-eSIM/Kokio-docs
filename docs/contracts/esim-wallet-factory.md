@@ -17,7 +17,7 @@ Three callers, and only three: the [Registry](./registry.md), the [device wallet
 
 ## One beacon, every wallet {#one-beacon-every-wallet}
 
-`updateESIMWalletImplementation` points the beacon at new code. Every eSIM wallet in the protocol moves onto it in that transaction, and there is no opt-out for a wallet whose owner would rather stay put. `getCurrentESIMWalletImplementation` reads back what they are running, and the value is published on the [deployed addresses](./deployments.md) page.
+`updateESIMWalletImplementation` points the beacon at new code. Every eSIM wallet in the protocol moves onto it in that transaction, and there is no opt-out for a wallet whose owner would rather stay put. `getCurrentESIMWalletImplementation` reads back what they are running. The beacon's address is on the [Base mainnet](../deployments/base.md#contracts) and [Base Sepolia](../deployments/base-sepolia.md#contracts) pages.
 
 That is a real amount of power over other people's wallets, which is why the owner of this contract is the [`ProtocolAdmin`](./protocol-admin.md) timelock. An upgrade is announced by being scheduled, and cannot execute for two days.
 

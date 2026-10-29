@@ -9,7 +9,7 @@ Kokio's onchain half is a suite of eighteen Solidity units that deploy and manag
 
 Two ideas hold the design together. Every user gets a wallet per phone and a wallet per eSIM, so an eSIM can be moved between devices without moving anything else. And the wallets are ERC-4337 smart accounts owned by a passkey in the phone's secure enclave, so there is no seed phrase to write down and nothing for Kokio to hold on the user's behalf.
 
-The whole suite is deployed on Base Sepolia and nowhere else. Addresses are on the [deployed addresses](./deployments.md) page.
+The suite is live on [Base mainnet](../deployments/base.md), with a testnet copy on [Base Sepolia](../deployments/base-sepolia.md).
 
 ## What each contract does {#what-each-contract-does}
 

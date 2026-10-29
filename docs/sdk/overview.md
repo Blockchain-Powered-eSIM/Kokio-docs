@@ -73,7 +73,7 @@ const { factoryAddresses, chain, rpcURL } = await kokio.constants;
 
 The first read resolves them and every later one is served from that result, so reading `constants` repeatedly costs nothing.
 
-You never pass contract addresses in. The SDK resolves them from the wallet client's chain id. Base Sepolia, chain id 84532, is the only chain with a live deployment, and its addresses are listed on the [deployed addresses](../contracts/deployments.md) page. Ethereum, Optimism and Arbitrum, mainnet and testnets, are wired into the chain resolution but not deployed. Connecting to one of them throws `UnconfiguredChainError`.
+You never pass contract addresses in. The SDK resolves them from the wallet client's chain id. Two chains are supported: [Base mainnet](../deployments/base.md), chain id 8453, and [Base Sepolia](../deployments/base-sepolia.md), chain id 84532. Any other chain id throws `UnsupportedChainError`.
 
 ## Reference {#reference}
 

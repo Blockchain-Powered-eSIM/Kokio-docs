@@ -25,7 +25,7 @@ Both routes land on the same address for the same inputs. Which one ran is not v
 
 ## Upgrades {#upgrades}
 
-`updateDeviceWalletImplementation` points the beacon at new code, which moves every device wallet at once. `getCurrentDeviceWalletImplementation` reads back what they are running now, and the same value is published on the [deployed addresses](./deployments.md) page. The owner of this contract is the [`ProtocolAdmin`](./protocol-admin.md) timelock, so that call waits out a delay like every other privileged change.
+`updateDeviceWalletImplementation` points the beacon at new code, which moves every device wallet at once. `getCurrentDeviceWalletImplementation` reads back what they are running now. The beacon's address is on the [Base mainnet](../deployments/base.md#contracts) and [Base Sepolia](../deployments/base-sepolia.md#contracts) pages. The owner of this contract is the [`ProtocolAdmin`](./protocol-admin.md) timelock, so that call waits out a delay like every other privileged change.
 
 <!-- docgen:start source=smart-contract-suite/docs/device-wallet/DeviceWalletFactory.md -->
 ## DeviceWalletFactory {#devicewalletfactory}

@@ -21,7 +21,7 @@ The batch size limits, `MAX_HISTORY_ENTRIES_PER_CALL` and `MAX_ESIM_WALLETS_PER_
 
 Only the eSIM wallet admin. A record in this contract is Kokio's word that a card payment happened, because a card payment leaves no trace a contract can check. That is why the [price ceiling](./registry.md) applies to these purchases too, and why the `Settlement` value stored against each entry says plainly which of the three payment routes was used. The [types](./types.md) page lists them.
 
-`LazyWalletRegistry` is a UUPS proxy owned by [`ProtocolAdmin`](./protocol-admin.md). Its address is on the [deployed addresses](./deployments.md) page.
+`LazyWalletRegistry` is a UUPS proxy owned by [`ProtocolAdmin`](./protocol-admin.md). Its address is on the [Base mainnet](../deployments/base.md) and [Base Sepolia](../deployments/base-sepolia.md) pages.
 
 <!-- docgen:start source=smart-contract-suite/docs/LazyWalletRegistry.md -->
 ## LazyWalletRegistry {#lazywalletregistry}
