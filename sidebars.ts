@@ -127,6 +127,20 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: "category",
+      label: "Deployed addresses",
+      items: [
+        {
+          type: "doc",
+          id: "deployments/base",
+        },
+        {
+          type: "doc",
+          id: "deployments/base-sepolia",
+        },
+      ],
+    },
+    {
+      type: "category",
       label: "SDK",
       items: [
         {
