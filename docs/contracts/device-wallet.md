@@ -11,7 +11,7 @@ It does three jobs. It funds its eSIM wallets, it decides which of them may spen
 
 ## Owned by a key, not an address {#owned-by-a-key-not-an-address}
 
-The owner is a pair of co-ordinates, not an account. Signing works through [`Account4337`](./account-4337.md), the base this contract inherits, which checks each WebAuthn assertion through the [P256 verifier](./p256-verifier.md) before letting a call through. Rotating the key is `transferOwnership`, and the same call updates the [Registry](./registry.md) so the two records cannot drift apart.
+The owner is a pair of co-ordinates, not an account. Signing works through [`Account4337`](./account-4337.md), the base this contract inherits, which checks each WebAuthn assertion through the [P256 verifier](./p256-verifier.md) before letting a call through. Rotating the key is `transferOwnership`, and the new key has to sign [`rotationChallenge`](./account-4337.md#rotating-the-owner-key) before the wallet accepts it. The same call updates the [Registry](./registry.md) so the two records cannot drift apart, and the registry reads the key back from this wallet rather than trusting the call.
 
 Because the owner is a key rather than an address, a lost phone is not a lost wallet: the passkey can be restored from the platform's own keychain sync, and a device wallet whose key is replaced keeps all of its eSIM wallets.
 
@@ -19,7 +19,7 @@ Because the owner is a key rather than an address, a lost phone is not a lost wa
 
 `toggleAccessToFunds` is the switch that decides whether a given eSIM wallet may pull ETH from here to pay for a data bundle. It is off until the user turns it on, and `canPullFunds` is the read that answers for any one wallet. `pullToken` moves an ERC-20 balance the same way.
 
-This is the setting that limits what Kokio's admin can charge for. The admin can start a purchase against an eSIM wallet, but the money only moves if this device wallet has granted that wallet access and the price is under the wallet's [ceiling](./esim-wallet.md).
+This is one of the settings that limits what Kokio's admin can charge for. The admin can start a purchase against an eSIM wallet, but the money only moves if this device wallet has granted that wallet access, the price is under the wallet's [ceiling](./esim-wallet.md), and the wallet's [admin allowance](./esim-wallet.md#what-the-admin-can-and-cannot-do) still covers it.
 
 ## A beacon proxy, and what that means for upgrades {#a-beacon-proxy}
 

@@ -29,6 +29,20 @@ The signature itself is packed as one version byte, then six bytes of `validUnti
 
 The two entry points hash different precursors on purpose. A signature made for a user operation is not accepted as an ERC-1271 signature, and the reverse is also true.
 
+## Rotating the owner key {#rotating-the-owner-key}
+
+`transferOwnership(newOwner, newOwnerSignature)` replaces the key, and it takes two signatures. The current owner signs the call itself, which reaches the account through `execute`. The new key signs a challenge, which proves it exists and is under the user's control. Without that second signature an owner could rotate onto a key nobody holds and lose the wallet, or onto someone else's key before they had registered it. A missing or wrong proof reverts with `NewOwnerKeyCannotSign`.
+
+`rotationChallenge(newOwner)` returns the bytes to sign:
+
+```
+keccak256("\x19Ethereum Signed Message:\n116" ‖ chainId ‖ account ‖ x ‖ y)
+```
+
+packed, so it can also be built offchain. It binds the chain, this account and the new key, and its length differs from the other two precursors, so a proof made here is accepted nowhere else. `newOwnerSignature` is the ABI-encoded WebAuthn assertion over those bytes, with user verification required. Unlike an ERC-1271 signature it has no version byte and no `validUntil` in front.
+
+Every rotation runs through the internal `_transferOwnership`, so a recovery route added later gets the same check.
+
 ## Where the signature is checked {#where-the-signature-is-checked}
 
 Both paths end at the [P256 verifier](./p256-verifier.md), whose address this contract stores as an immutable. The verifier calls the [WebAuthn library](./webauthn.md), which tries the RIP-7212 precompile and falls back to FreshCryptoLib.

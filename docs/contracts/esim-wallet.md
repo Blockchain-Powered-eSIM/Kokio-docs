@@ -5,15 +5,19 @@ description: The Kokio wallet that stands for one eSIM, holding its data bundle 
 
 # eSIM wallet {#esim-wallet}
 
-An eSIM wallet is one eSIM's account in the Kokio [suite](./overview.md). It holds that eSIM's purchase history, the ceiling on what may be charged for a single data bundle, and whatever funds are passing through it on the way to paying for one.
+An eSIM wallet is one eSIM's account in the Kokio [suite](./overview.md). It holds that eSIM's purchase history, the limits on what Kokio's admin may charge it, and whatever funds are passing through it on the way to paying for one.
 
 Its owner is always a [device wallet](./device-wallet.md), never a key. That is unusual and it is the security property the whole design rests on: every call that moves ETH or changes ownership arrives through a device wallet `execute`, which means it has already been signed for by the user's passkey. There is no key that can act on an eSIM wallet directly.
 
 ## What the admin can and cannot do {#what-the-admin-can-and-cannot-do}
 
-Kokio's admin can charge this wallet for a data bundle. It cannot raise the ceiling that limits what it may charge.
+Kokio's admin can charge this wallet for a data bundle. Two limits apply, and the admin can raise neither of them.
 
-`priceCapUSDCents` is that ceiling, in US cents, and only the owning device wallet can set it. Zero means "follow the [Registry's](./registry.md) default", not "no ceiling". Beyond the cap, the money still only moves if the device wallet has granted this wallet access to its funds, so a charge needs the user to have said yes twice: once to the access and once to the cap.
+`priceCapUSDCents` bounds a single charge, in US cents. Zero means "follow the [Registry's](./registry.md) default", not "no ceiling".
+
+`adminAllowanceUSDCents` bounds the total. Every admin charge spends it, nothing refills it, and a charge above what is left reverts with `AdminAllowanceExceeded`. Without it the admin key could repeat charges under the cap until the wallet was empty. Setting it replaces what is left rather than adding to it, and zero stops admin charges altogether. A new wallet starts on the registry's `defaultAdminAllowanceUSDCents`. Purchases the user signs through their own device wallet never touch it.
+
+Only the owning device wallet can set either figure. On top of both, the money only moves if the device wallet has granted this wallet access to its funds.
 
 ## Buying a data bundle {#buying-a-data-bundle}
 
@@ -29,7 +33,15 @@ A token that delivers less than it was asked to transfer, such as a fee-on-trans
 
 Reading the whole history therefore means one of two things: index upwards until the call reverts, or read the `DataBundleBoughtWithToken` and `DataBundleSettlementRecorded` events from the logs, which is cheaper and carries a timestamp the struct does not store. The [Kokio SDK](../sdk/mobile/esim-wallet.md) does the second.
 
-Each entry records how the bundle was paid for, in a `Settlement` field with three values: paid from this wallet onchain, paid from an external wallet, or paid in fiat. Only the first can be proven onchain. The other two are the admin's word, which is why the price cap applies to them as well.
+Each entry records how the bundle was paid for, in a `Settlement` field with three values: paid from this wallet onchain, paid from an external wallet, or paid in fiat. Only the first can be proven onchain. The other two are the admin's word, which is why the price cap applies to them as well. The admin allowance does not, because recording a purchase paid elsewhere moves no money out of this wallet.
+
+## Moving to another device {#moving-to-another-device}
+
+A handover takes two steps. The owning device wallet calls `requestTransferOwnership` with the new device wallet, and that device wallet calls `acceptOwnershipTransfer`. A pending request can be pointed at someone else by calling again, and nominating the current owner cancels it and binds the wallet back, with fund access off.
+
+Only ETH comes back to the old device wallet when a request is made. ERC-20 balances stay in the eSIM wallet and go to whoever accepts, so sweep each token with `sendTokenToDeviceWallet` in the same `executeBatch` as the request.
+
+On acceptance the new owner starts fresh: the price cap goes back to following the registry, and the admin allowance resets to the registry default.
 
 ## A beacon proxy {#a-beacon-proxy}
 

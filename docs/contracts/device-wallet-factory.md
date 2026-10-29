@@ -17,7 +17,7 @@ That is what lets the app show a user their wallet address the moment they regis
 
 ## Two deployment routes, one address {#two-deployment-routes}
 
-`deployDeviceWalletForUsers` is the admin route. It deploys the wallet, its first [eSIM wallet](./esim-wallet.md) and the registry records together, in one transaction.
+`deployDeviceWalletForUsers` is the admin route. It deploys the wallet, its first [eSIM wallet](./esim-wallet.md) and the registry records together, in one transaction. It forwards ETH into the new wallets, so like the lazy route it refuses to run while the protocol is paused.
 
 `createAccount` is the ERC-4337 route, called by the EntryPoint when a user operation carries an `initCode`. It writes no external storage at all, which is what keeps it inside the EntryPoint's validation rules. A wallet created that way is registered afterwards with `postCreateAccount`, and until that runs the [Registry](./registry.md) does not know about it.
 
