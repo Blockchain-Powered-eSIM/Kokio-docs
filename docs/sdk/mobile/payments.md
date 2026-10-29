@@ -37,7 +37,7 @@ const usdcSymbol = stringToHex("USDC", { size: 32 });
 // 0x5553444300000000000000000000000000000000000000000000000000000000
 ```
 
-`USDC` is Circle's USDC on each network, and Base mainnet also accepts `USDT`. The token addresses are on the [Base mainnet](../../deployments/base.md#currencies) and [Base Sepolia](../../deployments/base-sepolia.md#currencies) pages. Read any asset's token address with [`resolveAsset`](#resolveasset) rather than hardcoding it.
+`USDC` is Circle's USDC on each network, and Base mainnet also accepts `USDT` and `DAI`. The token addresses are on the [Base mainnet](../../deployments/base.md#currencies) and [Base Sepolia](../../deployments/base-sepolia.md#currencies) pages. Read any asset's token address with [`resolveAsset`](#resolveasset) rather than hardcoding it.
 
 ## registry {#registry}
 

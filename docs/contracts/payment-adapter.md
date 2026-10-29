@@ -21,7 +21,7 @@ Every price in the protocol is a `uint64` of whole US cents. \$4.99 is `499`. Th
 
 An asset is registered under a `bytes32` symbol, not an address, so a currency can be a token or an offchain rail. An entry is 23 bytes and fits one storage slot with nine to spare; new fields have to stay inside those nine bytes, because a second slot would move every entry in a live table.
 
-Both networks register `USDC`, an ERC-20 with six decimals that settles onchain, and `USD`, which has no token address and two decimals and stands for a card or bank payment taken outside the contracts, recorded so the purchase history is complete either way. Base mainnet also registers `USDT`, six decimals. Each network's list is on its own page: [Base mainnet](../deployments/base.md#currencies) and [Base Sepolia](../deployments/base-sepolia.md#currencies).
+Both networks register `USDC`, an ERC-20 with six decimals that settles onchain, and `USD`, which has no token address and two decimals and stands for a card or bank payment taken outside the contracts, recorded so the purchase history is complete either way. Base mainnet also registers `USDT`, six decimals, and `DAI`, eighteen. Each network's list is on its own page: [Base mainnet](../deployments/base.md#currencies) and [Base Sepolia](../deployments/base-sepolia.md#currencies).
 
 `registerAsset` and `updateAsset` are owner-only, which means they run through the [`ProtocolAdmin`](./protocol-admin.md) timelock.
 

@@ -24,7 +24,7 @@ Prices are whole US cents as a `bigint`, and a currency is named by a `bytes32` 
 
 ## buyDataBundleWithToken {#buydatabundlewithtoken}
 
-Buys a data bundle for this eSIM, paid for in an ERC-20 the payment adapter accepts, which is USDC or USDT on Base mainnet and USDC on Base Sepolia. This is the everyday purchase flow.
+Buys a data bundle for this eSIM, paid for in an ERC-20 the payment adapter accepts, which is USDC, USDT or DAI on Base mainnet and USDC on Base Sepolia. This is the everyday purchase flow.
 
 If this eSIM wallet holds less than the price, the contract pulls the rest from the device wallet. That needs fund access, granted by [`deviceWallet.toggleAccessToFunds`](./device-wallet.md#toggleaccesstofunds) or by `deployAndBindESIMWallet` with `grantAccessToFunds: true`. Without it the purchase reverts with `FundsAccessRevoked`, and [`buyDataBundleWithTransfer`](#buydatabundlewithtransfer) is the one to use.
 

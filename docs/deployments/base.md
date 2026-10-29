@@ -41,6 +41,7 @@ Device and eSIM wallets have one address per device and per eSIM, so none is lis
 |---|---|---|
 | `USDC` | [`0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`](https://basescan.org/address/0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913) | 6 |
 | `USDT` | [`0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2`](https://basescan.org/address/0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2) | 6 |
+| `DAI` | [`0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb`](https://basescan.org/address/0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb) | 18 |
 | `USD` | none, a card or bank payment taken outside the contracts | 2 |
 
 ## Limits {#limits}
