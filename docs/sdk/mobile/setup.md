@@ -5,9 +5,17 @@ description: "Constructing the Kokio client in a React Native app: the viem wall
 
 # Mobile setup {#mobile-setup}
 
+Learn how to build a `Kokio` client in a React Native app, from an empty project to a first user operation.
+
+---
+
 `Kokio` is the [Kokio SDK](../overview.md) entry point for the mobile app. It acts for one user through their device wallet, an ERC-4337 smart account owned by a P-256 passkey held on the phone. No private key is ever in the app. Every write is a user operation signed by that passkey and submitted by a bundler.
 
-This page gets you from an empty project to a client that can send one.
+Setting up the client comes down to these steps:
+
+1. Construct `Kokio` with a wallet client and the passkey
+2. Resolve the smart account and construct it again with the bundler client
+3. Send a write
 
 ## What you need {#what-you-need}
 
@@ -40,9 +48,13 @@ const kokio = new Kokio(
 );
 ```
 
+The example targets Base Sepolia. For Base mainnet, import `base` from `viem/chains` and use a mainnet RPC URL. The SDK picks the contract addresses from the chain id, so nothing else changes.
+
 The wallet client needs no `account`. The passkey signs everything. The one call that needs an account on it is `deviceWalletFactory.createAccountWithEOA`, which a normal app never uses.
 
-**Give `http()` a real RPC URL.** This is easy to get wrong, and it fails later, far from the line that caused it. The SDK reads `client.transport.url` to build the public client it uses for contract reads and nonce lookups. Calling `http()` with no argument leaves that undefined, the reads fall back to Base Sepolia's public endpoint, and its rate limit makes wallet derivation fail intermittently.
+:::warning
+Give `http()` a real RPC URL. This is easy to get wrong, and it fails later, far from the line that caused it. The SDK reads `client.transport.url` to build the public client it uses for contract reads and nonce lookups. Calling `http()` with no argument leaves that undefined, the reads fall back to the chain's public endpoint, and its rate limit makes wallet derivation fail intermittently.
+:::
 
 ## The second construction {#the-second-construction}
 
@@ -64,17 +76,30 @@ const session = new Kokio(
 
 Do this once per app session, straight after login. See [smart account](./smart-account.md) for what those two calls return.
 
-The contract surfaces are `deviceWallet`, `eSIMWallet`, `deviceWalletFactory`, `eSIMWalletFactory`, `registry`, `paymentAdapter` and `P256Verifier`. All of them stay `undefined` until a `smartAccountClient` is supplied. The two instance surfaces, `deviceWallet` and `eSIMWallet`, also need their contract address, so they stay `undefined` until you pass one.
+The contract surfaces are `deviceWallet`, `eSIMWallet`, `deviceWalletFactory`, `eSIMWalletFactory`, `registry`, `paymentAdapter` and `P256Verifier`.
+
+| Surface | Available once |
+|---|---|
+| `deviceWalletFactory`, `eSIMWalletFactory`, `registry`, `paymentAdapter`, `P256Verifier` | A `smartAccountClient` is supplied |
+| `deviceWallet`, `eSIMWallet` | A `smartAccountClient` and that contract's address are both supplied |
+
+Until then each one is `undefined`.
 
 ## Sending a write {#sending-a-write}
 
-```ts
+```ts title="Send and confirm"
 const hash = await session.deviceWallet!.toggleAccessToFunds(eSIMWalletAddress, true);
 const receipt = await smartAccountClient.waitForUserOperationReceipt({ hash });
 if (!receipt.success) throw new Error("operation reverted");
 ```
 
-A write the contract would refuse throws `ContractRevertError` before it is sent, with the contract's error name in `err.decoded?.errorName`. Still check `receipt.success`: if the chain changes between that check and inclusion, the operation can revert onchain, and it is then mined and still returns a receipt, so the await resolving is not proof that anything landed. `receipt.receipt.transactionHash` is the onchain transaction, which is what a block explorer link needs.
+A write the contract would refuse throws `ContractRevertError` before it is sent, with the contract's error name in `err.decoded?.errorName`.
+
+:::warning
+Still check `receipt.success`. If the chain changes between that check and inclusion, the operation can revert onchain. It is then mined and still returns a receipt, so the await resolving is not proof that anything landed.
+:::
+
+`receipt.receipt.transactionHash` is the onchain transaction, which is what a block explorer link needs.
 
 ## Switching eSIM wallet {#switching-esim-wallet}
 
@@ -94,10 +119,14 @@ Either side can. The backend can deploy it with `admin.deviceWalletFactory.creat
 await session.deviceWallet!.sendUserOperation([]); // an empty operation that only deploys the wallet
 ```
 
+:::warning
 A wallet deployed that way is not registered yet, so it cannot deploy eSIM wallets. The backend registers it with [`admin.deviceWalletFactory.postCreateAccount`](../backend/device-wallet-factory.md#postcreateaccount).
+:::
 
 The app only needs `deviceWalletFactory.createAccountWithEOA` if it holds its own funded EOA, which the wallet client above does not set up.
 
 ## Where to go next {#next}
 
-[Buy a data bundle](./esim-wallet.md), [read protocol state](./registry.md), or [check which currencies are accepted](./payments.md). Prices are whole US cents as a `bigint` and currencies are `bytes32`, both explained on the [payments](./payments.md) page.
+- [Buy a data bundle](./esim-wallet.md).
+- [Read protocol state](./registry.md).
+- [Check which currencies are accepted](./payments.md). Prices are whole US cents as a `bigint` and currencies are `bytes32`, both explained there.

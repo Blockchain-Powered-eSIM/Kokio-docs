@@ -5,19 +5,31 @@ description: kokio.deviceWallet wraps one user's Kokio device wallet, the ERC-43
 
 # Device wallet (mobile) {#device-wallet-mobile}
 
+Reference for `kokio.deviceWallet`: one user's passkey-owned smart account, from the app.
+
+---
+
 `kokio.deviceWallet`
 
 Wraps one user's device wallet, the ERC-4337 smart account a passkey owns. There is one per phone. The contract behind this surface is documented at [device wallet](../../contracts/device-wallet.md).
 
-It is only present once [`Kokio`](./setup.md) has both a `smartAccountClient` and a `deviceWalletAddress`, set on the constructor or bound afterwards with `kokio.setDeviceWalletAddress(address)`. Every write here sends a user operation signed by the passkey.
+:::note
+Only present once [`Kokio`](./setup.md) has both a `smartAccountClient` and a `deviceWalletAddress`, set on the constructor or bound afterwards with `kokio.setDeviceWalletAddress(address)`.
+:::
 
-```ts
+Every write here sends a user operation signed by the passkey.
+
+```ts title="Send and confirm"
 const hash = await kokio.deviceWallet!.toggleAccessToFunds(eSIMWalletAddress, true);
 const receipt = await smartAccountClient.waitForUserOperationReceipt({ hash });
 if (!receipt.success) throw new Error("operation reverted");
 ```
 
-A call the contract would refuse throws `ContractRevertError` before it is sent, with the error name in `err.decoded?.errorName`. If the chain changes between that check and inclusion, the operation can still revert onchain. It is then mined and returns a receipt, so check `success` rather than treating a resolved await as confirmation.
+A call the contract would refuse throws `ContractRevertError` before it is sent, with the error name in `err.decoded?.errorName`.
+
+:::warning
+If the chain changes between that check and inclusion, the operation can still revert onchain. It is then mined and returns a receipt, so check `success` rather than treating a resolved await as confirmation.
+:::
 
 ## sendUserOperation {#senduseroperation}
 
@@ -33,17 +45,23 @@ Returns `Promise<Hash>`, the user operation hash.
 
 ## deployAndBindESIMWallet {#deployandbindesimwallet}
 
-Deploys a new eSIM wallet for this device wallet and adds it to the device wallet's list, in one user operation and one passkey prompt. Use it when a user adds a new eSIM. Pass `grantAccessToFunds: true` to also let the new eSIM wallet pull tokens from this device wallet, which [`buyDataBundleWithToken`](./esim-wallet.md#buydatabundlewithtoken) needs when the eSIM wallet holds less than the price.
+Deploys a new eSIM wallet for this device wallet and adds it to the device wallet's list, in one user operation and one passkey prompt. Use it when a user adds a new eSIM.
 
-The device wallet has to be registered first, by the backend's [`postCreateAccount`](../backend/device-wallet-factory.md#postcreateaccount) or by a backend deploy, or the operation reverts. Each salt gives one address, so use a new salt for each eSIM wallet on the same device.
+:::warning
+The device wallet has to be registered first, by the backend's [`postCreateAccount`](../backend/device-wallet-factory.md#postcreateaccount) or by a backend deploy, or the operation reverts.
+:::
 
 ```ts
-const { userOpHash, eSIMWalletAddress } = await kokio.deviceWallet!.deployAndBindESIMWallet(
-  1n, // salt
-  { grantAccessToFunds: true },
-);
+const { userOpHash, eSIMWalletAddress } = await kokio.deviceWallet!.deployAndBindESIMWallet(1n, {
+  grantAccessToFunds: true,
+});
 kokio.setESIMWalletAddress(eSIMWalletAddress);
 ```
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| salt | `bigint` | Each salt gives one address, so use a new salt for each eSIM wallet on the same device |
+| options.grantAccessToFunds | `boolean`, optional | Also let the new eSIM wallet pull tokens from this device wallet, which [`buyDataBundleWithToken`](./esim-wallet.md#buydatabundlewithtoken) needs when the eSIM wallet holds less than the price |
 
 Returns `Promise<{ userOpHash: Hash; eSIMWalletAddress: Address }>`. The address is worked out before the operation lands, so wait for the receipt before reading from it.
 
@@ -51,7 +69,9 @@ Returns `Promise<{ userOpHash: Hash; eSIMWalletAddress: Address }>`. The address
 
 Adds an eSIM wallet this device already owns onto the device wallet's list. Use it after an eSIM wallet transfer lands, once the eSIM wallet's `owner()` already points at this device wallet.
 
+:::note
 This never grants fund access on its own. Call `toggleAccessToFunds` afterwards if the eSIM wallet should be able to pull tokens.
+:::
 
 ```ts
 const hash = await kokio.deviceWallet!.addESIMWallet(eSIMWalletAddress);
@@ -63,11 +83,18 @@ Returns `Promise<Hash>`, a user operation hash.
 
 Releases an eSIM wallet from this device wallet and marks it on standby for a transfer to another device.
 
-`callBackETH` sweeps any ETH the eSIM wallet is still holding back to this device wallet, after the release runs. A failed sweep does not fail the whole call, so a `true` here does not guarantee anything arrived.
-
 ```ts
 const hash = await kokio.deviceWallet!.removeESIMWallet(eSIMWalletAddress, true);
 ```
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| eSIMWalletAddress | `Address` | The eSIM wallet to release |
+| callBackETH | `boolean` | Sweep any ETH the eSIM wallet still holds back to this device wallet, after the release runs |
+
+:::warning
+A failed sweep does not fail the whole call, so `callBackETH: true` does not guarantee anything arrived.
+:::
 
 Returns `Promise<Hash>`.
 
@@ -79,19 +106,54 @@ Turns on or off whether an eSIM wallet may pull tokens held in this device walle
 const hash = await kokio.deviceWallet!.toggleAccessToFunds(eSIMWalletAddress, true);
 ```
 
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| eSIMWalletAddress | `Address` | The eSIM wallet to grant or revoke |
+| hasAccessToFunds | `boolean` | `true` to let it pull tokens, `false` to take that back |
+
 Returns `Promise<Hash>`.
 
 ## transferOwnership {#transferownership}
 
 Moves ownership of this device wallet to a new passkey. Use it when a user gets a new device or resets their passkey.
 
-This is permanent and self-signed: it needs a valid signature from the current passkey, and there is no way to transfer again if the new key turns out to be unusable. Make sure the new key can actually sign before calling.
+It takes two signatures:
+
+1. The new passkey signs the wallet's `rotationChallenge` for its own key.
+2. The current passkey signs the user operation that sends it.
 
 ```ts
-const hash = await kokio.deviceWallet!.transferOwnership(newOwnerKey);
+const challenge = await kokio.deviceWallet!.rotationChallenge(newOwnerKey);
+// The new passkey signs `challenge` here, and the app encodes its assertion as `newOwnerSignature`.
+const hash = await kokio.deviceWallet!.transferOwnership(newOwnerKey, newOwnerSignature);
 ```
 
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| newOwner | `P256Key` | The new passkey's public key, as `[x, y]` hex |
+| newOwnerSignature | `Hex` | The new passkey's WebAuthn assertion over the challenge bytes, ABI-encoded as a `WebAuthnSignature` tuple (`authenticatorData`, `clientDataJSON`, `challengeIndex`, `typeIndex`, `r`, `s`). No version or `validUntil` header, unlike a user operation signature |
+
+:::warning
+The wallet reverts with `NewOwnerKeyCannotSign` if the new key's signature is missing, comes from another key, was made for another wallet or chain, or lacks user verification. `s` must be in the low half of the curve order. A wallet can only move to a key that can sign.
+:::
+
 Returns `Promise<Hash>`.
+
+## rotationChallenge {#rotationchallenge}
+
+Reads the bytes a new passkey must sign before `transferOwnership` accepts it. They are bound to this wallet, this chain and `newOwnerKey`, so a challenge cannot be reused elsewhere.
+
+:::warning
+Do not cache a rotation challenge across chains.
+:::
+
+The value is `keccak256("\x19Ethereum Signed Message:\n116" ‖ chainId ‖ wallet ‖ x ‖ y)`, packed, so it can also be built offchain.
+
+```ts
+const challenge = await kokio.deviceWallet!.rotationChallenge(newOwnerKey);
+```
+
+Returns `Promise<Hex>`, 32 bytes.
 
 ## addDeposit {#adddeposit}
 
@@ -110,6 +172,11 @@ Pulls part of the EntryPoint gas deposit back out, to any address. Use it to rec
 ```ts
 const hash = await kokio.deviceWallet!.withdrawDepositTo(withdrawAddress, amount);
 ```
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| withdrawAddress | `Address` | Where the ETH goes |
+| amount | `bigint` | How much to withdraw, in wei |
 
 Returns `Promise<Hash>`.
 
@@ -170,6 +237,11 @@ Checks a signature over an arbitrary message, following ERC-1271. Use it to veri
 ```ts
 const result = await kokio.deviceWallet!.isValidSignature(messageHash, signature);
 ```
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| messageHash | `Hex` | The hash of the message that was signed |
+| signature | `Hex` | One version byte, six bytes of `validUntil`, then the ABI-encoded WebAuthn assertion. See [the ERC-1271 side](../../contracts/account-4337.md#the-erc-1271-side) |
 
 Returns `Promise<Hex>`, `0x1626ba7e` when the signature is valid and has not expired, `0xffffffff` otherwise.
 

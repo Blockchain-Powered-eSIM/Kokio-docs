@@ -5,6 +5,10 @@ description: "Where Kokio is heading: onboarding eSIM providers directly onchain
 
 # Future prospects {#future-prospects}
 
+Where Kokio is heading next: plans, and how much of each is already in place.
+
+---
+
 ## Onboarding eSIM providers onchain {#onboarding-esim-providers-onchain}
 
 Today Kokio sits in the middle. It deals with eSIM providers, processes the payment when someone buys an eSIM or a data bundle, and passes the money on to the provider that supplied it.
@@ -17,8 +21,18 @@ HTTP has carried a 402 status code since version 1.1 and nothing has ever used i
 
 The point is machines buying from machines: an agent paying for one API call the way a person pays for a coffee. What makes it work is EIP-3009, a token transfer that a signature can authorise on its own without a transaction behind it. USDC implements it. As of 2026 the protocol is production-ready.
 
-Most of what a paid endpoint needs underneath it is already deployed here. [`PaymentAdapter`](./contracts/payment-adapter.md) holds the list of currencies a purchase can be paid in, and it does the protocol's one conversion, US cents to a token amount. The [Registry](./contracts/registry.md) spends each payment reference once, so a call that gets retried cannot charge twice. Pricing and replay protection are the two hard parts of charging over HTTP, and both are contract code that already exists.
+Most of what a paid endpoint needs underneath it is already deployed here. [`PaymentAdapter`](./contracts/payment-adapter.md) holds the list of currencies a purchase can be paid in, and it does the protocol's one conversion, US cents to a token amount. The [Registry](./contracts/registry.md) spends each payment reference once, so a call that gets retried cannot charge twice.
 
-The HTTP layer does not exist yet. Something has to answer 402, name a price, and check the proof before it hands data back. The [backend](./kokio/tech-stack.md) is where that would live, since it already aggregates the provider APIs and reaches the contracts through the SDK, but nothing there does it today.
+Pricing and replay protection are the two hard parts of charging over HTTP, and both are contract code that already exists.
 
+| Piece | State |
+|---|---|
+| Currency list and US cents to token conversion | Deployed, in `PaymentAdapter` |
+| Spending each payment reference once | Deployed, in the Registry |
+| Answering 402, naming a price, checking the proof | Not built |
+
+The HTTP layer would live in the [backend](./kokio/tech-stack.md), since it already aggregates the provider APIs and reaches the contracts through the SDK. Nothing there does it today.
+
+:::note
 One question is still open, and code will not settle it. Every purchase now goes through a passkey signature from a device its owner is holding. An agent buying a data bundle would have no one present at the moment of payment. Whether that should be allowed has not been decided.
+:::

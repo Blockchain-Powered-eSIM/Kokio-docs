@@ -5,9 +5,15 @@ description: "What happens in the Kokio app from installing it to using the eSIM
 
 # Mobile app flow {#mobile-app-flow}
 
-The Kokio app is where a user does everything: registers a passkey, gets a wallet, buys a data bundle and installs the eSIM. This page follows that path in order. The pieces behind it are described in [the tech stack](./tech-stack.md), and the contracts each step touches are under [smart contracts](../contracts/overview.md).
+What happens in the Kokio app, from installing it to using the eSIM.
+
+---
+
+The Kokio app is where a user does everything: registers a passkey, gets a wallet, buys a data bundle and installs the eSIM. The pieces behind it are described in [the tech stack](./tech-stack.md), and the contracts each step touches are under [smart contracts](../contracts/overview.md).
 
 ## Checkout {#checkout}
+
+![Three ways to pay, all recorded onchain. First, from the Kokio wallet in USDC, USDT or DAI: the payment adapter sends the exact amount to the vault, with one Face ID approval and Kokio paying the network fee. Second, by card, crypto checkout or coupon, paid outside the wallet: the Kokio backend records it onchain, each order only once, and issues the eSIM, and a coupon can cover all or part of the price. Third, before the wallet is deployed: the history is kept for the phone and its eSIMs, and when the wallets are deployed later every earlier purchase is copied into the new eSIM wallets. All three end in the eSIM wallet's history, with every bundle, its price and how it was paid. Each bundle is capped at USD 250 unless the user raises their own limit.](../../resources/ways-to-pay.png)
 
 Buying a plan runs in this order:
 
@@ -16,22 +22,27 @@ Buying a plan runs in this order:
 | Select eSIM plan | The user picks from the catalogue the backend aggregates out of the eSIM provider APIs |
 | Checkout | The app reads the plan and its price back from the backend |
 | Is this a new user? | The flow forks here, on whether the user already has a device wallet |
-| Payment method, returning user | Credit card, or their own [device wallet](../contracts/device-wallet.md) |
-| Payment method, new user | Credit card, or a third-party wallet. There is no device wallet to pay from yet |
+| Payment method, returning user | Credit card, stablecoins from their own [device wallet](../contracts/device-wallet.md), or **Other crypto wallet** |
+| Payment method, new user | Credit card, stablecoins from a device wallet, or **Other crypto wallet**. To pay from a device wallet, the app deploys one if the user does not have one yet, and the user funds it by sending USDC, USDT or DAI from any wallet they already hold |
 | Make payment | Card payments settle offchain, wallet payments settle onchain through the [payment adapter](../contracts/payment-adapter.md) |
 | Get eSIM and data bundle | The backend orders the profile from the provider once the payment has settled |
-| Deploy and fund wallet | A new user's device wallet is deployed and funded out of the same payment |
 
 ## Step by step {#step-by-step}
 
-1. **Install the app and register a passkey.** The passkey is a P-256 key generated in the device's secure enclave. It never leaves the phone, and it is the only thing that can authorise anything that follows.
+1. **Install the app and register a passkey.** The passkey is a P-256 key generated in the device's secure enclave. It never leaves the phone.
+
+   :::note
+   The passkey is the only key that can sign for the user's device wallet.
+   :::
 
 2. **Deploy the wallets.** On a new device the app asks for a [device wallet](../contracts/device-wallet.md) and an [eSIM wallet](../contracts/esim-wallet.md), which are linked to each other as they are deployed. Both addresses can be computed before either exists, so the app can show them straight away.
 
 3. **Choose a data bundle and pay for it.** The plan is picked before the eSIM is generated, and how the purchase settles depends on how it is paid for.
 
-   - Paid in crypto, the wallet is deployed and funded there and then.
-   - Paid in fiat, the purchase is recorded against the device and the wallet can be deployed later, whenever the user wants it. [The lazy wallet registry](../contracts/lazy-wallet-registry.md) holds the history until then.
+   - Paid in crypto, there are two options:
+     - **Device wallet.** Pay with a supported stablecoin from the device wallet. A user without one deploys it in the app, then funds it by sending USDC, USDT or DAI from any wallet they already hold.
+     - **Other crypto wallet.** Pay with tokens on other chains, EVM and non-EVM, through MoonPay, which handles the multi-chain payment options.
+   - Paid in fiat by a user with no device wallet, the purchase is recorded against the device in [the lazy wallet registry](../contracts/lazy-wallet-registry.md). When the user deploys their device wallet, every recorded purchase is copied onto it. From then on, every purchase, fiat or crypto, goes through the device wallet.
    - Once the payment settles, the server orders the eSIM and the data bundle from the provider.
    - The purchase gets a unique identifier, which is what ties the onchain record to the provisioned profile.
 

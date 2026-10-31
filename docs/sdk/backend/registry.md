@@ -5,6 +5,10 @@ description: admin.registry is the admin-only side of the Kokio registry, coveri
 
 # Registry (backend) {#registry-backend}
 
+Reference for `admin.registry`: pause, price caps, admin handover, and recording purchases paid for outside the protocol.
+
+---
+
 `admin.registry`
 
 The admin-only side of the Kokio protocol-wide directory: pausing, price caps, admin handover, recording purchases paid for outside the protocol, and wiring the other contracts together. Available as soon as [`KokioAdmin`](./setup.md) exists. The contract is documented at [registry](../../contracts/registry.md).
@@ -13,13 +17,24 @@ The admin-only side of the Kokio protocol-wide directory: pausing, price caps, a
 const hash = await admin.registry.pause();
 ```
 
-Two roles sit on this contract and they are not the same. The **admin** is the backend key, and it can pause, record purchases and assign identifiers. The **owner** is the [ProtocolAdmin](./protocol-admin.md) timelock, and it can unpause, upgrade and hand over ownership. Anything named `*Call` below builds a payload for the owner and sends nothing itself.
+Two roles sit on this contract and they are not the same:
+
+| Role | Who | Can |
+|---|---|---|
+| **Admin** | The backend key | Pause, record purchases, assign identifiers |
+| **Owner** | The [ProtocolAdmin](./protocol-admin.md) timelock | Pause and unpause, nominate, suspend and restore the admin, change the vault, the default price cap and the lazy wallet registry address, upgrade, hand over ownership |
+
+Anything named `*Call` below builds a payload for the owner and sends nothing itself.
+
+:::warning
+The methods marked owner only send a direct transaction. On the live deployment the owner is the ProtocolAdmin timelock, so sending one from the admin key reverts. Schedule the call through [`admin.protocolAdmin.proposer.schedule`](./protocol-admin.md#proposer-schedule) instead.
+:::
 
 The read-only half of this contract, reachable from a phone, is on [`kokio.registry`](../mobile/registry.md).
 
 ## addOrUpdateLazyWalletRegistryAddress {#addorupdatelazywalletregistryaddress}
 
-Wires the lazy wallet registry address into the registry. Run once during setup, or again if the [lazy wallet registry](./lazy-wallet-registry.md) is redeployed.
+Owner only. Wires the lazy wallet registry address into the registry. Run once during setup, or again if the [lazy wallet registry](./lazy-wallet-registry.md) is redeployed.
 
 ```ts
 const hash = await admin.registry.addOrUpdateLazyWalletRegistryAddress(lazyWalletRegistryAddress);
@@ -29,7 +44,7 @@ Returns `Promise<Hash>`.
 
 ## updateVaultAddress {#updatevaultaddress}
 
-Changes the vault address that receives eSIM payments.
+Owner only. Changes the vault address that receives eSIM payments.
 
 ```ts
 const hash = await admin.registry.updateVaultAddress(newVaultAddress);
@@ -39,9 +54,13 @@ Returns `Promise<Hash>`.
 
 ## requestAdminUpdate {#requestadminupdate}
 
-Starts the two-step handover of the admin role to a new address. Use it to rotate the backend's signing key.
+Owner only. Starts the two-step handover of the admin role to a new address. Use it to rotate the backend's signing key.
 
-This takes the role off the current admin right away: every admin-gated call reverts until the new address accepts with `acceptAdminUpdate`. Send the two steps close together, or user-facing calls that need the admin will fail in between. Naming the current admin instead cancels a pending nomination.
+:::warning
+This takes the role off the current admin right away. Every admin-gated call reverts until the new address accepts with `acceptAdminUpdate`, so send the two steps close together or user-facing calls that need the admin will fail in between.
+:::
+
+Naming the current admin instead withdraws a pending nomination and lifts a suspension.
 
 ```ts
 const hash = await admin.registry.requestAdminUpdate(newAdminAddress);
@@ -61,7 +80,7 @@ Returns `Promise<Hash>`.
 
 ## disableAdmin {#disableadmin}
 
-Suspends the admin's powers across the whole protocol. Use it if the backend's admin key is compromised, as a way to freeze admin actions without losing the address itself.
+Owner only. Suspends the admin's powers across the whole protocol. Use it if the backend's admin key is compromised, as a way to freeze admin actions without losing the address itself. A guardian can do the same without the delay, with [`guardian.disableAdminInstantly`](./protocol-admin.md#guardian-disableadmininstantly).
 
 The address stays on record, so turning the admin back on does not need it supplied again. Reverts if the admin is already suspended.
 
@@ -73,7 +92,7 @@ Returns `Promise<Hash>`.
 
 ## enableAdmin {#enableadmin}
 
-Lifts a suspension started by `disableAdmin`.
+Owner only. Lifts a suspension started by `disableAdmin`. There is no instant guardian route for this.
 
 ```ts
 const hash = await admin.registry.enableAdmin();
@@ -85,37 +104,111 @@ Returns `Promise<Hash>`.
 
 Binds an eSIM's unique identifier to its wallet. Use it once an eSIM wallet is deployed and its real-world identifier is known.
 
+:::warning
 The identifier can only be claimed once across the whole protocol, so assigning an identifier already bound to another wallet reverts.
+:::
 
 ```ts
 const hash = await admin.registry.assignESIMIdentifier(eSIMWalletAddress, eSIMUniqueIdentifier);
 ```
 
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| eSIMWalletAddress | `Address` | The deployed eSIM wallet |
+| eSIMUniqueIdentifier | `string` | The eSIM's real-world identifier |
+
 Returns `Promise<Hash>`.
 
 ## recordSettledPurchase {#recordsettledpurchase}
 
-Records a data bundle paid for outside the protocol, by card or an external wallet. Use it once the backend has confirmed a payment through whatever rail took it.
+Records a data bundle paid for outside the protocol, by card, an external wallet or a coupon. Use it once the backend has confirmed a payment through whatever rail took it.
 
-No money moves through this call, so `settlement` on the bundle details has to be `1` for an external wallet or `2` for fiat, never `0`. The contract reverts with `SettlementNotAsserted` on `0`, because nothing here proves the device wallet actually paid. `tokenAmount` is recorded for offchain matching and never checked against `priceUSDCents`. `paymentReference` is spendable once per eSIM wallet.
-
+:::warning
 This is the call that writes into a user's history on the backend's word alone. Confirm the payment first.
+:::
 
 ```ts
+import { stringToHex } from "viem";
+
 const hash = await admin.registry.recordSettledPurchase(
   eSIMWalletAddress,
   { id: bundleId, priceUSDCents: 500n, settlement: 2 }, // 2 = Fiat
-  asset,
-  tokenAmount,
+  stringToHex("USD", { size: 32 }),
+  500n,
   paymentReference,
 );
 ```
 
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| eSIMWalletAddress | `Address` | The eSIM wallet the purchase belongs to |
+| dataBundleDetail | `DataBundleDetails` | The bundle, its price in US cents, and `settlement`: `1` for an external wallet or `2` for fiat, never `0` |
+| asset | `Hex` | The currency the user paid in, as a `bytes32` symbol |
+| tokenAmount | `bigint` | What the user paid, in the asset's smallest unit (`400n` is \$4.00 in `USD`, `4_000_000n` in `USDC`). Recorded for offchain matching and never checked against `priceUSDCents` |
+| paymentReference | `Hex` | Spendable once per eSIM wallet. Pass two references for a [coupon split](#coupon-split) |
+
+No money moves through this call. The contract reverts with `SettlementNotAsserted` on a `settlement` of `0`, because nothing here proves the device wallet actually paid. The wallet's price cap applies, and its admin allowance does not, because nothing is charged.
+
+:::tip
+A coupon that covers the whole price is recorded as `Fiat` in `USD`, with its cents as `tokenAmount` and a reference tagged `Coupon` with [`utils.tagPaymentReference`](./utils.md#tagpaymentreference).
+:::
+
 Returns `Promise<Hash>`.
+
+### Split between a coupon and another payment {#coupon-split}
+
+When a coupon covers part of the price and the user pays the rest by card or an external wallet, pass both of the order's references and the coupon's cents. The bundle details carry the full price and how the user paid the rest. `asset` and `tokenAmount` are what the user paid.
+
+```ts
+import { stringToHex } from "viem";
+import { PaymentReferenceKind } from "kokio-sdk/admin";
+
+const refs = [
+  admin.utils.tagPaymentReference(orderRef, PaymentReferenceKind.CouponPart),
+  admin.utils.tagPaymentReference(orderRef, PaymentReferenceKind.Remainder),
+] as const;
+
+// A \$10.00 bundle: \$6.00 by coupon, \$4.00 in USDC from an external wallet.
+const hash = await admin.registry.recordSettledPurchase(
+  eSIMWalletAddress,
+  { id: bundleId, priceUSDCents: 1000n, settlement: 1 }, // 1 = ExternalWallet
+  stringToHex("USDC", { size: 32 }),
+  4_000_000n,
+  refs,
+  600n, // the coupon's cents
+);
+```
+
+The registry has no call that records two purchases at once, so this sends two transactions:
+
+| Line | `priceUSDCents` | `settlement` | asset | `tokenAmount` | Reference |
+|---|---|---|---|---|---|
+| The user's share | `400n` | as passed | as passed | as passed | `Remainder` |
+| The coupon's share | `600n` | `2` (`Fiat`) | `USD` | `600n` | `CouponPart` |
+
+The user's share goes first, and the coupon's share is sent once it is mined. Before sending, each line is checked against `usedPaymentReferences` and skipped if already recorded, so a retry after a partial failure sends only what is missing. With both already recorded, the user's share is sent anyway and the contract refuses it with `PaymentReferenceAlreadyUsed`, the same error a retried single reference gets.
+
+:::warning
+This form is not for a device wallet split. There the user's own purchase records their share, and the coupon's share is recorded with the single form: `priceUSDCents` and `tokenAmount` set to the coupon's cents, and a `CouponPart` reference.
+:::
+
+| Error | When | Thrown if |
+|---|---|---|
+| `InvalidPaymentReferenceError` | Before anything is sent | The references are not one order's `CouponPart` and `Remainder`, in that order, or one of them cannot be read |
+| `CouponSplitOutOfRangeError` | Before anything is sent | The coupon's cents are missing, `0n` or less, or not below the full price. A coupon that covers the whole price takes a single `Coupon` reference |
+| `ContractRevertError` | Before anything is sent | The contract would refuse the first line, for example `SettlementNotAsserted` when `settlement` is `0` |
+| `TransactionRevertedError` | After the first transaction | The user's share reverted once mined. The coupon's share is not sent |
+| `ContractRevertError` | After the first transaction | The contract would refuse the coupon's share. The user's share is already recorded, so a retry sends only the coupon's share |
+
+Returns `Promise<Hash>`, the hash of the last transaction sent. Any earlier one is already mined.
 
 ## pause {#pause}
 
-Stops the purchase and token pull paths on every device wallet and eSIM wallet, protocol-wide. This is the one emergency lever the admin key can pull on its own: it can pause, but only the owner can unpause. Use it if something looks wrong and needs an immediate stop.
+Stops the purchase and token pull paths on every device wallet and eSIM wallet, protocol-wide. Use it if something looks wrong and needs an immediate stop.
+
+:::note
+This is the one emergency lever the admin key can pull on its own: it can pause, but only the owner can unpause. The owner can pause too, which is how a guardian pauses with [`protocolAdmin.guardian.pauseInstantly`](./protocol-admin.md#guardian-pauseinstantly) while the admin key is suspended.
+:::
 
 ```ts
 const hash = await admin.registry.pause();
@@ -125,7 +218,11 @@ Returns `Promise<Hash>`.
 
 ## unpause {#unpause}
 
-Releases a pause. On the live deployment this needs the owner, so calling it from the admin EOA directly reverts. Schedule `admin.protocolAdmin.unpauseCall()` through `admin.protocolAdmin.proposer.schedule` instead, or have a guardian call [`admin.protocolAdmin.guardian.unpauseInstantly`](./protocol-admin.md) if a two day wait is not acceptable.
+Releases a pause.
+
+:::warning
+On the live deployment this needs the owner, so calling it from the admin EOA directly reverts. Schedule `admin.protocolAdmin.unpauseCall()` through `admin.protocolAdmin.proposer.schedule` instead, or have a guardian call [`admin.protocolAdmin.guardian.unpauseInstantly`](./protocol-admin.md) if a two day wait is not acceptable.
+:::
 
 ```ts
 const hash = await admin.registry.unpause();
@@ -135,9 +232,11 @@ Returns `Promise<Hash>`.
 
 ## setDefaultPriceCapUSDCents {#setdefaultpricecapusdcents}
 
-Sets the fallback price ceiling, in US cents, every eSIM wallet uses when it has no cap of its own.
+Owner only. Sets the fallback price ceiling, in US cents, every eSIM wallet uses when it has no cap of its own. The scheduled form is [`protocolAdmin.setDefaultPriceCapUSDCentsCall`](./protocol-admin.md#setdefaultpricecapusdcentscall).
 
+:::warning
 Zero reverts. A zero cap would read as "no limit" for every wallet without one of its own, so the contract refuses it outright.
+:::
 
 ```ts
 const hash = await admin.registry.setDefaultPriceCapUSDCents(cap);
@@ -170,12 +269,19 @@ Returns `Promise<OwnerCall>`.
 
 Builds the call payload to point the registry's proxy at a new implementation. Hand the result to `protocolAdmin.proposer.schedule`.
 
-There is no undo. Check the new implementation's storage layout matches before scheduling: the contract checks only that the new address answers as a compatible UUPS implementation, not that its storage lines up.
+:::warning
+There is no undo. Check the new implementation's storage layout matches before scheduling. The contract checks only that the new address answers as a compatible UUPS implementation, not that its storage lines up.
+:::
 
 ```ts
 const call = await admin.registry.upgradeCall(newImplementation);
 const scheduled = await admin.protocolAdmin.proposer.schedule(call);
 ```
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| newImplementation | `Address` | The new implementation contract |
+| data | `Hex`, optional | Calldata to run on the new implementation as part of the upgrade |
 
 Returns `Promise<OwnerCall>`.
 
@@ -191,7 +297,11 @@ Returns `Promise<Address>`.
 
 ## eSIMWalletAdmin {#esimwalletadmin}
 
-Reads the admin address that may currently act. Reads zero while a nomination is pending or the admin is suspended, so a zero here means the role is dormant rather than unset.
+Reads the admin address that may currently act.
+
+:::note
+Reads zero while a nomination is pending or the admin is suspended, so a zero here means the role is dormant rather than unset.
+:::
 
 ```ts
 const current = await admin.registry.eSIMWalletAdmin();
@@ -271,12 +381,17 @@ Returns `Promise<Address>`, zero if none.
 
 ## deviceWalletToOwner {#devicewallettoowner}
 
-Reads one of a device wallet's two P256 owner key coordinates, by index: `0` for x, `1` for y.
+Reads one of a device wallet's two P256 owner key coordinates, by index.
 
 ```ts
 const x = await admin.registry.deviceWalletToOwner(deviceWalletAddress, 0n);
 const y = await admin.registry.deviceWalletToOwner(deviceWalletAddress, 1n);
 ```
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| deviceWallet | `Address` | The device wallet |
+| index | `bigint` | `0n` for x, `1n` for y |
 
 Returns `Promise<Hex>`.
 
@@ -302,7 +417,11 @@ Returns `Promise<boolean>`.
 
 ## isESIMWalletValid {#isesimwalletvalid}
 
-Reads the device wallet an eSIM wallet is registered against. Despite the name this returns an address, not a boolean. It is a registration record rather than a current holder, and it never goes back to zero once set, even after a transfer. Ask [`deviceWallet.isValidESIMWallet`](./device-wallet.md#isvalidesimwallet) who holds it right now.
+Reads the device wallet an eSIM wallet is registered against.
+
+:::warning
+Despite the name this returns an address, not a boolean. It is a registration record rather than a current holder, and it never goes back to zero once set, even after a transfer. Ask [`deviceWallet.isValidESIMWallet`](./device-wallet.md#isvalidesimwallet) who holds it right now.
+:::
 
 ```ts
 const holder = await admin.registry.isESIMWalletValid(eSIMWalletAddress);
@@ -340,6 +459,16 @@ const cap = await admin.registry.defaultPriceCapUSDCents();
 
 Returns `Promise<bigint>`.
 
+## defaultAdminAllowanceUSDCents {#defaultadminallowanceusdcents}
+
+Reads what the admin key may charge a newly created eSIM wallet in total, in US cents. Changing it is an owner action, see [`protocolAdmin.setDefaultAdminAllowanceUSDCentsCall`](./protocol-admin.md#setdefaultadminallowanceusdcentscall).
+
+```ts
+const allowance = await admin.registry.defaultAdminAllowanceUSDCents();
+```
+
+Returns `Promise<bigint>`.
+
 ## paymentAdapter {#paymentadapter}
 
 Reads the payment adapter this registry currently points at.
@@ -352,7 +481,11 @@ Returns `Promise<Address>`.
 
 ## usedPaymentReferences {#usedpaymentreferences}
 
-Checks whether a payment reference has already been spent for an eSIM wallet. Scoped per wallet, so pass `keccak256(abi.encode(eSIMWalletAddress, paymentReference))`, not the bare reference.
+Checks whether a payment reference has already been spent for an eSIM wallet.
+
+:::warning
+References are scoped per wallet. Pass `keccak256(abi.encode(eSIMWalletAddress, paymentReference))`, not the bare reference.
+:::
 
 ```ts
 const used = await admin.registry.usedPaymentReferences(scopedReference);
@@ -402,7 +535,11 @@ Returns `Promise<Address>`, zero if nobody holds it.
 
 ## requireDeviceIdentifierNotReserved {#requiredeviceidentifiernotreserved}
 
-Throws if a fiat path user's eSIMs are already waiting on this device identifier. Worth checking before deploying.
+Throws if a fiat path user's eSIMs are already waiting on this device identifier.
+
+:::tip
+Check this before deploying.
+:::
 
 ```ts
 await admin.registry.requireDeviceIdentifierNotReserved(deviceUniqueIdentifier);
@@ -422,7 +559,11 @@ Returns `Promise<void>`.
 
 ## pendingOwner {#pendingowner}
 
-Reads the address a `transferOwnership` call is waiting on. Worth reading before `protocolAdmin.acceptOwnershipBatch`, which reverts on any target that has not actually been offered to the timelock.
+Reads the address a `transferOwnership` call is waiting on.
+
+:::tip
+Read this before `protocolAdmin.acceptOwnershipBatch`, which reverts on any target that has not actually been offered to the timelock.
+:::
 
 ```ts
 const pending = await admin.registry.pendingOwner();
@@ -452,7 +593,7 @@ Returns `Promise<Address>`.
 
 ## entryPoint {#entrypoint}
 
-Reads the ERC-4337 EntryPoint address the registry recognizes.
+Reads the ERC-4337 EntryPoint address the registry recognises.
 
 ```ts
 const entryPoint = await admin.registry.entryPoint();

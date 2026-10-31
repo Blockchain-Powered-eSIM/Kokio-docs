@@ -5,7 +5,11 @@ description: "Why Kokio was built the way it was, what it commits to as an open 
 
 # Principles and motivation {#principles-and-motivation}
 
-Kokio is a travel eSIM app whose purchase records live onchain and whose wallets are controlled by a passkey on the user's phone. This page is about why it was built that way. For what it does rather than why, read [what is Kokio](./kokio/landing-intro.md).
+Why Kokio was built the way it was, and who it is for.
+
+---
+
+Kokio is a travel eSIM app whose purchase records live onchain and whose wallets are controlled by a passkey on the user's phone. For what it does rather than why, read [what is Kokio](./kokio/landing-intro.md).
 
 ## What the project commits to {#what-the-project-commits-to}
 
@@ -19,6 +23,6 @@ Privacy and control over your own data are the point rather than a feature. Buyi
 
 **People who already hold crypto** and have very little to spend it on. Mobile data is something everyone actually buys, it costs a few dollars, and Kokio takes stablecoins for it directly.
 
-**People who hold none.** They pay by card, Apple Pay or Google Pay and never see a wallet. One is still created for them, their purchases are still recorded, and if they want the keys later the history is already there. [The lazy wallet registry](./contracts/lazy-wallet-registry.md) is the contract that makes that work.
+**People who hold none.** They pay by card, Apple Pay or Google Pay and never need a wallet. Their purchases are still recorded, in [the lazy wallet registry](./contracts/lazy-wallet-registry.md). If they deploy a wallet later, every recorded purchase is copied onto it, and from then on every purchase, card or crypto, goes through that wallet.
 
 **Both, in fewer steps than either is used to.** A purchase is authorised with a fingerprint or a face, signed by the phone's secure enclave, and submitted onchain with no seed phrase, no browser extension and no gas balance to top up.

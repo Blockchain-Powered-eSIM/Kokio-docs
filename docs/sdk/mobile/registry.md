@@ -5,6 +5,10 @@ description: kokio.registry reads the Kokio protocol-wide directory of device wa
 
 # Registry (mobile) {#registry-mobile}
 
+Reference for `kokio.registry`: the three writes a device wallet can make, and the protocol-wide reads.
+
+---
+
 `kokio.registry`
 
 The Kokio protocol-wide directory of device wallets and eSIM wallets. Present as soon as [`Kokio`](./setup.md) has a `smartAccountClient`. The contract behind this surface is documented at [registry](../../contracts/registry.md).
@@ -19,7 +23,11 @@ const hash = await kokio.registry!.bindESIMWallet(eSIMWalletAddress);
 
 Takes on an eSIM wallet as this device wallet's own. Use it after accepting an ownership transfer, to make the registry's record match.
 
-The eSIM wallet's `owner()` has to already be this device wallet, so accept the transfer first, then bind. This also clears any standby flag left over from the transfer.
+:::warning
+The eSIM wallet's `owner()` has to already be this device wallet, so accept the transfer first, then bind.
+:::
+
+This also clears any standby flag left over from the transfer.
 
 ```ts
 const hash = await kokio.registry!.bindESIMWallet(eSIMWalletAddress);
@@ -35,6 +43,11 @@ Flags an eSIM wallet as mid-transfer, or clears the flag. Use it to mark a trans
 const hash = await kokio.registry!.toggleESIMWalletStandbyStatus(eSIMWalletAddress, true);
 ```
 
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| eSIMWalletAddress | `Address` | The eSIM wallet to flag |
+| isOnStandby | `boolean` | `true` to mark a transfer as started, `false` to clear it |
+
 Returns `Promise<Hash>`.
 
 ## isDeviceIdentifierAlreadyUsed {#isdeviceidentifieralreadyused}
@@ -49,7 +62,11 @@ Returns `Promise<boolean>`.
 
 ## paused {#paused}
 
-Checks whether the whole protocol is paused. While paused, the purchase and token pull paths on the device wallets and eSIM wallets revert. Check this before offering a purchase.
+Checks whether the whole protocol is paused. While paused, the purchase and token pull paths on the device wallets and eSIM wallets revert.
+
+:::tip
+Check this before offering a purchase.
+:::
 
 ```ts
 const paused = await kokio.registry!.paused();
@@ -69,7 +86,11 @@ Returns `Promise<void>`.
 
 ## isESIMWalletValid {#isesimwalletvalid}
 
-Reads the device wallet holding an eSIM wallet. Despite the name this returns an address, not a boolean, and it keeps naming the last holder even after a release. Use [`deviceWallet.isValidESIMWallet`](./device-wallet.md#isvalidesimwallet) to ask who holds it right now.
+Reads the device wallet holding an eSIM wallet.
+
+:::warning
+Despite the name this returns an address, not a boolean, and it keeps naming the last holder even after a release. Use [`deviceWallet.isValidESIMWallet`](./device-wallet.md#isvalidesimwallet) to ask who holds it right now.
+:::
 
 ```ts
 const holder = await kokio.registry!.isESIMWalletValid(eSIMWalletAddress);
@@ -137,9 +158,23 @@ const cap = await kokio.registry!.defaultPriceCapUSDCents();
 
 Returns `Promise<bigint>`.
 
+## defaultAdminAllowanceUSDCents {#defaultadminallowanceusdcents}
+
+Reads what the admin key may charge a newly created eSIM wallet in total, in US cents. It is 0 on Base mainnet, so the admin cannot charge a new wallet until the user sets an allowance, and 10000 (\$100.00) on Base Sepolia. Existing wallets keep their own figure when this changes.
+
+```ts
+const allowance = await kokio.registry!.defaultAdminAllowanceUSDCents();
+```
+
+Returns `Promise<bigint>`.
+
 ## paymentAdapter {#paymentadapter}
 
-Reads the payment adapter this registry currently points at. Read this before going to [`kokio.paymentAdapter`](./payments.md), which targets whatever address you pass it rather than resolving the current one itself.
+Reads the payment adapter this registry currently points at.
+
+:::tip
+Read this before going to [`kokio.paymentAdapter`](./payments.md), which targets whatever address you pass it rather than resolving the current one itself.
+:::
 
 ```ts
 const adapter = await kokio.registry!.paymentAdapter();
@@ -149,7 +184,11 @@ Returns `Promise<Address>`.
 
 ## usedPaymentReferences {#usedpaymentreferences}
 
-Checks whether a payment reference has already been spent for an eSIM wallet. Scoped per wallet, so pass `keccak256(abi.encode(eSIMWalletAddress, paymentReference))`, not the bare reference.
+Checks whether a payment reference has already been spent for an eSIM wallet.
+
+:::warning
+References are scoped per wallet. Pass `keccak256(abi.encode(eSIMWalletAddress, paymentReference))`, not the bare reference.
+:::
 
 ```ts
 const used = await kokio.registry!.usedPaymentReferences(scopedReference);
@@ -169,7 +208,11 @@ Returns `Promise<void>`.
 
 ## requireDeviceIdentifierNotReserved {#requiredeviceidentifiernotreserved}
 
-Throws if a fiat path user's eSIMs are already waiting on this device identifier. Worth checking before deploying: taking a reserved identifier strands that user, because their history copy and wallet deployment both then refuse it.
+Throws if a fiat path user's eSIMs are already waiting on this device identifier.
+
+:::warning
+Check this before deploying. Taking a reserved identifier strands that user, because their history copy and wallet deployment both then refuse it.
+:::
 
 ```ts
 await kokio.registry!.requireDeviceIdentifierNotReserved(deviceUniqueIdentifier);

@@ -6,20 +6,41 @@ description: Kokio is a travel eSIM app that takes card, Apple Pay, Google Pay o
 
 # What is Kokio {#what-is-kokio}
 
+A travel eSIM app with no password, paid by card or crypto, with every purchase recorded in a wallet you own.
+
+---
+
 Kokio is a travel eSIM app. Pick a data plan for where you are going, pay with a card or with crypto, and install the eSIM on your phone. Coverage runs to more than 200 destinations, with regional and global plans alongside single-country ones.
 
 Two things separate it from every other eSIM app.
 
 ## No password and no seed phrase {#no-password-and-no-seed-phrase}
 
-You authenticate with your fingerprint or your face. The key that signs for you is a passkey generated in your phone's secure enclave, and it never leaves the device. Kokio does not have a copy, which is what stops Kokio spending your money or taking your eSIM back.
+You authenticate with your fingerprint or your face. The key that signs for you is a **passkey** generated in your phone's secure enclave, and it never leaves the device.
 
-The first time you buy, the app creates a [smart account](../contracts/device-wallet.md) owned by that passkey. It is an ERC-4337 wallet rather than a closed-off balance, so it works with the rest of the onchain ecosystem and you can use it as an everyday wallet, not only for eSIMs.
+:::note
+Kokio does not have a copy of your passkey, so it cannot sign for you or move your eSIM to another device. Kokio's admin key cannot charge your eSIM wallet unless you give it a spending allowance. A new eSIM wallet starts with none, and any allowance you set is still held to a price cap on each purchase.
+:::
+
+The first time you buy, the app creates a [smart account](../contracts/device-wallet.md) owned by that passkey. It is an ERC-4337 wallet rather than a closed-off balance, so you can use it as an everyday wallet with other onchain apps, not only for eSIMs.
+
+:::note
+The app calls this your **Kokio wallet**. The rest of these docs call it the [device wallet](../contracts/device-wallet.md), which is the contract's name.
+:::
 
 ## The purchase record is yours {#the-purchase-record-is-yours}
 
-Every purchase is written onchain, to a wallet you own, instead of into a row in a provider's database. You can read it, check it and move it between your own devices without asking anyone. [The registry](../contracts/registry.md) is the contract that holds it.
+Every purchase is written onchain, to a wallet you own, instead of into a row in a provider's database. You can read it, check it and move it between your own devices without asking anyone. Your [eSIM wallet](../contracts/esim-wallet.md) is the contract that holds it.
 
-Paying with a card does not opt you out. Card purchases are recorded too, held against your device until you want a wallet, then copied across the moment one exists. Starting with fiat and moving to crypto later costs you no history.
+Paying with a card does not opt you out. Card purchases are recorded too, held against your device until you deploy your Kokio wallet, then copied onto it. From then on, every purchase, card or crypto, goes through your Kokio wallet.
+
+You can pay in crypto two ways:
+
+- **From your Kokio wallet**, with a supported stablecoin. Deploy the wallet in the app and fund it by sending USDC, USDT or DAI from any wallet you already hold.
+- **With Other crypto wallet**, using tokens on other chains, EVM and non-EVM. MoonPay handles these payments.
+
+:::tip
+Starting with a card and moving to crypto later costs you no purchase history.
+:::
 
 The same records work in the other direction as well. For a telecom operator they are a shared, verifiable ledger of what was sold, which is easier to integrate against than a separate private API per partner.

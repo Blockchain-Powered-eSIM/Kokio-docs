@@ -5,21 +5,31 @@ description: kokio-sdk is the TypeScript client for the Kokio eSIM contracts, wi
 
 # Kokio SDK {#kokio-sdk}
 
+The TypeScript client for the Kokio contracts: one entry point for the mobile app, one for a backend.
+
+---
+
 `kokio-sdk` is the TypeScript package for talking to the Kokio eSIM contracts. It wraps [viem](https://viem.sh), including viem's account abstraction module, so you do not assemble calldata or manage an ERC-4337 bundler yourself. Install it, construct one of the two entry points, and call methods.
+
+## Install {#install}
 
 In the mobile app, install the passkey module alongside it:
 
-```sh
+```sh title="Mobile app"
 npm install kokio-sdk react-native-passkey
 ```
 
 A backend that only uses `kokio-sdk/admin` needs the SDK alone:
 
-```sh
+```sh title="Backend"
 npm install kokio-sdk
 ```
 
-Version 3.1.0. It ships as ES modules and needs Node 18 or newer, or a React Native runtime. `viem` comes with it. `react-native-passkey` is a peer dependency because it is a native module: Expo only links native code for packages the app lists itself, and one copy avoids version clashes. The admin entry point never loads it.
+Version 3.5.1. It ships as ES modules and needs Node 18 or newer, or a React Native runtime. `viem` comes with it.
+
+:::note
+`react-native-passkey` is a peer dependency because it is a native module. Expo only links native code for packages the app lists itself, and one copy avoids version clashes. The admin entry point never loads it.
+:::
 
 ## Two entry points {#two-entry-points}
 
@@ -59,9 +69,27 @@ try {
 }
 ```
 
-A write the contract would refuse throws `ContractRevertError` before anything is sent, on both entry points. For a user operation the SDK reads the reason out of the bundler's simulation error, so the contract's own error name reaches the app instead of a generic bundler message. `decoded` is `null` only when the revert data matches no Kokio contract's errors.
+A write the contract would refuse throws `ContractRevertError` before anything is sent, on both entry points. For a user operation the SDK reads the reason out of the bundler's simulation error, so the contract's own error name reaches the app instead of a generic bundler message.
 
-`KokioError` is the base class. The named subclasses are `MissingSmartWalletError`, `MissingEOAWalletError`, `InvalidClientError`, `UnsupportedChainError`, `UnconfiguredChainError`, `CounterfactualMismatchError` and `ContractRevertError`, plus the ones the paginated `lazyWalletRegistry` calls throw: `BatchSizeOutOfRangeError`, `DepositOnResumeError`, `ESIMWalletNotLazyDeployedError`, `MissingBatchEventError` and `StalledBatchError`. `decodeContractRevert` turns raw revert data into a readable reason.
+:::note
+`decoded` is `null` only when the revert data matches no Kokio contract's errors.
+:::
+
+`KokioError` is the base class. Its named subclasses:
+
+| Error | Thrown when |
+|---|---|
+| `MissingSmartWalletError`, `MissingEOAWalletError`, `InvalidClientError`, `UnsupportedChainError`, `UnconfiguredChainError`, `CounterfactualMismatchError`, `ContractRevertError` | Any call on either entry point |
+| `BatchSizeOutOfRangeError`, `DepositOnResumeError`, `ESIMWalletNotLazyDeployedError`, `MissingBatchEventError`, `StalledBatchError` | The paginated `lazyWalletRegistry` calls |
+| `NullOrUndefinedValueError` | A required argument was left out |
+
+`decodeContractRevert` turns raw revert data into a readable reason.
+
+`kokio-sdk/admin` exports a few more, all thrown before anything is sent:
+
+- `AdminAllowanceExceededError`, when an [admin purchase](./backend/esim-wallet.md#buydatabundlewithtoken) costs more than the wallet's admin allowance has left.
+- `InvalidPaymentReferenceError` and `CouponSplitOutOfRangeError`, from [payment reference tags](./backend/utils.md#payment-references) and the [coupon split](./backend/registry.md#coupon-split).
+- `InvalidAddressError`, `InvalidSymbolError`, `TokenNotAcceptedError`, `NotAProtocolESIMWalletError`, `UnknownTransactionError`, `TransactionRevertedError`, `ReceiptNotCanonicalError`, `UnmatchedPaymentEventsError`, `NotAnERC20TokenError` and `PriceOutOfRangeError`, from the [payment checks](./backend/utils.md).
 
 ## Chains {#chains}
 
@@ -73,15 +101,25 @@ const { factoryAddresses, chain, rpcURL } = await kokio.constants;
 
 The first read resolves them and every later one is served from that result, so reading `constants` repeatedly costs nothing.
 
-You never pass contract addresses in. The SDK resolves them from the wallet client's chain id. Base Sepolia, chain id 84532, is the only chain with a live deployment, and its addresses are listed on the [deployed addresses](../contracts/deployments.md) page. Ethereum, Optimism and Arbitrum, mainnet and testnets, are wired into the chain resolution but not deployed. Connecting to one of them throws `UnconfiguredChainError`.
+You never pass contract addresses in. The SDK resolves them from the wallet client's chain id.
+
+| Chain | Chain id |
+|---|---|
+| [Base mainnet](../deployments/base.md) | 8453 |
+| [Base Sepolia](../deployments/base-sepolia.md) | 84532 |
+
+:::warning
+Any other chain id throws `UnsupportedChainError`.
+:::
 
 ## Reference {#reference}
 
 Every method, with an example and a return type.
 
-**Mobile, the `Kokio` surface.** [Setup](./mobile/setup.md), [smart account](./mobile/smart-account.md), [device wallet](./mobile/device-wallet.md), [device wallet factory](./mobile/device-wallet-factory.md), [eSIM wallet](./mobile/esim-wallet.md), [registry](./mobile/registry.md), [payments](./mobile/payments.md).
-
-**Backend, the `KokioAdmin` surface.** [Setup](./backend/setup.md), [device wallet](./backend/device-wallet.md), [device wallet factory](./backend/device-wallet-factory.md), [eSIM wallet](./backend/esim-wallet.md), [registry](./backend/registry.md), [lazy wallet registry](./backend/lazy-wallet-registry.md), [payments](./backend/payments.md), [protocol admin](./backend/protocol-admin.md).
+| Surface | Pages |
+|---|---|
+| Mobile, `Kokio` | [Setup](./mobile/setup.md), [smart account](./mobile/smart-account.md), [device wallet](./mobile/device-wallet.md), [device wallet factory](./mobile/device-wallet-factory.md), [eSIM wallet](./mobile/esim-wallet.md), [registry](./mobile/registry.md), [payments](./mobile/payments.md) |
+| Backend, `KokioAdmin` | [Setup](./backend/setup.md), [device wallet](./backend/device-wallet.md), [device wallet factory](./backend/device-wallet-factory.md), [eSIM wallet](./backend/esim-wallet.md), [registry](./backend/registry.md), [lazy wallet registry](./backend/lazy-wallet-registry.md), [payments](./backend/payments.md), [protocol admin](./backend/protocol-admin.md), [calls](./backend/calls.md), [utils](./backend/utils.md) |
 
 The contracts these methods reach are documented separately, starting at the [wallet suite overview](../contracts/overview.md).
 
