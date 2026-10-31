@@ -5,6 +5,11 @@ import styles from "./styles.module.css";
 const MIN_SCALE = 1;
 const MAX_SCALE = 8;
 const STEP = 1.25;
+// How far a pointer may move between down and up and still count as a click.
+const CLICK_SLOP = 5;
+// Turns a pinch's wheel delta into a zoom factor. Small, because a trackpad
+// sends many events per pinch.
+const PINCH_SPEED = 0.01;
 
 type View = { scale: number; x: number; y: number };
 type Point = { x: number; y: number };
@@ -58,27 +63,59 @@ function Viewer({ src, alt, onClose }: { src: string; alt: string; onClose: () =
   const dialogRef = useRef<HTMLDialogElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const pointers = useRef(new Map<number, Point>());
+  // Where a single-pointer press started, or null once it has turned into a
+  // drag or a pinch and so can no longer be a click.
+  const pressStart = useRef<Point | null>(null);
   const [view, setView] = useState<View>(FITTED);
 
   useEffect(() => {
     dialogRef.current?.showModal();
   }, []);
 
-  // A native listener, because React's wheel handler is passive and cannot
-  // stop the page behind the dialog from scrolling.
+  // Native listeners, because React's wheel handler is passive and cannot stop
+  // the page behind the dialog from scrolling or zooming.
   useEffect(() => {
     const stage = stageRef.current;
     if (!stage) return undefined;
 
+    // A trackpad pinch arrives as a wheel event with ctrlKey set. Anything else
+    // is a scroll, which pans the zoomed image.
     const onWheel = (event: WheelEvent) => {
       event.preventDefault();
-      const at = fromCentre(stage, event.clientX, event.clientY);
-      const factor = event.deltaY < 0 ? STEP : 1 / STEP;
+      if (event.ctrlKey) {
+        const at = fromCentre(stage, event.clientX, event.clientY);
+        const factor = Math.exp(-event.deltaY * PINCH_SPEED);
+        setView((current) => zoomAbout(current, current.scale * factor, at));
+      } else {
+        setView((current) =>
+          current.scale === MIN_SCALE ? current : { ...current, x: current.x - event.deltaX, y: current.y - event.deltaY },
+        );
+      }
+    };
+
+    // Safari reports a trackpad pinch as its own gesture events instead.
+    let gestureScale = 1;
+    const onGestureStart = (event: Event) => {
+      event.preventDefault();
+      gestureScale = 1;
+    };
+    const onGestureChange = (event: Event) => {
+      event.preventDefault();
+      const gesture = event as Event & { scale: number; clientX: number; clientY: number };
+      const at = fromCentre(stage, gesture.clientX, gesture.clientY);
+      const factor = gesture.scale / gestureScale;
+      gestureScale = gesture.scale;
       setView((current) => zoomAbout(current, current.scale * factor, at));
     };
 
     stage.addEventListener("wheel", onWheel, { passive: false });
-    return () => stage.removeEventListener("wheel", onWheel);
+    stage.addEventListener("gesturestart", onGestureStart);
+    stage.addEventListener("gesturechange", onGestureChange);
+    return () => {
+      stage.removeEventListener("wheel", onWheel);
+      stage.removeEventListener("gesturestart", onGestureStart);
+      stage.removeEventListener("gesturechange", onGestureChange);
+    };
   }, []);
 
   const zoomBy = (factor: number) => setView((current) => zoomAbout(current, current.scale * factor, { x: 0, y: 0 }));
@@ -86,12 +123,16 @@ function Viewer({ src, alt, onClose }: { src: string; alt: string; onClose: () =
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     event.currentTarget.setPointerCapture(event.pointerId);
     pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    pressStart.current = pointers.current.size === 1 ? { x: event.clientX, y: event.clientY } : null;
   };
 
   const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
     const previous = pointers.current.get(event.pointerId);
     if (!previous) return;
     const next = { x: event.clientX, y: event.clientY };
+
+    const start = pressStart.current;
+    if (start && Math.hypot(next.x - start.x, next.y - start.y) > CLICK_SLOP) pressStart.current = null;
 
     if (pointers.current.size === 1) {
       setView((current) =>
@@ -113,6 +154,8 @@ function Viewer({ src, alt, onClose }: { src: string; alt: string; onClose: () =
 
   const onPointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
     pointers.current.delete(event.pointerId);
+    if (event.type === "pointerup" && pressStart.current) dialogRef.current?.close();
+    pressStart.current = null;
   };
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLDialogElement>) => {
