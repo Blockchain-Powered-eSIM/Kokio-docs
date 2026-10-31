@@ -17,7 +17,7 @@ React Native, and the only part a user ever sees.
 
 - **Onboarding is a passkey.** Registering generates a P-256 key in the phone's secure enclave through [`react-native-passkey`](https://github.com/f-23/react-native-passkey). No password, no seed phrase, no recovery file.
 - **Fiat payments**: credit and debit cards, Apple Pay, Google Pay, and other digital wallet and QR methods.
-- **Crypto payments**: stablecoins from the user's own wallet, with an on-ramp for buying them inside the app.
+- **Crypto payments**: supported stablecoins from the user's device wallet, or tokens on other chains, EVM and non-EVM, through the **Other crypto wallet** option, which uses MoonPay.
 - **Signing is biometric.** A purchase is a WebAuthn assertion over the transaction, authorised with a fingerprint or a face. The app builds it through the [Kokio SDK](../sdk/mobile/setup.md), which wraps [viem](https://viem.sh) and a bundler, so the app never holds a private key or a gas balance.
 
 ## Smart contract suite {#smart-contract-suite}

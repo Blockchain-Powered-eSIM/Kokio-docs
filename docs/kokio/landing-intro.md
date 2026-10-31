@@ -34,7 +34,10 @@ Every purchase is written onchain, to a wallet you own, instead of into a row in
 
 Paying with a card does not opt you out. Card purchases are recorded too, held against your device until you deploy your Kokio wallet, then copied onto it. From then on, every purchase, card or crypto, goes through your Kokio wallet.
 
-To pay in crypto, you deploy your Kokio wallet in the app and fund it by sending USDC, USDT or DAI from any wallet you already hold.
+You can pay in crypto two ways:
+
+- **From your Kokio wallet**, with a supported stablecoin. Deploy the wallet in the app and fund it by sending USDC, USDT or DAI from any wallet you already hold.
+- **With Other crypto wallet**, using tokens on other chains, EVM and non-EVM. MoonPay handles these payments.
 
 :::tip
 Starting with a card and moving to crypto later costs you no purchase history.
