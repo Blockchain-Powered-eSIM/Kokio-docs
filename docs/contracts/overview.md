@@ -20,6 +20,8 @@ The suite is live on [Base mainnet](../deployments/base.md), with a testnet copy
 
 ## What each contract does {#what-each-contract-does}
 
+![Architecture of the Kokio contract suite on Base. The Kokio app signs user operations with a passkey and sends them through the Pimlico bundler to EntryPoint v0.8, which validates and runs them on the device wallet. The Kokio backend holds the eSIM wallet admin key and calls the lazy wallet registry, the device wallet factory, the registry and the device wallet. The ProtocolAdmin timelock, driven by a proposer Safe and a guardian Safe, owns the five UUPS contracts: Registry, LazyWalletRegistry, DeviceWalletFactory, ESIMWalletFactory and PaymentAdapter. Each device wallet owns its eSIM wallets, P256Verifier checks every passkey signature, and the payment adapter sends spent tokens to the vault Safe.](../../resources/contract-architecture.png)
+
 | Contract | What it does | Pattern |
 |---|---|---|
 | [Registry](./registry.md) | The central record. Holds the admin address, the vault, the pause flag and the default limits on admin charges, and tracks which wallets are real | UUPS proxy |

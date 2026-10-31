@@ -21,6 +21,8 @@ Both wallet beacons sit under the two factories, so owning the factories reaches
 
 It replaces the single account that would otherwise own all of that. Nobody holds a key that can upgrade a Kokio contract on the spot.
 
+![Who can change what in Kokio, and how fast. A proposer Safe schedules and cancels, a canceller only cancels, and anyone can execute once the two day delay has passed. Scheduled operations become owner actions on the five contracts ProtocolAdmin owns, which in turn reach every device and eSIM wallet through the factory-owned beacons. A guardian Safe can pause, unpause, suspend the admin key and revoke cancellers with no delay. The backend admin key can register wallets, deploy eSIM wallets, assign eSIM ids, record purchases and pause, and can only spend a wallet's tokens on data bundles within the admin allowance the user sets, which is zero by default. The user's passkey owns the device and eSIM wallets and sets their price cap and admin allowance.](../../resources/governance.png)
+
 ## Every change waits {#every-change-waits}
 
 A privileged change goes one way:

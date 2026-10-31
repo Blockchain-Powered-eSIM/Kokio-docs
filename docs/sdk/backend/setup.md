@@ -96,6 +96,10 @@ await admin.deviceWallet!.deployESIMWallet(salt);
 
 See [device wallet factory](./device-wallet-factory.md) for the checks to run before deploying, and [lazy wallet registry](./lazy-wallet-registry.md) for users who bought an eSIM before they had a wallet at all.
 
+The whole journey, call by call, from creating the passkey to recording a purchase:
+
+![Kokio user journey as contract calls. Onboarding: the user creates a passkey, the app works out the device wallet's address, and either the backend calls createAccount on the device wallet factory or the app's first sponsored user operation deploys it through the EntryPoint, after which the backend calls postCreateAccount to register the wallet and owner key in the registry. eSIM wallet: the backend calls deployESIMWallet on the device wallet, or the user calls deployAndBindESIMWallet, and the new eSIM wallet starts with the registry's default admin allowance, zero on Base mainnet. Purchase: the app gets the calls from the backend, the user approves with Face ID, the bundler submits the user operation, the device wallet tops up the eSIM wallet and calls buyDataBundleWithToken, the eSIM wallet checks the pause, price cap and payment reference with the registry, and the payment adapter quotes, settles and sends the tokens to the vault Safe. The backend sees the DataBundleBoughtWithToken event, provisions the eSIM and assigns its identifier. A purchase paid outside the protocol is recorded with recordSettledPurchase, and no tokens move.](../../../resources/contract-call-journey.png)
+
 ## Buying for a user {#buying}
 
 ```ts
