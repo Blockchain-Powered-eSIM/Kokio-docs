@@ -19,7 +19,7 @@ Two things separate it from every other eSIM app.
 You authenticate with your fingerprint or your face. The key that signs for you is a **passkey** generated in your phone's secure enclave, and it never leaves the device.
 
 :::note
-Kokio does not have a copy of your passkey, so it cannot sign for you or move your eSIM to another device. Kokio's admin key can only charge your eSIM wallet for data bundles, within a price cap and a spending allowance that only you can change.
+Kokio does not have a copy of your passkey, so it cannot sign for you or move your eSIM to another device. Kokio's admin key cannot charge your eSIM wallet unless you give it a spending allowance. A new eSIM wallet starts with none, and any allowance you set is still held to a price cap on each purchase.
 :::
 
 The first time you buy, the app creates a [smart account](../contracts/device-wallet.md) owned by that passkey. It is an ERC-4337 wallet rather than a closed-off balance, so you can use it as an everyday wallet with other onchain apps, not only for eSIMs.

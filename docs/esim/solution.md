@@ -26,5 +26,5 @@ Every eSIM provider today keeps what you bought in a database of their own. You 
 The wallet holding that record is an ERC-4337 smart account owned by a passkey generated in your phone's secure enclave. Authorising a purchase is a fingerprint or a face. There is no password to phish and no seed phrase to lose.
 
 :::note
-Kokio never has the key, so it cannot sign for you or move your eSIM to another device. Kokio's admin key can only charge your eSIM wallet for data bundles, within a price cap and a spending allowance that only you can change.
+Kokio never has the key, so it cannot sign for you or move your eSIM to another device. Kokio's admin key cannot charge your eSIM wallet unless you give it a spending allowance. A new eSIM wallet starts with none, and any allowance you set is still held to a price cap on each purchase.
 :::

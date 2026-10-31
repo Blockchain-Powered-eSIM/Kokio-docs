@@ -44,6 +44,6 @@ Node.js, doing the work that can happen neither on the phone nor onchain.
 |---|---|
 | Write purchase history | Move a user's eSIM wallet to another device |
 | Deploy wallets for users | Charge an eSIM wallet above its price cap or admin allowance |
-| Charge an eSIM wallet for a data bundle, within those limits | Change either limit, or upgrade a contract |
+| Charge an eSIM wallet for a data bundle, within those limits. A new eSIM wallet starts with no allowance, so this needs the user to set one first | Change either limit, or upgrade a contract |
 
 Anything in the second column needs either the user's passkey or the [timelock](../contracts/protocol-admin.md).
