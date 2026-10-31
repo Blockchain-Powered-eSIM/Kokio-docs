@@ -32,7 +32,9 @@ The app calls this your **Kokio wallet**. The rest of these docs call it the [de
 
 Every purchase is written onchain, to a wallet you own, instead of into a row in a provider's database. You can read it, check it and move it between your own devices without asking anyone. Your [eSIM wallet](../contracts/esim-wallet.md) is the contract that holds it.
 
-Paying with a card does not opt you out. Card purchases are recorded too, held against your device until you want a wallet, then copied across the moment one exists.
+Paying with a card does not opt you out. Card purchases are recorded too, held against your device until you deploy your Kokio wallet, then copied onto it. From then on, every purchase, card or crypto, goes through your Kokio wallet.
+
+To pay in crypto, you deploy your Kokio wallet in the app and fund it by sending USDC, USDT or DAI from any wallet you already hold.
 
 :::tip
 Starting with a card and moving to crypto later costs you no purchase history.

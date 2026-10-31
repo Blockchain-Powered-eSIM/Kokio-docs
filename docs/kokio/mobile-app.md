@@ -21,10 +21,9 @@ Buying a plan runs in this order:
 | Checkout | The app reads the plan and its price back from the backend |
 | Is this a new user? | The flow forks here, on whether the user already has a device wallet |
 | Payment method, returning user | Credit card, or their own [device wallet](../contracts/device-wallet.md) |
-| Payment method, new user | Credit card, or a third-party wallet. There is no device wallet to pay from yet |
+| Payment method, new user | Credit card, or crypto from a device wallet. The app deploys the device wallet if the user does not have one yet, and the user funds it by sending USDC, USDT or DAI from any wallet they already hold |
 | Make payment | Card payments settle offchain, wallet payments settle onchain through the [payment adapter](../contracts/payment-adapter.md) |
 | Get eSIM and data bundle | The backend orders the profile from the provider once the payment has settled |
-| Deploy and fund wallet | A new user's device wallet is deployed and funded out of the same payment |
 
 ## Step by step {#step-by-step}
 
@@ -38,8 +37,8 @@ Buying a plan runs in this order:
 
 3. **Choose a data bundle and pay for it.** The plan is picked before the eSIM is generated, and how the purchase settles depends on how it is paid for.
 
-   - Paid in crypto, the wallet is deployed and funded there and then.
-   - Paid in fiat, the purchase is recorded against the device and the wallet can be deployed later, whenever the user wants it. [The lazy wallet registry](../contracts/lazy-wallet-registry.md) holds the history until then.
+   - Paid in crypto, the purchase is paid from the device wallet. A user without one deploys it in the app, then funds it by sending USDC, USDT or DAI from any wallet they already hold.
+   - Paid in fiat by a user with no device wallet, the purchase is recorded against the device in [the lazy wallet registry](../contracts/lazy-wallet-registry.md). When the user deploys their device wallet, every recorded purchase is copied onto it. From then on, every purchase, fiat or crypto, goes through the device wallet.
    - Once the payment settles, the server orders the eSIM and the data bundle from the provider.
    - The purchase gets a unique identifier, which is what ties the onchain record to the provisioned profile.
 
