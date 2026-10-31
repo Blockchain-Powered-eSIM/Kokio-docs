@@ -23,6 +23,8 @@ The project is open source, and it sits where mobile telecoms and blockchain ove
 - a public chain, so a purchase is recorded somewhere the buyer can read and the seller cannot quietly edit
 - passkeys and P-256 cryptography, so the phone's secure enclave holds the only key that can sign for the wallet
 
+![How Kokio works. The Kokio app on the phone signs in with a passkey and Face ID, with no seed phrase, and the user approves each purchase with Face ID. The Kokio backend sets up the user's Kokio wallet, gets the eSIM from the network provider, records card and coupon payments, and cannot change protocol rules. On Base, one Kokio wallet per phone holds USDC, USDT or DAI and owns one eSIM wallet per eSIM. Each eSIM wallet pays for its data bundles, keeps the full purchase history and can move to a new phone. The payment adapter turns the USD price into the exact token amount and sends it to the Kokio vault, a 2-of-3 multisig. Protocol rules change only after a 2-day public wait, and the emergency pause cannot move anyone's money.](../resources/how-kokio-works-clean.png)
+
 ## The three layers of an eSIM {#the-three-layers-of-an-esim}
 
 Every eSIM runs on the same three pieces, Kokio's included.

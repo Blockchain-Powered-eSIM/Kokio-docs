@@ -13,6 +13,8 @@ The Kokio app is where a user does everything: registers a passkey, gets a walle
 
 ## Checkout {#checkout}
 
+![Three ways to pay, all recorded onchain. First, from the Kokio wallet in USDC, USDT or DAI: the payment adapter sends the exact amount to the vault, with one Face ID approval and Kokio paying the network fee. Second, by card, crypto checkout or coupon, paid outside the wallet: the Kokio backend records it onchain, each order only once, and issues the eSIM, and a coupon can cover all or part of the price. Third, before the wallet is deployed: the history is kept for the phone and its eSIMs, and when the wallets are deployed later every earlier purchase is copied into the new eSIM wallets. All three end in the eSIM wallet's history, with every bundle, its price and how it was paid. Each bundle is capped at USD 250 unless the user raises their own limit.](../../resources/ways-to-pay.png)
+
 Buying a plan runs in this order:
 
 | Stage | What happens |
