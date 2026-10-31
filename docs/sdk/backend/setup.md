@@ -5,23 +5,37 @@ description: "Constructing KokioAdmin on a server: an EOA wallet client, no bund
 
 # Backend setup {#backend-setup}
 
+Learn how to build a `KokioAdmin` client on a server, and what the admin key it holds can do.
+
+---
+
 `KokioAdmin` is the [Kokio SDK](../overview.md) entry point for a backend server. It exposes the contract functions that are restricted onchain to the admin or owner account, the ones marked `onlyAdmin`, `onlyOwner` or `onlyESIMWalletAdmin`. A device wallet cannot call those at all, whatever it signs, which is why they live on a separate class.
 
 Every write here is an ordinary transaction from the admin EOA and resolves to a transaction hash. No bundler, no paymaster, no passkey.
 
 ## The trust boundary {#trust-boundary}
 
-Read this before wiring the key in. The admin key deploys wallets on users' behalf, records purchases that were paid for outside the protocol, and moves the price cap. `recordSettledPurchase` in particular writes a purchase into a user's history on the backend's word alone, because a card payment leaves no onchain proof. Nothing in the contracts distinguishes a correct record from an invented one.
+Read this before wiring the key in. The admin key:
 
-So the key belongs in a server you control, never in an app bundle or a browser, and every call that spends it should be traceable to an order in your own system. Ownership of the protocol contracts is separate and sits behind the [ProtocolAdmin timelock](./protocol-admin.md), which the admin key cannot bypass.
+- Deploys wallets on users' behalf
+- Records purchases that were paid for outside the protocol
+- Buys data bundles for users, within each eSIM wallet's price cap and admin allowance. On Base mainnet a new eSIM wallet's allowance starts at zero, so the user has to set one first
+
+`recordSettledPurchase` in particular writes a purchase into a user's history on the backend's word alone, because a card payment leaves no onchain proof. Nothing in the contracts distinguishes a correct record from an invented one.
+
+Ownership of the protocol contracts is separate and sits behind the [ProtocolAdmin timelock](./protocol-admin.md), which the admin key cannot bypass.
 
 ## Constructing the client {#constructing-the-client}
+
+First, install the SDK.
 
 ```sh
 npm install kokio-sdk
 ```
 
-```ts
+Then, construct `KokioAdmin` with a viem wallet client that carries the admin account.
+
+```ts title="KokioAdmin"
 import { KokioAdmin } from "kokio-sdk/admin";
 import { createWalletClient, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
@@ -37,7 +51,9 @@ const walletClient = createWalletClient({
 const admin = new KokioAdmin(walletClient);
 ```
 
+:::warning
 Give `http()` a real RPC URL. The SDK reads it to build the public client it uses for reads.
+:::
 
 The example targets Base Sepolia. For Base mainnet, import `base` from `viem/chains` and point `RPC_URL` at a mainnet node. The SDK picks the contract addresses from the chain id, so nothing else changes.
 
@@ -45,7 +61,11 @@ Writes sign locally with the key and go out as raw transactions, so any hosted R
 
 ## Which surfaces are ready when {#surfaces}
 
-`deviceWalletFactory`, `eSIMWalletFactory`, `registry`, `lazyWalletRegistry`, `paymentAdapter` and `protocolAdmin` work as soon as the instance exists, because they are chain-wide. So do [`calls`](./calls.md) and [`utils`](./utils.md), which take every address as an argument. The two instance-scoped surfaces, `deviceWallet` and `eSIMWallet`, stay `undefined` until bound to an address.
+| Surface | Ready |
+|---|---|
+| `deviceWalletFactory`, `eSIMWalletFactory`, `registry`, `lazyWalletRegistry`, `paymentAdapter`, `protocolAdmin` | As soon as the instance exists, because they are chain-wide |
+| [`calls`](./calls.md), [`utils`](./utils.md) | As soon as the instance exists, because they take every address as an argument |
+| `deviceWallet`, `eSIMWallet` | Once bound to an address. `undefined` until then |
 
 ```ts
 admin.setDeviceWalletAddress(deviceWalletAddress);
@@ -56,9 +76,13 @@ This matters more on a backend than on a phone, because the backend usually depl
 
 ## Provisioning a user {#provisioning}
 
-The order is fixed: a device wallet first, then an eSIM wallet under it, then the eSIM's identifier.
+The order is fixed:
 
-```ts
+1. A device wallet
+2. An eSIM wallet under it
+3. The eSIM's identifier
+
+```ts title="Device wallet, then eSIM wallet"
 const deployHash = await admin.deviceWalletFactory.createAccount(
   deviceUniqueIdentifier,
   ownerKey,
@@ -71,6 +95,10 @@ await admin.deviceWallet!.deployESIMWallet(salt);
 ```
 
 See [device wallet factory](./device-wallet-factory.md) for the checks to run before deploying, and [lazy wallet registry](./lazy-wallet-registry.md) for users who bought an eSIM before they had a wallet at all.
+
+The whole journey, call by call, from creating the passkey to recording a purchase:
+
+![Kokio user journey as contract calls. Onboarding: the user creates a passkey, the app works out the device wallet's address, and either the backend calls createAccount on the device wallet factory or the app's first sponsored user operation deploys it through the EntryPoint, after which the backend calls postCreateAccount to register the wallet and owner key in the registry. eSIM wallet: the backend calls deployESIMWallet on the device wallet, or the user calls deployAndBindESIMWallet, and the new eSIM wallet starts with the registry's default admin allowance, zero on Base mainnet. Purchase: the app gets the calls from the backend, the user approves with Face ID, the bundler submits the user operation, the device wallet tops up the eSIM wallet and calls buyDataBundleWithToken, the eSIM wallet checks the pause, price cap and payment reference with the registry, and the payment adapter quotes, settles and sends the tokens to the vault Safe. The backend sees the DataBundleBoughtWithToken event, provisions the eSIM and assigns its identifier. A purchase paid outside the protocol is recorded with recordSettledPurchase, and no tokens move.](../../../resources/contract-call-journey.png)
 
 ## Buying for a user {#buying}
 
@@ -91,7 +119,7 @@ Prices are whole US cents as a `bigint`, and a currency is named by a `bytes32`.
 
 `paymentReference` is a `bytes32` order id the backend mints. The SDK never invents one. Anything unique per purchase works, for example `keccak256(toBytes(internalOrderId))`. It is spendable once per eSIM wallet.
 
-```ts
+```ts title="Check whether a reference is spent"
 const used = await admin.registry.usedPaymentReferences(
   keccak256(encodeAbiParameters(
     [{ type: "address" }, { type: "bytes32" }],
@@ -100,12 +128,27 @@ const used = await admin.registry.usedPaymentReferences(
 );
 ```
 
-Mint it and store it against the order before calling `buyDataBundleWithToken` or `recordSettledPurchase`, so a retry after a dropped transaction reuses the same reference instead of recording the purchase twice.
+:::warning
+Mint the reference and store it against the order before calling `buyDataBundleWithToken` or `recordSettledPurchase`. A retry after a dropped transaction then reuses the same reference instead of recording the purchase twice.
+:::
 
 ## Governance {#governance}
 
-`admin.protocolAdmin` wraps the timelock that owns the registry, the lazy wallet registry and both factories onchain. It schedules, executes and cancels privileged calls behind a delay, split across four role-scoped surfaces: `proposer` schedules a call, `executor` runs one once its delay has passed, `canceller` cancels a pending one, and `guardian` bypasses the delay for emergency actions such as unpausing or disabling a compromised admin. See [protocol admin](./protocol-admin.md).
+`admin.protocolAdmin` wraps the timelock that owns the five upgradeable contracts onchain: the registry, the lazy wallet registry, both factories and the payment adapter. It schedules, executes and cancels privileged calls behind a delay, split across four role-scoped surfaces:
+
+| Surface | Does |
+|---|---|
+| `proposer` | Schedules a call |
+| `executor` | Runs one once its delay has passed |
+| `canceller` | Cancels a pending one |
+| `guardian` | Skips the delay for emergency actions, such as unpausing or disabling a compromised admin |
+
+See [protocol admin](./protocol-admin.md).
 
 ## Where to go next {#next}
 
-[Device wallet](./device-wallet.md), [device wallet factory](./device-wallet-factory.md), [eSIM wallet](./esim-wallet.md), [registry](./registry.md), [lazy wallet registry](./lazy-wallet-registry.md), [payments](./payments.md), [protocol admin](./protocol-admin.md).
+- [Device wallet](./device-wallet.md) and [device wallet factory](./device-wallet-factory.md)
+- [eSIM wallet](./esim-wallet.md)
+- [Registry](./registry.md) and [lazy wallet registry](./lazy-wallet-registry.md)
+- [Payments](./payments.md)
+- [Protocol admin](./protocol-admin.md)

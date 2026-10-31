@@ -5,13 +5,33 @@ description: The timelock that owns Kokio's upgradeable contracts, the two day d
 
 # Protocol admin {#protocol-admin}
 
-`ProtocolAdmin` is the timelock that owns the five upgradeable contracts in the [Kokio suite](./overview.md): the [Registry](./registry.md), the [lazy wallet registry](./lazy-wallet-registry.md), the [device wallet factory](./device-wallet-factory.md), the [eSIM wallet factory](./esim-wallet-factory.md) and the [payment adapter](./payment-adapter.md). Both wallet beacons sit under the two factories, so owning the factories reaches every [device wallet](./device-wallet.md) and every [eSIM wallet](./esim-wallet.md) in the protocol.
+The timelock that owns every upgradeable Kokio contract, and the four things a guardian can do without waiting.
+
+---
+
+`ProtocolAdmin` is the timelock that owns the five upgradeable contracts in the [Kokio suite](./overview.md):
+
+- the [Registry](./registry.md)
+- the [lazy wallet registry](./lazy-wallet-registry.md)
+- the [device wallet factory](./device-wallet-factory.md)
+- the [eSIM wallet factory](./esim-wallet-factory.md)
+- the [payment adapter](./payment-adapter.md)
+
+Both wallet beacons sit under the two factories, so owning the factories reaches every [device wallet](./device-wallet.md) and every [eSIM wallet](./esim-wallet.md) in the protocol.
 
 It replaces the single account that would otherwise own all of that. Nobody holds a key that can upgrade a Kokio contract on the spot.
 
+![Who can change what in Kokio, and how fast. A proposer Safe schedules and cancels, a canceller only cancels, and anyone can execute once the two day delay has passed. Scheduled operations become owner actions on the five contracts ProtocolAdmin owns, which in turn reach every device and eSIM wallet through the factory-owned beacons. A guardian Safe can pause, unpause, suspend the admin key and revoke cancellers with no delay. The backend admin key can register wallets, deploy eSIM wallets, assign eSIM ids, record purchases and pause, and can only spend a wallet's tokens on data bundles within the admin allowance the user sets, which is zero by default. The user's passkey owns the device and eSIM wallets and sets their price cap and admin allowance.](../../resources/governance.png)
+
 ## Every change waits {#every-change-waits}
 
-A privileged change goes one way. A proposer schedules it, the delay elapses, and then anyone at all executes it. On both Base networks the delay is two days and the floor below which it cannot be set is one day, listed on the [Base mainnet](../deployments/base.md) and [Base Sepolia](../deployments/base-sepolia.md) pages.
+A privileged change goes one way:
+
+1. A proposer schedules it.
+2. The delay elapses.
+3. Anyone at all executes it.
+
+On both Base networks the delay is two days, and the floor below which it cannot be set is one day. Both are listed on the [Base mainnet](../deployments/base.md) and [Base Sepolia](../deployments/base-sepolia.md) pages.
 
 Execution being open is deliberate. The announcement is what the delay buys, and once the wait is served there is no reason for the protocol to depend on one particular key still being around to press the button.
 
@@ -30,7 +50,11 @@ None of the four grants anything, which is what keeps the role away from user fu
 
 Restoring a canceller or an admin is an owner action and waits out the delay, so the side taking power away always wins the race against the side handing it back.
 
-Replacing the admin is not a guardian power. `disableAndNominate` suspends the current admin and nominates a new one in one scheduled operation, so it waits like any other change. It refuses to nominate the current admin (`NomineeIsTheIncumbent`), because the registry would read that as withdrawing the nomination and lift the suspension.
+Replacing the admin is not a guardian power. `disableAndNominate` suspends the current admin and nominates a new one in one scheduled operation, so it waits like any other change.
+
+:::warning
+`disableAndNominate` refuses to nominate the current admin (`NomineeIsTheIncumbent`). The registry would read that as withdrawing the nomination and lift the suspension.
+:::
 
 ## Why a guardian can evict a canceller {#why-a-guardian-can-evict-a-canceller}
 
@@ -43,7 +67,11 @@ Two limits carry the recovery argument, and both are enforced in code rather tha
 
 Reaching zero cancellers is survivable by comparison. It costs the veto, and a proposer can schedule the role back.
 
-One limit is not enforced in code. A rogue guardian and a rogue proposer together can strip every canceller and then schedule changes nobody can veto. The strip power stays because it is the only way out of a compromised canceller. Keep the guardian's and the proposers' Safes on different signers, and alert on every `CancellerRevoked` event.
+One limit is not enforced in code. A rogue guardian and a rogue proposer together can strip every canceller and then schedule changes nobody can veto. The strip power stays because it is the only way out of a compromised canceller.
+
+:::warning
+Keep the guardian's and the proposers' Safes on different signers, and alert on every `CancellerRevoked` event.
+:::
 
 ## Not upgradeable {#not-upgradeable}
 

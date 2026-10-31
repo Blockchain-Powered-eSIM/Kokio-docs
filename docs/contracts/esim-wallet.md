@@ -1,23 +1,42 @@
 ---
 title: ESIMWallet
-description: The Kokio wallet that stands for one eSIM, holding its data bundle purchase history, its spending ceiling, and the funds moving through it.
+description: The Kokio contract that stands for one eSIM, holding its data bundle purchase history, its spending ceiling, and the funds moving through it.
 ---
 
 # eSIM wallet {#esim-wallet}
 
-An eSIM wallet is one eSIM's account in the Kokio [suite](./overview.md). It holds that eSIM's purchase history, the limits on what Kokio's admin may charge it, and whatever funds are passing through it on the way to paying for one.
+What an eSIM wallet holds, the two limits on what the admin may charge it, and how it moves between devices.
 
-Its owner is always a [device wallet](./device-wallet.md), never a key. That is unusual and it is the security property the whole design rests on: every call that moves ETH or changes ownership arrives through a device wallet `execute`, which means it has already been signed for by the user's passkey. There is no key that can act on an eSIM wallet directly.
+---
+
+An **eSIM wallet** is one eSIM's account in the Kokio [suite](./overview.md). It holds that eSIM's purchase history, the limits on what Kokio's admin may charge it, and whatever funds are passing through it on the way to paying for a data bundle.
+
+:::note
+The owner is always a [device wallet](./device-wallet.md), never a key. Every call that moves ETH or changes ownership arrives through a device wallet `execute`, so the user's passkey has already signed it. No key can act on an eSIM wallet directly.
+:::
 
 ## What the admin can and cannot do {#what-the-admin-can-and-cannot-do}
 
 Kokio's admin can charge this wallet for a data bundle. Two limits apply, and the admin can raise neither of them.
 
-`priceCapUSDCents` bounds a single charge, in US cents. Zero means "follow the [Registry's](./registry.md) default", not "no ceiling".
+| Limit | Bounds | Set by |
+|---|---|---|
+| `priceCapUSDCents` | A single charge, in US cents | The owning device wallet |
+| `adminAllowanceUSDCents` | The total of all admin charges, in US cents | The owning device wallet |
 
-`adminAllowanceUSDCents` bounds the total. Every admin charge spends it, nothing refills it, and a charge above what is left reverts with `AdminAllowanceExceeded`. Without it the admin key could repeat charges under the cap until the wallet was empty. Setting it replaces what is left rather than adding to it, and zero stops admin charges altogether. A new wallet starts on the registry's `defaultAdminAllowanceUSDCents`. Purchases the user signs through their own device wallet never touch it.
+:::warning
+A price cap of zero means "follow the [Registry's](./registry.md) default", not "no ceiling".
+:::
 
-Only the owning device wallet can set either figure. On top of both, the money only moves if the device wallet has granted this wallet access to its funds.
+The **admin allowance** stops the admin key repeating charges under the cap until the wallet is empty:
+
+- Every admin charge spends it, and nothing refills it.
+- A charge above what is left reverts with `AdminAllowanceExceeded`.
+- Setting it replaces what is left rather than adding to it, and zero stops admin charges altogether.
+- A new wallet starts on the registry's `defaultAdminAllowanceUSDCents`. On Base mainnet that is zero, so the admin cannot charge a new wallet until its owner sets an allowance. Each network's figure is on its [deployment page](../deployments/base.md#limits).
+- Purchases the user signs through their own device wallet never touch it.
+
+A purchase spends this wallet's own token balance first. A shortfall is pulled from the device wallet, which needs the device wallet to have granted this wallet access to its funds.
 
 ## Buying a data bundle {#buying-a-data-bundle}
 
@@ -25,21 +44,43 @@ Only the owning device wallet can set either figure. On top of both, the money o
 
 The payment reference is spent once. Retrying a call that already landed cannot charge the user a second time.
 
-A token that delivers less than it was asked to transfer, such as a fee-on-transfer token, fails at the adapter's funding check with a readable reason. The protocol does not support such tokens otherwise, because the vault still has to receive the price in full.
+:::warning
+Fee-on-transfer tokens are not supported. A token that delivers less than it was asked to transfer fails at the adapter's funding check with a readable reason, because the vault still has to receive the price in full.
+:::
 
 ## Reading the purchase history {#reading-the-purchase-history}
 
 `transactionHistory` is a public array of `DataBundleDetails`, described on the [types](./types.md) page. Solidity generates an indexed getter for a public array but not a length getter, so `transactionHistory(0)`, `transactionHistory(1)` and so on work while there is no `transactionHistory.length` to call.
 
-Reading the whole history therefore means one of two things: index upwards until the call reverts, or read the `DataBundleBoughtWithToken` and `DataBundleSettlementRecorded` events from the logs, which is cheaper and carries a timestamp the struct does not store. The [Kokio SDK](../sdk/mobile/esim-wallet.md) does the second.
+Reading the whole history means one of two things:
 
-Each entry records how the bundle was paid for, in a `Settlement` field with three values: paid from this wallet onchain, paid from an external wallet, or paid in fiat. Only the first can be proven onchain. The other two are the admin's word, which is why the price cap applies to them as well. The admin allowance does not, because recording a purchase paid elsewhere moves no money out of this wallet.
+- Index upwards until the call reverts.
+- Read the `DataBundleBoughtWithToken`, `DataBundleSettlementRecorded` and `TransactionHistoryPopulated` events from the logs. This is cheaper and carries a timestamp the struct does not store.
+
+The [Kokio SDK](../sdk/mobile/esim-wallet.md#transactionhistory) reads one entry at a time, by index.
+
+Each entry records how the bundle was paid for, in a `Settlement` field:
+
+| Settlement | Provable onchain | Price cap applies | Admin allowance applies |
+|---|---|---|---|
+| Paid from this wallet onchain | Yes | Yes | Yes, for admin charges |
+| Paid from an external wallet | No, the admin's word | Yes, when recorded with `recordSettledPurchase` | No |
+| Paid in fiat | No, the admin's word | Yes, when recorded with `recordSettledPurchase` | No |
+
+The allowance skips the last two because recording a purchase paid elsewhere moves no money out of this wallet. History copied in from the [lazy wallet registry](./lazy-wallet-registry.md) is not held to the price cap either.
 
 ## Moving to another device {#moving-to-another-device}
 
-A handover takes two steps. The owning device wallet calls `requestTransferOwnership` with the new device wallet, and that device wallet calls `acceptOwnershipTransfer`. A pending request can be pointed at someone else by calling again, and nominating the current owner cancels it and binds the wallet back, with fund access off.
+A handover takes two steps:
 
+1. The owning device wallet calls `requestTransferOwnership` with the new device wallet.
+2. That device wallet calls `acceptOwnershipTransfer`.
+
+A pending request can be pointed at someone else by calling again. Nominating the current owner cancels it and binds the wallet back, with fund access off.
+
+:::warning
 Only ETH comes back to the old device wallet when a request is made. ERC-20 balances stay in the eSIM wallet and go to whoever accepts, so sweep each token with `sendTokenToDeviceWallet` in the same `executeBatch` as the request.
+:::
 
 On acceptance the new owner starts fresh: the price cap goes back to following the registry, and the admin allowance resets to the registry default.
 

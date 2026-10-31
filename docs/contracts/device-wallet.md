@@ -5,27 +5,56 @@ description: The Kokio wallet that stands for one phone, an ERC-4337 account own
 
 # Device wallet {#device-wallet}
 
-A device wallet is one phone's account in the Kokio [suite](./overview.md). It is an ERC-4337 smart account owned by a P-256 passkey held in that phone's secure enclave, and it owns every [eSIM wallet](./esim-wallet.md) bought on that device. There is no seed phrase behind it, and no copy of the key anywhere outside the phone.
+One phone's passkey-owned smart account, and the owner of every eSIM wallet bought on it.
 
-It does three jobs. It funds its eSIM wallets, it decides which of them may spend its money, and it is the only party that can move an eSIM wallet to another device.
+---
+
+A **device wallet** is one phone's account in the Kokio [suite](./overview.md). It is an ERC-4337 smart account owned by a P-256 passkey held in that phone's secure enclave, and it owns every [eSIM wallet](./esim-wallet.md) bought on that device. There is no seed phrase behind it, and no copy of the key anywhere outside the phone.
+
+:::note
+The Kokio app calls this the **Kokio wallet**. It is the same thing. These docs call it the device wallet, to keep it apart from the eSIM wallet.
+:::
+
+A device wallet:
+
+- Funds its eSIM wallets
+- Decides which of them may spend its money
+- Is the only party that can move an eSIM wallet to another device
 
 ## Owned by a key, not an address {#owned-by-a-key-not-an-address}
 
-The owner is a pair of co-ordinates, not an account. Signing works through [`Account4337`](./account-4337.md), the base this contract inherits, which checks each WebAuthn assertion through the [P256 verifier](./p256-verifier.md) before letting a call through. Rotating the key is `transferOwnership`, and the new key has to sign [`rotationChallenge`](./account-4337.md#rotating-the-owner-key) before the wallet accepts it. The same call updates the [Registry](./registry.md) so the two records cannot drift apart, and the registry reads the key back from this wallet rather than trusting the call.
+The owner is a pair of co-ordinates, not an account. Signing works through [`Account4337`](./account-4337.md), the base this contract inherits, which checks each WebAuthn assertion through the [P256 verifier](./p256-verifier.md) before letting a call through.
 
-Because the owner is a key rather than an address, a lost phone is not a lost wallet: the passkey can be restored from the platform's own keychain sync, and a device wallet whose key is replaced keeps all of its eSIM wallets.
+Rotating the key is `transferOwnership`. The same call updates the [Registry](./registry.md) so the two records cannot drift apart, and the registry reads the key back from this wallet rather than trusting the call.
+
+:::warning
+The new key has to sign [`rotationChallenge`](./account-4337.md#rotating-the-owner-key) before the wallet accepts it.
+:::
+
+:::tip
+A lost phone is not a lost wallet. The passkey can be restored from the platform's own keychain sync, and a device wallet whose key is replaced keeps all of its eSIM wallets.
+:::
 
 ## Funds access {#funds-access}
 
-`toggleAccessToFunds` is the switch that decides whether a given eSIM wallet may pull ETH from here to pay for a data bundle. It is off until the user turns it on, and `canPullFunds` is the read that answers for any one wallet. `pullToken` moves an ERC-20 balance the same way.
+`toggleAccessToFunds` decides whether a given eSIM wallet may pull ETH from here to pay for a data bundle. It is off until the user turns it on. `canPullFunds` answers for any one wallet, and `pullToken` moves an ERC-20 balance the same way.
 
-This is one of the settings that limits what Kokio's admin can charge for. The admin can start a purchase against an eSIM wallet, but the money only moves if this device wallet has granted that wallet access, the price is under the wallet's [ceiling](./esim-wallet.md), and the wallet's [admin allowance](./esim-wallet.md#what-the-admin-can-and-cannot-do) still covers it.
+This is one of the settings that limits what Kokio's admin can charge for. An admin purchase against an eSIM wallet goes through only if:
+
+1. The price is under the eSIM wallet's [ceiling](./esim-wallet.md).
+2. The eSIM wallet's [admin allowance](./esim-wallet.md#what-the-admin-can-and-cannot-do) still covers it. On Base mainnet a new eSIM wallet's allowance starts at zero.
+
+The purchase spends the eSIM wallet's own token balance first. Only a shortfall is pulled from this device wallet, and only if this device wallet has granted that eSIM wallet access.
 
 ## A beacon proxy, and what that means for upgrades {#a-beacon-proxy}
 
-Every device wallet is a beacon proxy deployed by [`DeviceWalletFactory`](./device-wallet-factory.md), and all of them follow one beacon. Upgrading that beacon moves every device wallet in the protocol onto new code in the same transaction, and there is no per-wallet opt-out. That is a deliberate trade: it is the only way to fix a bug in a wallet nobody can enumerate, and it is why the beacon's owner is the [`ProtocolAdmin`](./protocol-admin.md) timelock rather than a key someone holds.
+Every device wallet is a beacon proxy deployed by [`DeviceWalletFactory`](./device-wallet-factory.md), and all of them follow one beacon. Upgrading that beacon moves every device wallet in the protocol onto new code in the same transaction, and there is no per-wallet opt-out.
 
-The practical consequence for anyone reading storage: the layout of this contract is fixed by what is already deployed. `Account4337` comes first, so any new state variable added there would move every variable here on wallets that already exist.
+That is a deliberate trade. It is the only way to fix a bug in a wallet nobody can enumerate, and it is why the beacon's owner is the [`ProtocolAdmin`](./protocol-admin.md) timelock rather than a key someone holds.
+
+:::note
+The storage layout of this contract is fixed by what is already deployed. `Account4337` comes first, so any new state variable added there would move every variable here on wallets that already exist.
+:::
 
 <!-- docgen:start source=smart-contract-suite/docs/device-wallet/DeviceWallet.md -->
 ## DeviceWallet {#devicewallet}

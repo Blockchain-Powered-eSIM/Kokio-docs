@@ -5,9 +5,15 @@ description: Every custom error the Kokio contracts revert with, grouped by the 
 
 # Custom errors {#custom-errors}
 
-Every custom error in the Kokio [wallet suite](./overview.md) is declared in one place, `Errors`. It is an interface rather than a library, so each contract reaches them as `Errors.Name` without inheriting anything. Ninety-five of them, listed below and grouped by the contract that raises them.
+Every custom error the Kokio contracts revert with, how to decode one, and what to do about the common ones.
 
-If you are here because a transaction reverted, decode the selector first, then find the name in the tables.
+---
+
+Every custom error in the Kokio [wallet suite](./overview.md) is declared in one place, `Errors`. It is an interface rather than a library, so each contract reaches them as `Errors.Name` without inheriting anything. There are ninety-five, grouped below by the contract that raises them.
+
+:::tip
+If a transaction reverted, decode the selector first, then find the name in the tables. [The ones you are most likely to hit](#the-ones-you-are-most-likely-to-hit) covers most cases.
+:::
 
 ## Decoding a revert {#decoding-a-revert}
 
@@ -21,7 +27,9 @@ cast sig "DataBundlePriceAboveCap(uint64,uint64)"
 cast decode-error 0x... --sig "DataBundlePriceAboveCap(uint64,uint64)"
 ```
 
+:::note
 The [Kokio SDK](../sdk/overview.md) does this for you. It resolves the selector against the same list and throws a `ContractRevertError` carrying the readable name, so a backend does not need a decoding table of its own.
+:::
 
 ## The ones you are most likely to hit {#the-ones-you-are-most-likely-to-hit}
 
@@ -174,7 +182,7 @@ Raised by an [eSIM wallet](./esim-wallet.md).
 | `ESIMIdentifierAlreadySet(string eSIMUniqueIdentifier)` | The eSIM identifier is set once and not replaced |
 | `EmptyDataBundleID()` | The bundle id is empty |
 | `ZeroDataBundlePrice()` | A bundle cannot be recorded at a price of zero |
-| `ZeroDataBundlePriceCap()` | A cap of zero means "follow the registry", so it cannot be set explicitly |
+| `ZeroDataBundlePriceCap()` | Raised by the Registry. Its default price cap cannot be zero, because zero reads as "no ceiling" for every wallet without a cap of its own |
 | `NotADeviceWallet(address account)` | An eSIM wallet's owner has to be a device wallet, and that address is not one. Also raised by `RegistryHelper` |
 | `OnlyRequestedOwner(address newRequestedOwner)` | Only the nominated owner may accept the handover |
 | `UseAcceptOwnershipTransfer()` | Ownership moves in two steps here. The one-step call is blocked |

@@ -5,6 +5,10 @@ description: The ERC-4337 and ERC-1271 base that every Kokio device wallet inher
 
 # ERC-4337 account {#erc-4337-account}
 
+The passkey-owned account base every device wallet inherits: user operations, ERC-1271 signatures and key rotation.
+
+---
+
 `Account4337` is the base contract every Kokio [device wallet](./device-wallet.md) inherits. It is what makes a wallet owned by a passkey rather than by an address, and it is where a WebAuthn assertion becomes a call the chain will execute.
 
 The owner is a pair of P-256 co-ordinates stored as `bytes32[2]`, not an account. It never sends a transaction itself. It signs an assertion, and either the ERC-4337 EntryPoint or the account calling into itself turns that into a call.
@@ -13,9 +17,13 @@ The owner is a pair of P-256 co-ordinates stored as `bytes32[2]`, not an account
 
 ERC-4337 is account abstraction without a change to the protocol. Instead of broadcasting a transaction, the app builds a **user operation**, the passkey signs it, and a **bundler** submits it to the EntryPoint singleton on the wallet's behalf. A **paymaster** can pay the gas, which is why a Kokio user never has to hold a cryptocurrency just to pay a fee.
 
-`validateUserOp` is the account's half of that. The EntryPoint calls it before executing anything, and it answers whether the signature is good. It has to stay inside the ERC-4337 validation rules, which means no banned opcodes, no calls out to other contracts and no reading the clock. Expiry is not checked here at all; it is packed into the return value and handed to the EntryPoint, which does check it.
+`validateUserOp` is the account's half of that. The EntryPoint calls it before executing anything, and it answers whether the signature is good. It has to stay inside the ERC-4337 validation rules: no banned opcodes, no calls out to other contracts and no reading the clock.
 
-A signature failure returns a failure code rather than reverting. That is the standard's rule and it matters: a revert inside validation fails the whole bundle rather than the one operation that was wrong.
+Expiry is not checked here at all. It is packed into the return value and handed to the EntryPoint, which does check it.
+
+:::note
+A signature failure returns a failure code rather than reverting. That is the standard's rule, because a revert inside validation fails the whole bundle rather than the one operation that was wrong.
+:::
 
 `execute` and `executeBatch` are what actually run once validation passes. `getDeposit`, `addDeposit` and `withdrawDepositTo` manage the account's gas balance held at the EntryPoint.
 
@@ -23,7 +31,17 @@ A signature failure returns a failure code rather than reverting. That is the st
 
 ERC-1271 is how a contract answers "is this signature valid for you", so a smart account can sign a message the way a plain account does. Signing in to a service, approving an offchain order, anything that would normally take a personal signature.
 
-`isValidSignature` is that answer, and there is one detail to get right. The challenge inside the assertion's `clientDataJSON` is not the message hash you pass in. It is an EIP-191 digest over five things: a version byte, a `validUntil` timestamp, the chain id, this account's address and the message hash. An offchain signer needs all five to produce something this will accept.
+`isValidSignature` is that answer.
+
+:::warning
+The challenge inside the assertion's `clientDataJSON` is not the message hash you pass in. It is an EIP-191 digest over five things, and an offchain signer needs all five to produce something this will accept:
+
+1. a version byte
+2. a `validUntil` timestamp
+3. the chain id
+4. this account's address
+5. the message hash
+:::
 
 The signature itself is packed as one version byte, then six bytes of `validUntil`, then the ABI-encoded WebAuthn assertion.
 
@@ -31,7 +49,14 @@ The two entry points hash different precursors on purpose. A signature made for 
 
 ## Rotating the owner key {#rotating-the-owner-key}
 
-`transferOwnership(newOwner, newOwnerSignature)` replaces the key, and it takes two signatures. The current owner signs the call itself, which reaches the account through `execute`. The new key signs a challenge, which proves it exists and is under the user's control. Without that second signature an owner could rotate onto a key nobody holds and lose the wallet, or onto someone else's key before they had registered it. A missing or wrong proof reverts with `NewOwnerKeyCannotSign`.
+`transferOwnership(newOwner, newOwnerSignature)` replaces the key, and it takes two signatures:
+
+| Signer | Signs | Proves |
+|---|---|---|
+| The current owner | The call itself, which reaches the account through `execute` | The user asked for the rotation |
+| The new key | A challenge from `rotationChallenge` | The new key exists and is under the user's control |
+
+Without the second signature an owner could rotate onto a key nobody holds and lose the wallet, or onto someone else's key before they had registered it. A missing or wrong proof reverts with `NewOwnerKeyCannotSign`.
 
 `rotationChallenge(newOwner)` returns the bytes to sign:
 
@@ -51,7 +76,11 @@ The EntryPoint address is immutable too, which keeps validation cheap. It also m
 
 ## A note for anyone changing this contract {#storage-note}
 
-`DeviceWallet` inherits this contract, and base storage comes first, so a device wallet's own variables begin immediately after `owner`. Adding a state variable here moves all of them on wallets that are already deployed, which then read back as zero. Anything this contract needs later belongs in its own ERC-7201 namespace, not in a slot following `owner`.
+`DeviceWallet` inherits this contract, and base storage comes first, so a device wallet's own variables begin immediately after `owner`.
+
+:::warning
+Adding a state variable here moves every device wallet variable on wallets that are already deployed, which then read back as zero. Anything this contract needs later belongs in its own ERC-7201 namespace, not in a slot following `owner`.
+:::
 
 <!-- docgen:start source=smart-contract-suite/docs/aa-helper/Account4337.md -->
 ## Account4337 {#account4337}

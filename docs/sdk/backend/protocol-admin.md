@@ -5,9 +5,19 @@ description: admin.protocolAdmin drives the Kokio timelock that owns the registr
 
 # Protocol admin (backend) {#protocol-admin-backend}
 
+Reference for `admin.protocolAdmin`: schedule, execute and cancel owner calls through the timelock, and the guardian's emergency actions.
+
+---
+
 `admin.protocolAdmin`
 
-The Kokio timelock that owns the [registry](./registry.md), the [lazy wallet registry](./lazy-wallet-registry.md), both wallet factories and the [payment adapter](./payments.md). Any change to those contracts that needs `onlyOwner` goes through here: a proposer announces it, a delay passes, and anyone can then run it. This is what stands between one compromised key and an instant change to five contracts.
+The Kokio timelock that owns the [registry](./registry.md), the [lazy wallet registry](./lazy-wallet-registry.md), both wallet factories and the [payment adapter](./payments.md). This is what stands between one compromised key and an instant change to five contracts.
+
+Any change to those contracts that needs `onlyOwner` goes through here:
+
+1. A proposer announces it.
+2. A delay passes.
+3. Anyone can then run it.
 
 On both Base networks the delay is two days and the floor below which it cannot go is one day, listed on the [Base mainnet](../../deployments/base.md#limits) and [Base Sepolia](../../deployments/base-sepolia.md#limits) pages. `getMinDelay()` reads the real one.
 
@@ -20,7 +30,7 @@ Four role-scoped surfaces do the work.
 | `canceller` | cancels a call before it runs | `CANCELLER_ROLE`, which every proposer also holds |
 | `guardian` | bypasses the delay for four emergency actions | `GUARDIAN_ROLE` |
 
-```ts
+```ts title="Schedule, wait, execute"
 const op = await admin.protocolAdmin.proposer.schedule({
   address: registryAddress,
   abi: Registry,
@@ -31,19 +41,23 @@ const op = await admin.protocolAdmin.proposer.schedule({
 await admin.protocolAdmin.executor.execute(op);
 ```
 
-Keep whatever `schedule` returns. The timelock recomputes an operation's id from those fields and there is no way to look one up afterwards without them.
+:::warning
+Keep whatever `schedule` returns. The timelock recomputes an operation's id from those fields, and there is no way to look one up afterwards without them.
+:::
 
 ## proposer.schedule {#proposer-schedule}
 
 Announces a single owner call. Use it for most changes: build the call as an `OwnerCall` object, or use one of the `*Call` builders on `registry`, `deviceWalletFactory` and the others.
 
 ```ts
-const scheduled = await admin.protocolAdmin.proposer.schedule(
-  call,      // an OwnerCall
-  {},        // optional OperationOptions: { salt?, predecessor? }
-  undefined, // optional delay in seconds, defaults to getMinDelay()
-);
+const scheduled = await admin.protocolAdmin.proposer.schedule(call);
 ```
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| call | `OwnerCall` | The call to schedule |
+| opts | `OperationOptions`, optional | `{ salt?, predecessor? }`. `predecessor` is an operation that has to run before this one |
+| delay | `bigint`, optional | In seconds. Defaults to `getMinDelay()` |
 
 Returns `Promise<ScheduledOperation>`, shaped `{ hash, id, target, value, payload, predecessor, salt, delay }`.
 
@@ -52,8 +66,14 @@ Returns `Promise<ScheduledOperation>`, shaped `{ hash, id, target, value, payloa
 Announces several owner calls as a single operation that runs together or not at all. Use it when the calls only make sense as a set, for example revoking both a guardian's guardian role and its executor role in one step.
 
 ```ts
-const scheduled = await admin.protocolAdmin.proposer.scheduleBatch(calls); // OwnerCall[]
+const scheduled = await admin.protocolAdmin.proposer.scheduleBatch(calls);
 ```
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| calls | `OwnerCall[]` | The calls, run in order |
+| opts | `OperationOptions`, optional | The same as for [`schedule`](#proposer-schedule) |
+| delay | `bigint`, optional | The same as for [`schedule`](#proposer-schedule) |
 
 Returns `Promise<ScheduledBatchOperation>`, shaped `{ hash, id, targets, values, payloads, predecessor, salt, delay }`.
 
@@ -65,11 +85,24 @@ Schedules a call built from calldata that did not come from this SDK's ABIs. Use
 const scheduled = await admin.protocolAdmin.proposer.scheduleRaw(target, value, payload, predecessor, salt, delay);
 ```
 
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| target | `Address` | The contract to call |
+| value | `bigint` | ETH to send with the call, in wei |
+| payload | `Hex` | The calldata |
+| predecessor | `Hex` | An operation that has to run first, or zero |
+| salt | `Hex` | Makes the operation id unique |
+| delay | `bigint` | In seconds, at least `getMinDelay()` |
+
 Returns `Promise<ScheduledOperation>`.
 
 ## executor.execute {#executor-execute}
 
-Runs a scheduled operation once its delay has passed. Anyone with a funded account can call this, no role needed. Pass back exactly what `schedule` returned: the timelock recomputes the operation's id from those fields, and a changed value looks up an operation that was never scheduled.
+Runs a scheduled operation once its delay has passed. Anyone with a funded account can call this, no role needed.
+
+:::warning
+Pass back exactly what `schedule` returned. The timelock recomputes the operation's id from those fields, and a changed value looks up an operation that was never scheduled.
+:::
 
 ```ts
 const hash = await admin.protocolAdmin.executor.execute(scheduled);
@@ -95,6 +128,8 @@ Executes a call scheduled through `scheduleRaw`.
 const hash = await admin.protocolAdmin.executor.executeRaw(target, value, payload, predecessor, salt);
 ```
 
+Takes the same `target`, `value`, `payload`, `predecessor` and `salt` that were passed to [`scheduleRaw`](#proposer-scheduleraw).
+
 Returns `Promise<Hash>`.
 
 ## canceller.cancel {#canceller-cancel}
@@ -109,7 +144,11 @@ Returns `Promise<Hash>`.
 
 ## guardian.pauseInstantly {#guardian-pauseinstantly}
 
-Pauses a protocol contract immediately, with no delay. Needs `GUARDIAN_ROLE`. It can only stop the contract, which the admin key can already do, but this route still works while the admin key is suspended or being replaced. `guardian.unpauseInstantly` releases it. The contract emits `PauseRaised(target, guardian)`.
+Pauses a protocol contract immediately, with no delay. Needs `GUARDIAN_ROLE`. `guardian.unpauseInstantly` releases it. The contract emits `PauseRaised(target, guardian)`.
+
+:::note
+It can only stop the contract, which the admin key can already do, but this route still works while the admin key is suspended or being replaced.
+:::
 
 ```ts
 const hash = await admin.protocolAdmin.guardian.pauseInstantly(registryAddress);
@@ -131,7 +170,9 @@ Returns `Promise<Hash>`.
 
 Strips the cancel role from a list of accounts immediately. Use it to shut down compromised proposer or canceller keys before they can cancel a legitimate pending operation.
 
-All or nothing: if any listed account does not actually hold the role, the whole call reverts rather than skipping that one quietly.
+:::warning
+All or nothing. If any listed account does not actually hold the role, the whole call reverts rather than skipping that one quietly.
+:::
 
 ```ts
 const hash = await admin.protocolAdmin.guardian.revokeCancellersInstantly([addr1, addr2]);
@@ -141,9 +182,13 @@ Returns `Promise<Hash>`.
 
 ## guardian.disableAdminInstantly {#guardian-disableadmininstantly}
 
-Suspends a contract's admin key immediately, with no delay. Use it during an incident, if the backend's admin key looks compromised. This only takes power away. Giving it back or naming a replacement is an owner action and waits the normal delay.
+Suspends a contract's admin key immediately, with no delay. Use it during an incident, if the backend's admin key looks compromised.
 
-`target` defaults to the registry, which is where every other contract looks up the admin address, so suspending it there closes every admin-gated call across the whole protocol.
+:::note
+This only takes power away. Giving it back or naming a replacement is an owner action and waits the normal delay.
+:::
+
+The optional `target` defaults to the registry, which is where every other contract looks up the admin address, so suspending it there closes every admin-gated call across the whole protocol.
 
 ```ts
 const hash = await admin.protocolAdmin.guardian.disableAdminInstantly();
@@ -153,7 +198,11 @@ Returns `Promise<Hash>`.
 
 ## acceptOwnershipBatch {#acceptownershipbatch}
 
-Accepts ownership of every contract that has already offered it to the timelock, in one call. Use it once, when setting the timelock up as owner. Reverts if any target in the list has not actually offered ownership yet, so check `pendingOwner` on each contract first.
+Accepts ownership of every contract that has already offered it to the timelock, in one call. Use it once, when setting the timelock up as owner.
+
+:::warning
+Reverts if any target in the list has not actually offered ownership yet, so check `pendingOwner` on each contract first.
+:::
 
 ```ts
 const hash = await admin.protocolAdmin.acceptOwnershipBatch([registryAddress, deviceWalletFactoryAddress]);
@@ -169,6 +218,11 @@ Gives up one of your own roles. This is the one role change that does not need s
 const hash = await admin.protocolAdmin.renounceRole(role, account);
 ```
 
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| role | `Hex` | The role id, such as `PROPOSER_ROLE` |
+| account | `Address` | Your own account. The chain refuses any other |
+
 Returns `Promise<Hash>`.
 
 ## grantRoleCall {#grantrolecall}
@@ -180,13 +234,20 @@ const call = await admin.protocolAdmin.grantRoleCall(role, account);
 const scheduled = await admin.protocolAdmin.proposer.schedule(call);
 ```
 
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| role | `Hex` | The role id |
+| account | `Address` | The account to grant it to |
+
 Returns `Promise<OwnerCall>`.
 
 ## revokeRoleCall {#revokerolecall}
 
 Builds the call payload to revoke a role from an account. Same pattern as `grantRoleCall`.
 
+:::warning
 Evicting a guardian takes two of these scheduled together in one `scheduleBatch` call, its guardian role and its executor role. The revoke call cannot tell that the two were granted as a pair.
+:::
 
 ```ts
 const call = await admin.protocolAdmin.revokeRoleCall(role, account);
@@ -197,7 +258,11 @@ Returns `Promise<OwnerCall>`.
 
 ## updateDelayCall {#updatedelaycall}
 
-Builds the call payload to change the timelock's delay. `minDelayFloor` still applies underneath, so the delay can never drop below the floor whatever this sets.
+Builds the call payload to change the timelock's delay, in seconds.
+
+:::note
+`minDelayFloor` still applies underneath, so the delay can never drop below the floor whatever this sets.
+:::
 
 ```ts
 const call = await admin.protocolAdmin.updateDelayCall(newDelaySeconds);
@@ -208,18 +273,31 @@ Returns `Promise<OwnerCall>`.
 
 ## disableAndNominateCall {#disableandnominatecall}
 
-Builds the call payload to suspend a contract's admin and name its replacement in one step. The nominee still has to accept separately, and the role stays dormant until then.
+Builds the call payload to suspend a contract's admin and name its replacement in one step.
 
 ```ts
 const call = await admin.protocolAdmin.disableAndNominateCall(target, newAdmin);
 const scheduled = await admin.protocolAdmin.proposer.schedule(call);
 ```
 
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| target | `Address` | The contract whose admin to replace |
+| newAdmin | `Address` | The nominee. Must not be the current admin |
+
+:::note
+The nominee still has to accept separately, and the role stays dormant until then.
+:::
+
 Returns `Promise<OwnerCall>`.
 
 ## disableAdminCall {#disableadmincall}
 
-Builds the call payload to suspend a contract's admin key on the normal, delayed route. Prefer `guardian.disableAdminInstantly` during an actual incident. This is for a planned suspension.
+Builds the call payload to suspend a contract's admin key on the normal, delayed route. This is for a planned suspension.
+
+:::tip
+During an actual incident, use [`guardian.disableAdminInstantly`](#guardian-disableadmininstantly) instead.
+:::
 
 `target` defaults to the registry.
 
@@ -232,7 +310,11 @@ Returns `Promise<OwnerCall>`.
 
 ## enableAdminCall {#enableadmincall}
 
-Builds the call payload to give a suspended admin its powers back. This is the only way to lift a suspension. There is no instant guardian form of it, by design.
+Builds the call payload to give a suspended admin its powers back.
+
+:::note
+This is the only way to lift a suspension. There is no instant guardian form of it, by design.
+:::
 
 `target` defaults to the registry.
 
@@ -258,14 +340,21 @@ Returns `Promise<OwnerCall>`.
 
 ## setDefaultPriceCapUSDCentsCall {#setdefaultpricecapusdcentscall}
 
-Builds the call payload to set the registry's fallback price cap, in US cents. A zero cap only fails when this eventually executes, not when it is scheduled, so a mistake here costs the whole delay before it is caught.
+Builds the call payload to set the registry's fallback price cap, in US cents.
 
-`target` defaults to the registry.
+:::warning
+A zero cap only fails when this eventually executes, not when it is scheduled, so a mistake here costs the whole delay before it is caught.
+:::
 
 ```ts
 const call = await admin.protocolAdmin.setDefaultPriceCapUSDCentsCall(cap);
 const scheduled = await admin.protocolAdmin.proposer.schedule(call);
 ```
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| cap | `bigint` | The cap, in whole US cents. Must not be zero |
+| target | `Address`, optional | Defaults to the registry |
 
 Returns `Promise<OwnerCall>`.
 
@@ -273,25 +362,35 @@ Returns `Promise<OwnerCall>`.
 
 Builds the call payload to set what the admin key may charge each newly created eSIM wallet in total, in US cents. Wallets that already exist keep their own figure.
 
-`target` defaults to the registry.
-
 ```ts
 const call = await admin.protocolAdmin.setDefaultAdminAllowanceUSDCentsCall(allowance);
 const scheduled = await admin.protocolAdmin.proposer.schedule(call);
 ```
 
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| allowance | `bigint` | The total, in whole US cents |
+| target | `Address`, optional | Defaults to the registry |
+
 Returns `Promise<OwnerCall>`.
 
 ## setPaymentAdapterCall {#setpaymentadaptercall}
 
-Builds the call payload to point the registry at a new payment adapter. Owner only, deliberately not the admin: the adapter holds the spent payment references, so an admin that could swap it would get an empty set back and could record every purchase a second time.
+Builds the call payload to point the registry at a new payment adapter.
 
-`target` defaults to the registry.
+:::note
+Owner only, deliberately not the admin, because the adapter decides where money goes. Spent payment references live on the registry, so they survive the swap.
+:::
 
 ```ts
 const call = await admin.protocolAdmin.setPaymentAdapterCall(paymentAdapterAddress);
 const scheduled = await admin.protocolAdmin.proposer.schedule(call);
 ```
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| paymentAdapter | `Address` | The new adapter |
+| target | `Address`, optional | Defaults to the registry |
 
 Returns `Promise<OwnerCall>`.
 
@@ -307,7 +406,11 @@ Returns `Promise<Hex>`.
 
 ## operationIdBatch {#operationidbatch}
 
-The same as `operationId`, for a batch. A batch hashes differently from the same calls scheduled one at a time.
+The same as `operationId`, for a batch.
+
+:::note
+A batch hashes differently from the same calls scheduled one at a time.
+:::
 
 ```ts
 const id = await admin.protocolAdmin.operationIdBatch(calls);
@@ -367,7 +470,11 @@ Returns `Promise<OperationState>`, one of `Unset`, `Waiting`, `Ready` or `Done`.
 
 ## getTimestamp {#gettimestamp}
 
-Reads when an operation becomes executable, as a Unix timestamp. Reads `0` for an operation the timelock has never seen and `1` for one already executed, so check `getOperationState` rather than treating every value here as a real time.
+Reads when an operation becomes executable, as a Unix timestamp.
+
+:::warning
+Reads `0` for an operation the timelock has never seen and `1` for one already executed. Check `getOperationState` rather than treating every value here as a real time.
+:::
 
 ```ts
 const readyAt = await admin.protocolAdmin.getTimestamp(operationId);
@@ -423,6 +530,11 @@ Checks whether an account holds a given role. Get the role's id from one of the 
 const proposerRole = await admin.protocolAdmin.PROPOSER_ROLE();
 const canPropose = await admin.protocolAdmin.hasRole(proposerRole, account);
 ```
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| role | `Hex` | The role id |
+| account | `Address` | The account to check |
 
 Returns `Promise<boolean>`.
 

@@ -5,23 +5,46 @@ description: The one place in Kokio where a price in US cents becomes an amount 
 
 # Payment adapter {#payment-adapter}
 
-`PaymentAdapter` holds the currencies Kokio accepts, converts a price into one of them, moves the tokens to the vault, and spends each payment reference once. It is the money path of the [wallet suite](./overview.md), and it is the only contract in it that touches a token amount.
+The accepted currencies, the one place a US cent price becomes a token amount, and how a purchase pays the vault.
 
-That last part is the design. Prices cross every other contract boundary in US cents and nothing else, so a decimals mismatch is not something to be checked for anywhere; there is one place a cent figure becomes a token amount, and it is here. Tokens pass through in a single call and never rest in this contract.
+---
+
+`PaymentAdapter` is the money path of the [wallet suite](./overview.md). It:
+
+- Holds the currencies Kokio accepts
+- Converts a price into one of them
+- Moves the tokens to the vault
+
+It is the only contract in the suite that touches a token amount. Prices cross every other contract boundary in US cents and nothing else, so there is one place a cent figure becomes a token amount, and it is here. Tokens pass through in a single call and never rest in this contract.
 
 ## Prices are whole US cents {#prices-are-whole-us-cents}
 
 Every price in the protocol is a `uint64` of whole US cents. \$4.99 is `499`. There are no fractional cents and no floating point anywhere in the suite.
 
-`quote(symbol, priceUSDCents)` turns that figure into an amount of one currency's smallest unit, reading the decimals from the stored asset entry rather than being told them. For a six decimal token like USDC, `499` becomes `4990000`. A currency that is not already denominated in dollars would need an exchange rate, and there are no price feeds here, so `quote` reverts rather than guessing.
+`quote(symbol, priceUSDCents)` turns that figure into an amount of one currency's smallest unit, reading the decimals from the stored asset entry rather than being told them. For a six decimal token like USDC, `499` becomes `4990000`.
+
+:::warning
+`quote` reverts for a currency not already denominated in dollars. That would need an exchange rate, and there are no price feeds here.
+:::
 
 `resolveAsset(symbol)` reads back a currency entry and reverts if it is not allowed, which is how a caller checks a symbol is accepted before building a transaction around it.
 
 ## Currencies {#currencies}
 
-An asset is registered under a `bytes32` symbol, not an address, so a currency can be a token or an offchain rail. An entry is 23 bytes and fits one storage slot with nine to spare; new fields have to stay inside those nine bytes, because a second slot would move every entry in a live table.
+An asset is registered under a `bytes32` symbol, not an address, so a currency can be a token or a payment taken outside the contracts.
 
-Both networks register `USDC`, an ERC-20 with six decimals that settles onchain, and `USD`, which has no token address and two decimals and stands for a card or bank payment taken outside the contracts, recorded so the purchase history is complete either way. Base mainnet also registers `USDT`, six decimals, and `DAI`, eighteen. Each network's list is on its own page: [Base mainnet](../deployments/base.md#currencies) and [Base Sepolia](../deployments/base-sepolia.md#currencies).
+:::note
+An entry is 23 bytes and fits one storage slot with nine to spare. New fields have to stay inside those nine bytes, because a second slot would move every entry in a live table.
+:::
+
+| Symbol | Networks | Decimals | What it is |
+|---|---|---|---|
+| `USDC` | Both | 6 | An ERC-20 that settles onchain |
+| `USD` | Both | 2 | No token address. A card or bank payment taken outside the contracts, recorded so the purchase history is complete either way |
+| `USDT` | Base mainnet | 6 | An ERC-20 that settles onchain |
+| `DAI` | Base mainnet | 18 | An ERC-20 that settles onchain |
+
+The token addresses are on each network's page: [Base mainnet](../deployments/base.md#currencies) and [Base Sepolia](../deployments/base-sepolia.md#currencies).
 
 `registerAsset` and `updateAsset` are owner-only, which means they run through the [`ProtocolAdmin`](./protocol-admin.md) timelock.
 
@@ -31,19 +54,28 @@ Both networks register `USDC`, an ERC-20 with six decimals that settles onchain,
 
 The caller funding the contract first, rather than the contract pulling from the caller, is what leaves room for a swap step to be added later without changing this signature.
 
-One thing to know if you are extending this. `_amountIn` is the caller's word for what it sent, checked only against the balance. What stops a caller from naming more than it sent and carrying off a token somebody left here by mistake is that there is exactly one path in: an [eSIM wallet](./esim-wallet.md) going through `quote`, with no way to supply a figure of its own choosing. That property is worth keeping.
+:::warning
+If you are extending this contract: `_amountIn` is the caller's word for what it sent, checked only against the balance. What stops a caller naming more than it sent, and carrying off a token somebody left here by mistake, is that there is exactly one path in. An [eSIM wallet](./esim-wallet.md) goes through `quote`, with no way to supply a figure of its own choosing. Keep it that way.
+:::
 
 ## Recovering stray tokens {#recovering-stray-tokens}
 
-`settle` is funded and spent in the same transaction, so a purchase never leaves anything here. Any balance this contract holds was sent to it by mistake. `recoverTokens(token, to, amount)` sends it back out and emits `TokensRecovered`. It is owner only, which means it runs through the [`ProtocolAdmin`](./protocol-admin.md) timelock and every recovery is public for the delay before it executes.
+`settle` is funded and spent in the same transaction, so a purchase never leaves anything here. Any balance this contract holds was sent to it by mistake.
+
+`recoverTokens(token, to, amount)` sends it back out and emits `TokensRecovered`. It is owner only, so it runs through the [`ProtocolAdmin`](./protocol-admin.md) timelock and every recovery is public for the delay before it executes.
 
 ## Payment references {#payment-references}
 
-A payment reference is an offchain order id, spent once. Retrying a purchase call that already landed cannot charge a user twice, because the second attempt finds the reference already spent.
+A **payment reference** is an offchain order id, spent once. Retrying a purchase call that already landed cannot charge a user twice, because the second attempt finds the reference already spent.
 
-The record of which references are spent lives on the [Registry](./registry.md), in `usedPaymentReferences`, not here. Two reasons, and both are worth knowing before you build against it. It survives an adapter rotation through `setPaymentAdapter`, where a mapping held here would reset with the contract. And it is keyed by the wallet and the reference together rather than by the reference alone, so one wallet spending a reference cannot burn it for another wallet's pending settlement.
+The record of which references are spent lives on the [Registry](./registry.md), in `usedPaymentReferences`, not here, for two reasons:
 
-This contract's own `usedReferences` mapping and its `consumePaymentReference` are retired. Nothing in the protocol calls them any more. They stay declared because the storage layout behind the proxy is pinned by a test and removing the slot would shift every variable below it.
+- **It survives an adapter rotation.** A mapping held here would reset when `setPaymentAdapter` points the registry at a new adapter.
+- **It is keyed by the wallet and the reference together.** One wallet spending a reference cannot burn it for another wallet's pending settlement.
+
+:::note
+This contract's own `usedReferences` mapping and its `consumePaymentReference` are retired, and nothing in the protocol calls them. They stay declared because the storage layout behind the proxy is pinned by a test, and removing the slot would shift every variable below it.
+:::
 
 <!-- docgen:start source=smart-contract-suite/docs/payments/PaymentAdapter.md -->
 ## Asset {#asset}

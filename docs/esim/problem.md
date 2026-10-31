@@ -5,9 +5,13 @@ description: Why Kokio exists. eSIM provisioning is convenient, but it leaves co
 
 # The problem with eSIMs {#the-problem-with-esims}
 
-Kokio was built because the convenience of eSIMs arrived with a set of security and privacy problems nobody has fixed. This page is the short version. [The wiki](https://github.com/Blockchain-Powered-eSIM/Kokio-docs/wiki/Problems-With-eSIMs) is the long one.
+The security and privacy problems the convenience of eSIMs brought with it.
 
-An eSIM removes the plastic card, which is genuinely useful for phones, watches and IoT devices. What it does not remove is the trust. A physical SIM is a thing you hold. An eSIM profile is a record in somebody else's system, delivered over the air, and it puts you in the hands of several parties you never chose:
+---
+
+Kokio was built because the convenience of eSIMs arrived with a set of security and privacy problems nobody has fixed. This is the short version. [The wiki](https://github.com/Blockchain-Powered-eSIM/Kokio-docs/wiki/Problems-With-eSIMs) has the long one.
+
+An eSIM removes the plastic card, which is useful for phones, watches and IoT devices. It does not remove the trust. A physical SIM is a thing you hold. An eSIM profile is a record in somebody else's system, delivered over the air, and it puts you in the hands of several parties you never chose:
 
 - **Provisioning is the weak point.** A profile is created, delivered and activated remotely. Every step in that chain is a chance for it to be intercepted, misdirected or issued to the wrong person.
 - **Standards are applied unevenly.** Implementations differ between operators and between manufacturers, so how secure your eSIM is depends on which combination you happen to own rather than on a floor everybody meets.

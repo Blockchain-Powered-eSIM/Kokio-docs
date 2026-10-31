@@ -5,15 +5,27 @@ description: admin.lazyWalletRegistry records purchases for Kokio users who boug
 
 # Lazy wallet registry (backend) {#lazy-wallet-registry-backend}
 
+Reference for `admin.lazyWalletRegistry`: record a card buyer's purchases, deploy their wallets later, then copy the history across.
+
+---
+
 `admin.lazyWalletRegistry`
 
-Handles Kokio users who bought an eSIM before they had a device wallet, for example through a fiat checkout instead of the app. Their purchase history is recorded here first. Their device wallet and eSIM wallets are deployed later, and the history is copied onto the real wallets once those exist. Available as soon as [`KokioAdmin`](./setup.md) exists. The contract is documented at [LazyWalletRegistry](../../contracts/lazy-wallet-registry.md).
+Handles Kokio users who bought an eSIM before they had a device wallet, for example through a fiat checkout instead of the app. Available as soon as [`KokioAdmin`](./setup.md) exists. The contract is documented at [LazyWalletRegistry](../../contracts/lazy-wallet-registry.md).
 
-The order matters: record history first, deploy second, copy third. The deploy step refuses a device that already has a wallet and expects its history to be on record already.
+The order matters:
 
-Deploying a device and copying its history both take more than one onchain transaction once a device has enough eSIMs or purchases. The run-to-completion methods below handle that pagination for you and can be retried safely if a call is interrupted partway through. Use those for normal work, and reach for the single-transaction versions only if you want to drive the batching yourself.
+1. Record the purchase history with [`batchPopulateHistory`](#batchpopulatehistory).
+2. Deploy the device wallet and its eSIM wallets with [`deployLazyWalletAndSetESIMIdentifier`](#deploylazywalletandsetesimidentifier).
+3. Copy each eSIM's history onto its wallet with [`setHistoryForLazyWallet`](#sethistoryforlazywallet).
 
-```ts
+:::warning
+The deploy step refuses a device that already has a wallet, and expects its history to be on record already.
+:::
+
+Deploying a device and copying its history both take more than one onchain transaction once a device has enough eSIMs or purchases. The run-to-completion methods handle that pagination for you and can be retried safely if a call is interrupted partway through. Use those for normal work. The single-transaction versions are only for driving the batching yourself.
+
+```ts title="Record, then deploy"
 await admin.lazyWalletRegistry.batchPopulateHistory(deviceIds, eSIMIdsPerDevice, purchasesPerDevice);
 const deployment = await admin.lazyWalletRegistry.deployLazyWalletAndSetESIMIdentifier(
   ownerKey, deviceUniqueIdentifier, salt, depositAmount,
@@ -26,15 +38,23 @@ The errors these calls throw are exported by name from both entry points: `Batch
 
 Records purchase history for a batch of devices that have no wallet yet. Call it first, before deploying anything.
 
-Nothing here saw any of these purchases move money, so every entry's `settlement` has to be `1` for an external wallet or `2` for fiat. The contract reverts with `SettlementNotAsserted` on `0`.
-
 ```ts
 const hash = await admin.lazyWalletRegistry.batchPopulateHistory(
-  deviceUniqueIdentifiers,        // string[]
-  eSIMUniqueIdentifiersPerDevice, // string[][], one array of eSIM ids per device
-  purchasesPerDevice,             // DataBundleDetails[][], one array of purchases per device
+  deviceUniqueIdentifiers,
+  eSIMUniqueIdentifiersPerDevice,
+  purchasesPerDevice,
 );
 ```
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| deviceUniqueIdentifiers | `string[]` | One id per device |
+| eSIMUniqueIdentifiers | `string[][]` | One array of eSIM ids per device |
+| dataBundleDetails | `DataBundleDetails[][]` | One array of purchases per device |
+
+:::warning
+Nothing here saw any of these purchases move money, so every entry's `settlement` has to be `1` for an external wallet or `2` for fiat. The contract reverts with `SettlementNotAsserted` on `0`.
+:::
 
 Returns `Promise<Hash>`.
 
@@ -42,17 +62,27 @@ Returns `Promise<Hash>`.
 
 Deploys a device wallet and every one of its eSIM wallets, sending as many transactions as it takes and waiting for the whole device to finish. This is the normal way to deploy a lazily provisioned device.
 
-Safe to call again with the same arguments, and a `depositAmount` of `0n`, if a previous call stopped partway through, for example because a transaction was dropped. It picks up where it left off instead of starting over.
-
 ```ts
 const deployment = await admin.lazyWalletRegistry.deployLazyWalletAndSetESIMIdentifier(
   ownerKey,
   deviceUniqueIdentifier,
   salt,
   depositAmount,
-  10n, // optional, how many eSIM wallets to deploy per transaction
+  10n,
 );
 ```
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| deviceOwnerPublicKey | `P256Key` | The passkey's P-256 public key, as `[x, y]` hex |
+| deviceUniqueIdentifier | `string` | The device id the history was recorded under |
+| salt | `bigint` | Makes the address unique per user |
+| depositAmount | `bigint` | ETH forwarded to the new device wallet's balance, in wei. `0n` when resuming |
+| maxWallets | `bigint`, optional | How many eSIM wallets to deploy per transaction |
+
+:::tip
+Safe to call again with the same arguments, and a `depositAmount` of `0n`, if a previous call stopped partway through, for example because a transaction was dropped. It picks up where it left off instead of starting over.
+:::
 
 `eSIMWallets` and `eSIMIdentifiers` always list every eSIM wallet the device has, in deploy order, even when this call resumed a deploy or found it already complete. Walk them to copy each eSIM's history with [`setHistoryForLazyWallet`](#sethistoryforlazywallet). `batches` lists only the transactions this call sent.
 
@@ -62,14 +92,18 @@ Returns `Promise<LazyDeployment>`, shaped `{ deviceWallet, eSIMWallets, eSIMIden
 
 Copies one eSIM's whole recorded purchase history onto its deployed wallet, sending as many transactions as it takes. Call it once the eSIM's wallet has been deployed by `deployLazyWalletAndSetESIMIdentifier`.
 
-Retryable the same way as the deploy call, and safe to run while the device's other eSIM wallets are still deploying, because the history cursor is tracked per eSIM rather than per device.
-
 ```ts
-const copy = await admin.lazyWalletRegistry.setHistoryForLazyWallet(
-  eSIMIdentifier,
-  25n, // optional, how many entries to copy per transaction
-);
+const copy = await admin.lazyWalletRegistry.setHistoryForLazyWallet(eSIMIdentifier, 25n);
 ```
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| eSIMIdentifier | `string` | The eSIM whose history to copy |
+| maxEntries | `bigint`, optional | How many entries to copy per transaction |
+
+:::tip
+Retryable the same way as the deploy call, and safe to run while the device's other eSIM wallets are still deploying, because the history cursor is tracked per eSIM rather than per device.
+:::
 
 Returns `Promise<LazyHistoryCopy>`, shaped `{ eSIMWallet, copied, batches, alreadyComplete }`.
 
@@ -83,11 +117,21 @@ const hash = await admin.lazyWalletRegistry.switchESIMIdentifierToNewDeviceIdent
 );
 ```
 
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| eSIMIdentifier | `string` | The eSIM to move |
+| oldDeviceIdentifier | `string` | The device it is recorded under now |
+| newDeviceIdentifier | `string` | The device to move it to |
+
 Returns `Promise<Hash>`.
 
 ## deployLazyWalletFirstBatch {#deploylazywalletfirstbatch}
 
-Sends exactly one deploy transaction, mirroring the contract call directly instead of running the device to completion. Use `deployLazyWalletAndSetESIMIdentifier` for normal work and reach for this only when driving the batching yourself.
+Sends exactly one deploy transaction, mirroring the contract call directly instead of running the device to completion.
+
+:::note
+Use `deployLazyWalletAndSetESIMIdentifier` for normal work. This and the two methods after it are only for driving the batching yourself.
+:::
 
 ```ts
 const hash = await admin.lazyWalletRegistry.deployLazyWalletFirstBatch(
@@ -95,25 +139,37 @@ const hash = await admin.lazyWalletRegistry.deployLazyWalletFirstBatch(
 );
 ```
 
+Takes the same arguments as [`deployLazyWalletAndSetESIMIdentifier`](#deploylazywalletandsetesimidentifier), except that `maxWallets` is required.
+
 Returns `Promise<Hash>`.
 
 ## deployMoreESIMWalletsForLazyDevice {#deploymoreesimwalletsforlazydevice}
 
-Sends one more deploy transaction for a device the first batch already started. Same single-transaction use as `deployLazyWalletFirstBatch`.
+Sends one more deploy transaction for a device the first batch already started.
 
 ```ts
 const hash = await admin.lazyWalletRegistry.deployMoreESIMWalletsForLazyDevice(deviceUniqueIdentifier, 10n);
 ```
 
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| deviceUniqueIdentifier | `string` | The device being deployed |
+| maxWallets | `bigint` | How many eSIM wallets to deploy in this transaction |
+
 Returns `Promise<Hash>`.
 
 ## setHistoryForLazyWalletBatch {#sethistoryforlazywalletbatch}
 
-Sends exactly one history copy transaction. Same single-transaction use as the deploy calls above.
+Sends exactly one history copy transaction.
 
 ```ts
 const hash = await admin.lazyWalletRegistry.setHistoryForLazyWalletBatch(eSIMIdentifier, 25n);
 ```
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| eSIMIdentifier | `string` | The eSIM whose history to copy |
+| maxEntries | `bigint` | How many entries to copy in this transaction |
 
 Returns `Promise<Hash>`.
 
@@ -199,7 +255,11 @@ Returns `Promise<bigint>`.
 
 ## outstandingHistoryEntries {#outstandinghistoryentries}
 
-Reads how many of an eSIM's stored purchase entries are still waiting to be copied in. `buyDataBundleWithToken` and `recordSettledPurchase` both refuse a new entry while this is non-zero, because it would land ahead of history that has not arrived yet.
+Reads how many of an eSIM's stored purchase entries are still waiting to be copied in.
+
+:::warning
+`buyDataBundleWithToken` and `recordSettledPurchase` both refuse a new entry while this is non-zero, because it would land ahead of history that has not arrived yet.
+:::
 
 ```ts
 const outstanding = await admin.lazyWalletRegistry.outstandingHistoryEntries(eSIMIdentifier);
@@ -235,6 +295,12 @@ Reads one recorded purchase for a device and eSIM pair, by its position in the l
 const purchase = await admin.lazyWalletRegistry.deviceIdentifierToESIMDetails(deviceIdentifier, eSIMIdentifier, 0n);
 ```
 
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| deviceIdentifier | `string` | The device |
+| eSIMIdentifier | `string` | The eSIM |
+| index | `bigint` | The position in the list, from `0n` |
+
 Returns `Promise<DataBundleDetails>`, shaped `{ id, priceUSDCents, settlement }`.
 
 ## eSIMIdentifiersAssociatedWithDeviceIdentifier {#esimidentifiersassociatedwithdeviceidentifier}
@@ -244,6 +310,11 @@ Reads one eSIM identifier associated with a device, by its position in the list.
 ```ts
 const eSIMId = await admin.lazyWalletRegistry.eSIMIdentifiersAssociatedWithDeviceIdentifier(deviceIdentifier, 0n);
 ```
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| deviceIdentifier | `string` | The device |
+| index | `bigint` | The position in the list, from `0n` |
 
 Returns `Promise<string>`.
 
@@ -312,11 +383,18 @@ Returns `Promise<OwnerCall>`.
 
 Builds the call payload to point this contract's proxy at a new implementation. Hand the result to `protocolAdmin.proposer.schedule`.
 
+:::warning
 This contract holds every fiat user's unclaimed purchase history and it has no other copy. Check the new implementation's storage layout carefully before scheduling. There is no undo.
+:::
 
 ```ts
 const call = await admin.lazyWalletRegistry.upgradeCall(newImplementation);
 const scheduled = await admin.protocolAdmin.proposer.schedule(call);
 ```
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| newImplementation | `Address` | The new implementation contract |
+| data | `Hex`, optional | Calldata to run on the new implementation as part of the upgrade |
 
 Returns `Promise<OwnerCall>`.

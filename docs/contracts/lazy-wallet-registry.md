@@ -5,21 +5,42 @@ description: Where a Kokio purchase is recorded when the buyer paid by card and 
 
 # Lazy wallet registry {#lazy-wallet-registry}
 
+How a card purchase is recorded before the buyer has a wallet, then copied onto one.
+
+---
+
 `LazyWalletRegistry` solves an ordering problem Kokio has with every card payment. Someone buys an eSIM with a card, on a phone that has never touched a blockchain, and the purchase has to be recorded before there is anything to record it on. This contract holds that history until wallets exist, then deploys them and copies the record across.
 
-Everything here is keyed by string identifiers rather than by addresses, because a user in this state has no address yet. A device identifier stands in for the phone and an eSIM identifier for the eSIM, and the [Registry](./registry.md) resolves both to real wallets once `deployLazyWalletAndSetESIMIdentifier` has run. From that point the user's purchases live on their own [eSIM wallet](./esim-wallet.md) and this contract is out of the path.
+Everything here is keyed by string identifiers rather than by addresses, because a user in this state has no address yet:
+
+- A **device identifier** stands in for the phone.
+- An **eSIM identifier** stands in for the eSIM.
+
+The [Registry](./registry.md) resolves both to real wallets once `deployLazyWalletAndSetESIMIdentifier` has run. From that point the user's purchases live on their own [eSIM wallet](./esim-wallet.md) and this contract is out of the path.
 
 ## Retrying is the normal case {#retrying-is-the-normal-case}
 
-Both the deployment and the history copy are batched, and both keep their own cursor in storage. A dropped transaction is retried by sending the same call again: the cursor says how far the last attempt got, and the work resumes from there rather than starting over or double-writing.
+Both the deployment and the history copy are batched, and both keep their own cursor in storage. A dropped transaction is retried by sending the same call again. The cursor says how far the last attempt got, and the work resumes from there rather than starting over or double-writing.
 
-Each batch loop reverts on its terminal condition rather than returning quietly. That looks unusual, and it is deliberate: it is what lets a backend call the same function in a loop until it stops, without having to track completion separately. `outstandingHistoryEntries` is the read that answers how much is left.
+:::note
+Each batch loop reverts on its terminal condition rather than returning quietly. That lets a backend call the same function in a loop until it stops, without tracking completion separately. `outstandingHistoryEntries` answers how much is left.
+:::
 
-The batch size limits, `MAX_HISTORY_ENTRIES_PER_CALL` and `MAX_ESIM_WALLETS_PER_CALL`, are constants. A call asking for more than the limit is rejected rather than truncated.
+The batch size limits, `MAX_HISTORY_ENTRIES_PER_CALL` and `MAX_ESIM_WALLETS_PER_CALL`, are constants.
+
+:::warning
+A call asking for more than the batch limit is rejected, not truncated.
+:::
 
 ## Who can write here {#who-can-write-here}
 
-Only the eSIM wallet admin. A record in this contract is Kokio's word that a card payment happened, because a card payment leaves no trace a contract can check. That is why the [price ceiling](./registry.md) applies to these purchases too, and why the `Settlement` value stored against each entry says plainly which of the three payment routes was used. The [types](./types.md) page lists them.
+Only the eSIM wallet admin. A record in this contract is Kokio's word that a card payment happened, because a card payment leaves no trace a contract can check.
+
+That is why the `Settlement` value stored against each entry has to name a route paid outside the protocol, and `batchPopulateHistory` reverts with `SettlementNotAsserted` otherwise. The [types](./types.md) page lists the routes.
+
+:::note
+The [price ceiling](./registry.md) does not apply to this history. It records past payments, and no charge happens when it is copied onto a wallet.
+:::
 
 `LazyWalletRegistry` is a UUPS proxy owned by [`ProtocolAdmin`](./protocol-admin.md). Its address is on the [Base mainnet](../deployments/base.md) and [Base Sepolia](../deployments/base-sepolia.md) pages.
 

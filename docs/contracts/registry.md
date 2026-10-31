@@ -5,16 +5,33 @@ description: The central record of the Kokio wallet suite, holding the admin add
 
 # Registry contract {#registry-contract}
 
-`Registry` is the single source of truth for who is who in the Kokio [wallet suite](./overview.md), and the switchboard every wallet reads before it does anything guarded. It holds the admin address, the vault that receives payments, the pause flag and the defaults for each eSIM wallet's price ceiling and admin allowance, and it keeps the record of which [device wallets](./device-wallet.md) and [eSIM wallets](./esim-wallet.md) were deployed by the protocol rather than by someone imitating it.
+The central record of the suite: the admin, the vault, the pause switch, the default limits, and which wallets are real.
 
-One place, not several, and that is the point. Device wallets and eSIM wallets are beacon proxies tracked by mappings with no enumerable list, so there is no way to write a new value into each of them one by one. Every wallet reads this contract on its guarded paths instead, which means rotating the admin key or raising the pause reaches all of them in the same transaction.
+---
+
+`Registry` is the single source of truth for who is who in the Kokio [wallet suite](./overview.md). Every wallet reads it before it does anything guarded.
+
+It holds:
+
+- the admin address
+- the vault that receives payments
+- the pause flag
+- the defaults for each eSIM wallet's price ceiling and admin allowance
+- the record of which [device wallets](./device-wallet.md) and [eSIM wallets](./esim-wallet.md) the protocol deployed, as opposed to someone imitating it
+
+One place, not several, and that is the point. Device wallets and eSIM wallets are beacon proxies tracked by mappings with no enumerable list, so there is no way to write a new value into each of them one by one. Every wallet reads this contract on its guarded paths instead, so rotating the admin key or raising the pause reaches all of them in the same transaction.
 
 ## What it decides {#what-it-decides}
 
-- **Who the admin is.** `adminOfRecord` is the address on the books. Read `eSIMWalletAdmin()` rather than that field to find out who may currently act: a suspended admin keeps its entry so the suspension can be lifted without anyone having to remember the address.
+- **Who the admin is.** `adminOfRecord` is the address on the books. A suspended admin keeps its entry, so the suspension can be lifted without anyone having to remember the address.
+
+  :::warning
+  To find out who may act right now, read `eSIMWalletAdmin()`, not `adminOfRecord`.
+  :::
+
 - **Whether the protocol is paused.** `pause()` accepts the admin or the owner. The owner route is what lets a [guardian](./protocol-admin.md) pause through the timelock while the admin key is suspended. Releasing it is owner only, and a guardian can do that without waiting out the delay.
-- **What a purchase may cost.** `defaultPriceCapUSDCents` is the ceiling a new eSIM wallet starts with. A user can lower their own wallet's cap; nobody can raise it for them.
-- **What the admin may charge in total.** `defaultAdminAllowanceUSDCents` is the total the admin may charge a new [eSIM wallet](./esim-wallet.md#what-the-admin-can-and-cannot-do), set at `initialize` and changed by the owner. Wallets that already exist keep their own figure.
+- **What a purchase may cost.** `defaultPriceCapUSDCents` is the ceiling a new eSIM wallet starts with, set by the owner and never zero. The owning device wallet can set its own wallet's cap to any figure, and the admin cannot change it.
+- **What the admin may charge in total.** `defaultAdminAllowanceUSDCents` is the total the admin may charge a new [eSIM wallet](./esim-wallet.md#what-the-admin-can-and-cannot-do), set at `initialize` and changed by the owner. It is zero on Base mainnet, so a new wallet allows no admin charges until its owner sets an allowance. Wallets that already exist keep their own figure, and a wallet that moves to another device takes the default again.
 - **Which wallets count.** `isDeviceWalletValid` and `isESIMWalletValid` answer for anything deployed through the two factories. A wallet deployed outside the suite is not in these mappings and every guarded path rejects it. When a device wallet registers a new owner key, the registry reads the key back from the wallet and refuses one the wallet does not hold (`OwnerKeyNotHeldByWallet`), so no wallet can claim someone else's key first.
 - **Which eSIM identifiers are spoken for.** An identifier reserved for a fiat user's lazy batch cannot be handed out through `assignESIMIdentifier`. Only the [lazy wallet registry](./lazy-wallet-registry.md) can claim it, through its own path.
 - **Payment references.** `usedPaymentReferences` records which offchain order ids have been spent, so a purchase call that is retried after it already landed cannot charge the user twice. It is keyed by the wallet and the reference together, so one wallet cannot burn a reference another wallet is about to use. This lives here rather than on the [payment adapter](./payment-adapter.md) so that rotating the adapter does not reset it.

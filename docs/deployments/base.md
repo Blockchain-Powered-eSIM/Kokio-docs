@@ -5,7 +5,15 @@ description: The Kokio contract addresses on Base mainnet, chain 8453, with the 
 
 # Base mainnet {#base-mainnet}
 
-The live Kokio deployment. Real funds move through these addresses. The testnet is on the [Base Sepolia](./base-sepolia.md) page.
+Kokio contract addresses, currencies and limits on Base mainnet.
+
+---
+
+The live Kokio deployment. The testnet is on the [Base Sepolia](./base-sepolia.md) page.
+
+:::warning
+Real funds move through these addresses.
+:::
 
 | | |
 |---|---|
@@ -49,10 +57,10 @@ Device and eSIM wallets have one address per device and per eSIM, so none is lis
 | | |
 |---|---|
 | Price cap a new eSIM wallet starts with | 25000 US cents, \$250.00 per purchase |
-| Admin allowance a new eSIM wallet starts with | 2500 US cents, \$25.00 in total |
+| Admin allowance a new eSIM wallet starts with | 0. The admin cannot charge a new eSIM wallet until its owner sets an allowance |
 | Delay on every owner change | 2 days, floor 1 day |
 
-A user can lower their own wallet's price cap and set their own admin allowance. Every proxy and both beacons are owned, directly or through a factory, by ProtocolAdmin, so an upgrade or a settings change waits out the delay.
+A user can set their own wallet's price cap and admin allowance. Every proxy and both beacons are owned, directly or through a factory, by ProtocolAdmin, so an upgrade or a settings change waits out the delay.
 
 ## Checking an address {#checking-an-address}
 
@@ -64,4 +72,6 @@ cast code 0x76fB7F8C97457A5a6dF19a7041a66a7f1b3c910c --rpc-url https://mainnet.b
 cast call 0x76fB7F8C97457A5a6dF19a7041a66a7f1b3c910c "owner()(address)" --rpc-url https://mainnet.base.org
 ```
 
+:::warning
 If `owner()` returns anything other than `0x0E664e956aAD2599D17dE2381cc22687a066778B`, this page is out of date.
+:::

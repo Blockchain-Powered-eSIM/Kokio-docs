@@ -5,13 +5,22 @@ description: The eighteen contracts behind Kokio, what each one does, which prox
 
 # The Kokio wallet suite {#the-kokio-wallet-suite}
 
+The eighteen contracts behind Kokio, how a purchase moves through them, and the terms the reference uses.
+
+---
+
 Kokio's onchain half is a suite of eighteen Solidity units that deploy and manage eSIM data. A user buys a data bundle, the purchase is recorded onchain, and the wallet holding that record is theirs rather than the operator's. The same wallet works as an everyday hot wallet, so the eSIM and the money that pays for it live in one place.
 
-Two ideas hold the design together. Every user gets a wallet per phone and a wallet per eSIM, so an eSIM can be moved between devices without moving anything else. And the wallets are ERC-4337 smart accounts owned by a passkey in the phone's secure enclave, so there is no seed phrase to write down and nothing for Kokio to hold on the user's behalf.
+Two ideas hold the design together:
+
+- **A wallet per phone and a wallet per eSIM.** An eSIM can be moved between devices without moving anything else.
+- **Passkey-owned smart accounts.** The wallets are ERC-4337 accounts owned by a passkey in the phone's secure enclave, so there is no seed phrase to write down and nothing for Kokio to hold on the user's behalf.
 
 The suite is live on [Base mainnet](../deployments/base.md), with a testnet copy on [Base Sepolia](../deployments/base-sepolia.md).
 
 ## What each contract does {#what-each-contract-does}
+
+![Architecture of the Kokio contract suite on Base. The Kokio app signs user operations with a passkey and sends them through the Pimlico bundler to EntryPoint v0.8, which validates and runs them on the device wallet. The Kokio backend holds the eSIM wallet admin key and calls the lazy wallet registry, the device wallet factory, the registry and the device wallet. The ProtocolAdmin timelock, driven by a proposer Safe and a guardian Safe, owns the five UUPS contracts: Registry, LazyWalletRegistry, DeviceWalletFactory, ESIMWalletFactory and PaymentAdapter. Each device wallet owns its eSIM wallets, P256Verifier checks every passkey signature, and the payment adapter sends spent tokens to the vault Safe.](../../resources/contract-architecture.png)
 
 | Contract | What it does | Pattern |
 |---|---|---|
@@ -40,18 +49,30 @@ The two beacons the factories own are OpenZeppelin's [`UpgradeableBeacon`](https
 3. To buy a data bundle, the eSIM wallet asks [`PaymentAdapter`](./payment-adapter.md) what the price in US cents comes to in the currency being paid, sends that amount, and the adapter pays the vault and refunds the difference.
 4. The purchase is written into the eSIM wallet's own history, so the record belongs to the user rather than to a provider's database.
 
+:::note
 A user who pays by card has no wallet at the moment of purchase. That path runs through the [LazyWalletRegistry](./lazy-wallet-registry.md) instead, which holds the history against a device identifier until wallets are deployed and the record is copied onto them.
+:::
 
 ## Smart contract wallets, and what self-custodial means here {#self-custodial}
 
 A smart contract wallet for an eSIM keeps activation, profile switching and payment under rules written in code rather than in a provider's terms of service. Transferring an eSIM, changing a plan or paying for data are all calls anyone can read and nobody can quietly reinterpret.
 
-Self-custodial means the key that authorises those calls is on the user's device and nowhere else. Kokio cannot sign for a user, cannot move their funds and cannot take an eSIM back. What Kokio's admin key can do is narrow and worth naming plainly: it can charge an eSIM wallet for a data bundle, up to a per-purchase ceiling and a running total the user sets, and it can record a purchase made outside the contracts. It cannot raise either limit, and a charge only moves money if the user has also granted that eSIM wallet access to their funds. Every upgrade and every change of the admin key itself runs through the [ProtocolAdmin](./protocol-admin.md) timelock, which means an announcement and a two day wait before anything moves.
+**Self-custodial** means the key that authorises those calls is on the user's device and nowhere else. Kokio cannot sign for a user, and cannot move an eSIM wallet to another device.
+
+What Kokio's admin key can do is narrow:
+
+| The admin key can | The admin key cannot |
+|---|---|
+| Charge an eSIM wallet for a data bundle, within its price cap and its admin allowance. The payment goes to the vault. On Base mainnet a new eSIM wallet's allowance starts at zero, so the user has to set one first | Raise the price cap or the admin allowance. Only the owning device wallet sets them |
+| Record a purchase made outside the contracts, within the price cap | Pull a charge's shortfall from the device wallet, unless the device wallet has granted that eSIM wallet access to its funds |
+
+Every upgrade, and every replacement of the admin key, runs through the [ProtocolAdmin](./protocol-admin.md) timelock: an announcement, then a two day wait before anything moves.
 
 ## Terms used in this reference {#terms}
 
 Kokio's product glossary is at [kokio.app/glossary](https://kokio.app/glossary). These are the terms specific to this suite:
 
+- **Kokio wallet.** The name the Kokio app and its marketing use for the [device wallet](./device-wallet.md). They are the same contract. These docs say "device wallet" throughout, so it is never confused with the [eSIM wallet](./esim-wallet.md).
 - **Beacon proxy.** Many wallets, one shared pointer to the code they run. Upgrading the beacon moves every wallet at once, and there is no per-wallet opt-out. Both wallet types work this way, which is what makes an upgrade a governance question rather than a deployment detail.
 - **UUPS proxy.** A single contract whose upgrade logic lives in the implementation rather than in the proxy. The five singletons use it, and `ProtocolAdmin` owns them all.
 - **CREATE2.** Deploying to an address computed from the deployer, a salt and the code, rather than from a transaction counter. It is why a device wallet's address is known before it exists.

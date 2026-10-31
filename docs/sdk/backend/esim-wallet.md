@@ -5,13 +5,19 @@ description: admin.eSIMWallet buys a data bundle for one Kokio eSIM as the admin
 
 # eSIM wallet (backend) {#esim-wallet-backend}
 
+Reference for `admin.eSIMWallet` and `admin.eSIMWalletFactory`: buy for a user from the admin key, and manage the eSIM wallet factory.
+
+---
+
 `admin.eSIMWallet`
 
 The EOA-signed view of one Kokio eSIM wallet, the contract holding a single eSIM's purchase history and price cap. The contract is documented at [eSIM wallet](../../contracts/esim-wallet.md).
 
+:::note
 Only present once bound with `admin.setESIMWalletAddress(address)`. See [backend setup](./setup.md).
+:::
 
-```ts
+```ts title="Quote, then buy"
 admin.setESIMWalletAddress(eSIMWalletAddress);
 const asset = "0x5553444300000000000000000000000000000000000000000000000000000000"; // "USDC" as bytes32
 const maxAmountIn = await admin.paymentAdapter.quote(asset, 500n);
@@ -27,22 +33,33 @@ Prices are whole US cents as a `bigint` and a currency is named by a `bytes32`. 
 
 ## buyDataBundleWithToken {#buydatabundlewithtoken}
 
-Buys a data bundle for this eSIM as the admin, rather than as the eSIM's own device wallet. Use it when the backend is triggering a purchase on the user's behalf and the device wallet's own token balance pays for it.
+Buys a data bundle for this eSIM as the admin, rather than as the eSIM's own device wallet. Use it when the backend is triggering a purchase on the user's behalf and tokens pay for it. The eSIM wallet's own balance is spent first, and a shortfall is pulled from the device wallet if it has granted this eSIM wallet access to its funds.
 
-Read [`admin.paymentAdapter.quote(asset, priceUSDCents)`](./payments.md#quote) first to size `maxAmountIn`, the most of `asset` this purchase may spend, in its smallest unit. `paymentReference` is a backend-issued id, spendable once per eSIM wallet.
-
+:::note
 For a purchase that was paid for outside the protocol, on a card or through another wallet, use [`registry.recordSettledPurchase`](./registry.md) instead. This call moves tokens and only makes sense when tokens are what paid.
+:::
 
 ```ts
 const hash = await admin.eSIMWallet!.buyDataBundleWithToken(
-  { id: bundleId, priceUSDCents: 500n, settlement: 0 }, // 0 = the device wallet pays
+  { id: bundleId, priceUSDCents: 500n, settlement: 0 },
   asset,
   maxAmountIn,
   paymentReference,
 );
 ```
 
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| dataBundleDetails | `DataBundleDetails` | `id` (`bytes32`), `priceUSDCents` (`bigint`, whole US cents) and `settlement` (`0` when the device wallet pays). See [types](../../contracts/types.md#databundledetails-explained) |
+| asset | `Hex` | The currency as a `bytes32` symbol, such as `USDC` |
+| maxAmountIn | `bigint` | The most of `asset` this purchase may spend, in its smallest unit. Take it from [`admin.paymentAdapter.quote(asset, priceUSDCents)`](./payments.md#quote) |
+| paymentReference | `Hex` | A backend-issued `bytes32` id, spendable once per eSIM wallet |
+
+:::warning
 Each admin purchase spends the wallet's admin allowance, which only the user can raise. When the price is above what is left, this throws `AdminAllowanceExceededError` (with `priceUSDCents` and `remainingUSDCents`) and sends nothing. Ask the user to raise the allowance in the app, then retry.
+
+On Base mainnet a new eSIM wallet's allowance starts at zero, so this throws for every new wallet until the user sets one.
+:::
 
 Returns `Promise<Hash>`.
 
@@ -98,7 +115,11 @@ Returns `Promise<Address>`.
 
 ## priceCapUSDCents {#pricecapusdcents}
 
-Reads the price ceiling stored on this wallet directly, in US cents. Unlike the [mobile surface's version](../mobile/esim-wallet.md#pricecapusdcents), this does not fall back to the registry's default when the wallet has none of its own. It returns whatever this wallet's own storage holds.
+Reads the price ceiling stored on this wallet directly, in US cents.
+
+:::warning
+Unlike the [mobile surface's version](../mobile/esim-wallet.md#pricecapusdcents), this does not fall back to the registry's default when the wallet has none of its own. It returns whatever this wallet's own storage holds.
+:::
 
 ```ts
 const cap = await admin.eSIMWallet!.priceCapUSDCents();
@@ -124,17 +145,27 @@ Reads one past purchase by its position in the list.
 const purchase = await admin.eSIMWallet!.transactionHistory(0n);
 ```
 
-Returns `Promise<DataBundleDetails>`, shaped `{ id, priceUSDCents, settlement }`. `settlement` names which contract, if any, saw the money move: `0` for the device wallet's own balance, `1` for an external wallet, `2` for fiat. Only `0` is provable onchain.
+Returns `Promise<DataBundleDetails>`, shaped `{ id, priceUSDCents, settlement }`. `settlement` names which contract, if any, saw the money move:
+
+| Value | Paid from | Provable onchain |
+|---|---|---|
+| `0` | The device wallet's own balance | Yes |
+| `1` | An external wallet | No |
+| `2` | Fiat | No |
 
 ## Factory settings {#esim-wallet-factory}
 
 `admin.eSIMWalletFactory`
 
-Admin-only settings on the factory that deploys eSIM wallets. Deploying one is not exposed here: that call is restricted to the registry, the device wallet factory, or the owning device wallet, so it always reverts from a bare admin EOA. Use [`kokio.eSIMWalletFactory`](../mobile/esim-wallet.md#esim-wallet-factory) for actual deploys. The contract is documented at [eSIM wallet factory](../../contracts/esim-wallet-factory.md).
+Admin-only settings on the factory that deploys eSIM wallets. The contract is documented at [eSIM wallet factory](../../contracts/esim-wallet-factory.md).
+
+:::note
+Deploying an eSIM wallet is not exposed here. That call is restricted to the registry, the device wallet factory, or the owning device wallet, so it always reverts from a bare admin EOA. Use [`kokio.eSIMWalletFactory`](../mobile/esim-wallet.md#esim-wallet-factory) for actual deploys.
+:::
 
 ### addRegistryAddress {#addregistryaddress}
 
-One-time setup call that wires the registry address into the eSIM wallet factory. Run once, as part of initial deployment.
+Owner only. One-time setup call that wires the registry address into the eSIM wallet factory. Run once, as part of initial deployment.
 
 ```ts
 const hash = await admin.eSIMWalletFactory.addRegistryAddress(registryAddress);
@@ -144,7 +175,11 @@ Returns `Promise<Hash>`.
 
 ### updateESIMWalletImplementation {#updateesimwalletimplementation}
 
-Points the eSIM wallet beacon at a new implementation contract. This moves every deployed eSIM wallet to the new code at once.
+Owner only. Points the eSIM wallet beacon at a new implementation contract. On the live deployment the owner is the [ProtocolAdmin](./protocol-admin.md) timelock, so a direct call from the admin key reverts.
+
+:::warning
+This moves every deployed eSIM wallet to the new code at once.
+:::
 
 ```ts
 const hash = await admin.eSIMWalletFactory.updateESIMWalletImplementation(newImplementation);
@@ -226,7 +261,9 @@ Returns `Promise<Hash>`.
 
 Builds the call payload to hand ownership of the factory to a new address. On the live deployment the owner is the ProtocolAdmin timelock, so hand the result to `protocolAdmin.proposer.schedule` rather than sending it directly.
 
+:::warning
 Handing over ownership also hands over the eSIM wallet beacon, because the factory owns it.
+:::
 
 ```ts
 const call = await admin.eSIMWalletFactory.transferOwnershipCall(newOwner);
@@ -239,11 +276,18 @@ Returns `Promise<OwnerCall>`.
 
 Builds the call payload to point the factory's own proxy at a new implementation. Hand the result to `protocolAdmin.proposer.schedule`.
 
+:::note
 This does not touch already deployed eSIM wallets. Those move through `updateESIMWalletImplementation` and the beacon instead.
+:::
 
 ```ts
 const call = await admin.eSIMWalletFactory.upgradeCall(newImplementation);
 const scheduled = await admin.protocolAdmin.proposer.schedule(call);
 ```
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| newImplementation | `Address` | The new implementation contract |
+| data | `Hex`, optional | Calldata to run on the new implementation as part of the upgrade |
 
 Returns `Promise<OwnerCall>`.

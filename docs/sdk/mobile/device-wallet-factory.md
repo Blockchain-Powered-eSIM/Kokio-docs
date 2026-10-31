@@ -5,6 +5,10 @@ description: kokio.deviceWalletFactory predicts the address a Kokio device walle
 
 # Device wallet factory (mobile) {#device-wallet-factory-mobile}
 
+Reference for `kokio.deviceWalletFactory`: predict a device wallet's address and check inputs before deploying.
+
+---
+
 `kokio.deviceWalletFactory`
 
 Read-only lookups against the factory that deploys Kokio device wallets, plus one EOA-signed deploy method. The contract behind this surface is documented at [device wallet factory](../../contracts/device-wallet-factory.md).
@@ -17,16 +21,22 @@ const address = await kokio.deviceWalletFactory!.getAddress(deviceUniqueIdentifi
 
 ## createAccountWithEOA {#createaccountwitheoa}
 
-Deploys a device wallet directly from an EOA, instead of through the smart account flow. This needs the `walletClient` passed to `Kokio` to carry a signing account, which the [mobile setup](./setup.md) quick start does not do. Most apps deploy through the backend's [`admin.deviceWalletFactory.createAccount`](../backend/device-wallet-factory.md) instead. Use this method only if the app itself holds a funded EOA.
+Deploys a device wallet directly from an EOA, instead of through the smart account flow. Most apps deploy through the backend's [`admin.deviceWalletFactory.createAccount`](../backend/device-wallet-factory.md) instead. Use this method only if the app itself holds a funded EOA.
+
+:::warning
+This needs the `walletClient` passed to `Kokio` to carry a signing account, which the [mobile setup](./setup.md) quick start does not do.
+:::
 
 ```ts
-const hash = await kokio.deviceWalletFactory!.createAccountWithEOA(
-  deviceUniqueIdentifier,
-  ownerKey,
-  salt,
-  depositAmount,
-);
+const hash = await kokio.deviceWalletFactory!.createAccountWithEOA(deviceUniqueIdentifier, ownerKey, salt, depositAmount);
 ```
+
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| deviceUniqueIdentifier | `string` | The id for this device |
+| ownerKey | `P256Key` | The passkey's P-256 public key, as `[x, y]` hex |
+| salt | `bigint` | Makes the address unique per user |
+| depositAmount | `bigint` | ETH sent with the deploy, in wei |
 
 Returns `Promise<Hash>`, a transaction hash. This is a direct EOA transaction, not a user operation.
 
@@ -38,21 +48,36 @@ Works out the address a device wallet will deploy to for a given identifier, own
 const address = await kokio.deviceWalletFactory!.getAddress(deviceUniqueIdentifier, ownerKey, salt);
 ```
 
+Takes the same `deviceUniqueIdentifier`, `ownerKey` and `salt` as [`createAccountWithEOA`](#createaccountwitheoa).
+
 Returns `Promise<Address>`.
 
 ## preCreateAccountValidation {#precreateaccountvalidation}
 
-Checks whether a device identifier or owner key is already taken, before deploying. Call this before any deploy. Once a user operation reaches the chain the factory cannot see the registry from inside EntryPoint validation, so a taken identifier deploys a second, orphaned wallet instead of failing cleanly.
+Checks whether a device identifier or owner key is already taken, before deploying.
+
+:::warning
+Call this before any deploy. Once a user operation reaches the chain, the factory cannot see the registry from inside EntryPoint validation, so a taken identifier deploys a second, orphaned wallet instead of failing cleanly.
+:::
 
 ```ts
 const holder = await kokio.deviceWalletFactory!.preCreateAccountValidation(deviceUniqueIdentifier, ownerKey);
 ```
 
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| deviceUniqueIdentifier | `string` | The device id to check |
+| ownerKey | `P256Key` | The owner key to check |
+
 Returns `Promise<Address>`, the zero address when both are free, or the wallet already holding one of them.
 
 ## deviceWalletInfoAdded {#devicewalletinfoadded}
 
-Checks whether the factory has finished registering a device wallet. This flips to `true` only after the backend calls `postCreateAccount`, so a wallet the app just deployed reads `false` until the backend catches up.
+Checks whether the factory has finished registering a device wallet.
+
+:::note
+This flips to `true` only after the backend calls `postCreateAccount`, so a wallet the app just deployed reads `false` until the backend catches up.
+:::
 
 ```ts
 const registered = await kokio.deviceWalletFactory!.deviceWalletInfoAdded(deviceWalletAddress);
