@@ -57,7 +57,7 @@ Device and eSIM wallets have one address per device and per eSIM, so none is lis
 | | |
 |---|---|
 | Price cap a new eSIM wallet starts with | 25000 US cents, \$250.00 per purchase |
-| Admin allowance a new eSIM wallet starts with | 2500 US cents, \$25.00 in total |
+| Admin allowance a new eSIM wallet starts with | 0. The admin cannot charge a new eSIM wallet until its owner sets an allowance |
 | Delay on every owner change | 2 days, floor 1 day |
 
 A user can set their own wallet's price cap and admin allowance. Every proxy and both beacons are owned, directly or through a factory, by ProtocolAdmin, so an upgrade or a settings change waits out the delay.

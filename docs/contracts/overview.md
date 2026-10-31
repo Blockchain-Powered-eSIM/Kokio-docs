@@ -61,7 +61,7 @@ What Kokio's admin key can do is narrow:
 
 | The admin key can | The admin key cannot |
 |---|---|
-| Charge an eSIM wallet for a data bundle, within its price cap and its admin allowance. The payment goes to the vault | Raise the price cap or the admin allowance. Only the owning device wallet sets them |
+| Charge an eSIM wallet for a data bundle, within its price cap and its admin allowance. The payment goes to the vault. On Base mainnet a new eSIM wallet's allowance starts at zero, so the user has to set one first | Raise the price cap or the admin allowance. Only the owning device wallet sets them |
 | Record a purchase made outside the contracts, within the price cap | Pull a charge's shortfall from the device wallet, unless the device wallet has granted that eSIM wallet access to its funds |
 
 Every upgrade, and every replacement of the admin key, runs through the [ProtocolAdmin](./protocol-admin.md) timelock: an announcement, then a two day wait before anything moves.

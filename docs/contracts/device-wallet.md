@@ -42,7 +42,7 @@ A lost phone is not a lost wallet. The passkey can be restored from the platform
 This is one of the settings that limits what Kokio's admin can charge for. An admin purchase against an eSIM wallet goes through only if:
 
 1. The price is under the eSIM wallet's [ceiling](./esim-wallet.md).
-2. The eSIM wallet's [admin allowance](./esim-wallet.md#what-the-admin-can-and-cannot-do) still covers it.
+2. The eSIM wallet's [admin allowance](./esim-wallet.md#what-the-admin-can-and-cannot-do) still covers it. On Base mainnet a new eSIM wallet's allowance starts at zero.
 
 The purchase spends the eSIM wallet's own token balance first. Only a shortfall is pulled from this device wallet, and only if this device wallet has granted that eSIM wallet access.
 

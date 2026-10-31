@@ -160,7 +160,7 @@ Returns `Promise<bigint>`.
 
 ## defaultAdminAllowanceUSDCents {#defaultadminallowanceusdcents}
 
-Reads what the admin key may charge a newly created eSIM wallet in total, in US cents. It is 2500 (\$25.00) on Base mainnet and 10000 (\$100.00) on Base Sepolia. Existing wallets keep their own figure when this changes.
+Reads what the admin key may charge a newly created eSIM wallet in total, in US cents. It is 0 on Base mainnet, so the admin cannot charge a new wallet until the user sets an allowance, and 10000 (\$100.00) on Base Sepolia. Existing wallets keep their own figure when this changes.
 
 ```ts
 const allowance = await kokio.registry!.defaultAdminAllowanceUSDCents();

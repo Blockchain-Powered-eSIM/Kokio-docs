@@ -19,7 +19,7 @@ Read this before wiring the key in. The admin key:
 
 - Deploys wallets on users' behalf
 - Records purchases that were paid for outside the protocol
-- Buys data bundles for users, within each eSIM wallet's price cap and admin allowance
+- Buys data bundles for users, within each eSIM wallet's price cap and admin allowance. On Base mainnet a new eSIM wallet's allowance starts at zero, so the user has to set one first
 
 `recordSettledPurchase` in particular writes a purchase into a user's history on the backend's word alone, because a card payment leaves no onchain proof. Nothing in the contracts distinguishes a correct record from an invented one.
 

@@ -33,7 +33,7 @@ The **admin allowance** stops the admin key repeating charges under the cap unti
 - Every admin charge spends it, and nothing refills it.
 - A charge above what is left reverts with `AdminAllowanceExceeded`.
 - Setting it replaces what is left rather than adding to it, and zero stops admin charges altogether.
-- A new wallet starts on the registry's `defaultAdminAllowanceUSDCents`.
+- A new wallet starts on the registry's `defaultAdminAllowanceUSDCents`. On Base mainnet that is zero, so the admin cannot charge a new wallet until its owner sets an allowance. Each network's figure is on its [deployment page](../deployments/base.md#limits).
 - Purchases the user signs through their own device wallet never touch it.
 
 A purchase spends this wallet's own token balance first. A shortfall is pulled from the device wallet, which needs the device wallet to have granted this wallet access to its funds.

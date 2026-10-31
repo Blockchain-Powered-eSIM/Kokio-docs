@@ -111,7 +111,7 @@ Sets the total the Kokio backend (the admin key) may charge this eSIM wallet, in
 The new figure replaces what is left rather than adding to it. `0n` stops admin purchases entirely.
 :::
 
-A new eSIM wallet starts at the registry default, and so does a wallet that moves to another device wallet.
+A new eSIM wallet starts at the registry default, and so does a wallet that moves to another device wallet. On Base mainnet that default is zero, so the backend cannot buy for a user until this has been called.
 
 ```ts
 const hash = await kokio.eSIMWallet!.setAdminAllowanceUSDCents(5_000n); // \$50.00

@@ -57,6 +57,8 @@ const hash = await admin.eSIMWallet!.buyDataBundleWithToken(
 
 :::warning
 Each admin purchase spends the wallet's admin allowance, which only the user can raise. When the price is above what is left, this throws `AdminAllowanceExceededError` (with `priceUSDCents` and `remainingUSDCents`) and sends nothing. Ask the user to raise the allowance in the app, then retry.
+
+On Base mainnet a new eSIM wallet's allowance starts at zero, so this throws for every new wallet until the user sets one.
 :::
 
 Returns `Promise<Hash>`.
